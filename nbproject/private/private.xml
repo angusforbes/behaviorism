@@ -45,34 +45,4 @@
             <line>306</line>
         </file>
     </editor-bookmarks>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/BehaviorismDriver.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviors/BehaviorContinuous.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviors/geom/continuous/BehaviorGeomContinuous.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviors/geom/continuous/BehaviorTranslate.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/Geom.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/GeomCircle.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/GeomPoly.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/GeomRect.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/glu/GeomGluNurbsCurve.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/glut/GeomGlutSphere.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/text/GeomGlyph.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/text/GeomSimpleText.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/text/GeomText.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/text/GeomText2.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/text/GeomTextFlowForcedFontSize.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/geometry/text/GeomTextOutset.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/handlers/FontHandler.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/handlers/KeyboardHandler.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/handlers/MouseHandler.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/renderers/Cam.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/renderers/CamBasic.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/renderers/RendererJogl.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/renderers/State.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/renderers/VizGeom.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/utils/GeomUtils.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/utils/MatrixUtils.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/utils/Utils.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/worlds/WorldGeom.java</file>
-    </open-files>
 </project-private>
