@@ -894,7 +894,13 @@ public abstract class Geom //extends Point3f //Object
   public void clickAction(MouseEvent e)
   {
     //System.out.println("Geom superclass clickAction : I shouldn't be here... i should be with my children!");
-    System.out.println("you clicked a " + getClass());
+    //System.out.println("you clicked a " + getClass());
+  }
+
+  public void dragAction(MouseEvent e)
+  {
+    //System.out.println("Geom superclass clickAction : I shouldn't be here... i should be with my children!");
+    //System.out.println("you dragged a " + getClass());
   }
 
   public void doubleClickAction(MouseEvent e)
@@ -910,6 +916,15 @@ public abstract class Geom //extends Point3f //Object
   public void mouseOverAction(MouseEvent e)
   {
     //System.out.println("Geom superclass releaseAction : I shouldn't be here... i should be with my children!");
+  }
+
+
+  public final void handleDrag(MouseEvent e)
+  {
+    if (draggableObject != null)
+    {
+      draggableObject.dragAction(e);
+    }
   }
 
   public final void handleClick(MouseEvent e)

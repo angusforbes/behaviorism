@@ -359,6 +359,11 @@ public class GeomRect extends Geom
   }
 
 
+  public Point3f getCenterAnchor()
+  {
+    return new Point3f(anchor.x + w * .5f, anchor.y + h * .5f, anchor.z + d * .5f);
+  }
+
   public Point3f getCenter()
   {
     return new Point3f(w * .5f, h * .5f, d * .5f);

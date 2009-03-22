@@ -192,7 +192,25 @@ public class Utils
     return new Point3f(randomFloat(minx, maxx), randomFloat(miny, maxy), 0f);
   }
   
-	
+ public static Point3f randomPoint3f()
+  {
+    return new Point3f(randomFloat(-1f, 1f), randomFloat(-1f, 1f), 0f);
+  }
+
+ public static Point3f randomPoint3f(float rangeX, float rangeY)
+  {
+    return new Point3f(randomFloat(-rangeX, rangeX), randomFloat(-rangeY, rangeY), 0f);
+  }
+
+ public static Point3f randomPoint3f(float rangeX, float rangeY, float rangeZ)
+  {
+    return new Point3f(randomFloat(-rangeX, rangeX), randomFloat(-rangeY, rangeY), randomFloat(-rangeZ, rangeZ));
+  }
+ 
+ public static Point3f randomPoint3f(float range)
+  {
+    return new Point3f(randomFloat(-range, range), randomFloat(-range, range), 0f);
+  }
   /**
 	 * creates a random Point3f between the specified x, y, and z values.
 	 * @param minx

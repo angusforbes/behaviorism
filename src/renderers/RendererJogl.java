@@ -14,6 +14,8 @@ import geometry.GeomRect;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.*;
 import com.sun.opengl.util.*;
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureIO;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
@@ -22,10 +24,17 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import handlers.FontHandler;
 import java.awt.Point;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import shaders.FragmentShader;
+import shaders.Program;
+import shaders.VertexShader;
 import utils.GeomUtils;
 import utils.MatrixUtils;
 import utils.Utils;
@@ -46,6 +55,7 @@ public class RendererJogl implements GLEventListener
   public TessellationCallBack tessellationCallback = null;
   public GLUtessellator tessellationObject = null;
   public GLUnurbs nurbsRenderer = null;
+  public GLUquadric quadricRenderer = null;
   /** Automatically initialized to a default {@link soi3.CamBasic} unless set explicitly by the World */
   public Cam cam = null;
   private FontHandler fontHandler = FontHandler.getInstance();
@@ -117,10 +127,11 @@ public class RendererJogl implements GLEventListener
   { 
     return this.cam;
   }
+
   @Override
   public void init(GLAutoDrawable drawable)
   {
-
+   
     //init worldBoundaryPoints with 4 blank points...
     worldBoundaryPoints = new ArrayList<GeomPoint>();
     Utils.addTo(worldBoundaryPoints, new GeomPoint(), new GeomPoint(), new GeomPoint(), new GeomPoint());
@@ -131,6 +142,10 @@ public class RendererJogl implements GLEventListener
     glDrawable.setGL(new DebugGL(gl));
     glu = new GLU();
     glut = new GLUT();
+
+    //print out version info..
+    System.out.println("GLSL version = " + gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION));
+
 
     gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);                    // Black Background
     //gl.glEnable(gl.GL_LIGHT0);					// Enable Default Light (Quick And Dirty)	( NEW )
@@ -168,6 +183,9 @@ public class RendererJogl implements GLEventListener
 
     //set up global nurbs renderer
     nurbsRenderer = glu.gluNewNurbsRenderer();
+
+    quadricRenderer = glu.gluNewQuadric();
+
     //Utils.sleep(1000);
 
     // 0 = do *not* synch with refresh rate (ie fast as possible), 1 = synch with refresh rate (ie always 60fps)
@@ -180,8 +198,155 @@ public class RendererJogl implements GLEventListener
     //animator.setRunAsFastAsPossible(false);
 
     animator.start();
-    System.out.println("ok");
+    
+
   }
+
+  float zoomval = 1f;
+  int z_var, xc_var, yc_var;
+  float xcval, ycval;
+  int textureID = -1;
+
+  public void
+drawBox(float size)
+{
+  float n[][] = new float[][] {
+    {-1.0f, 0.0f, 0.0f},
+    {0.0f, 1.0f, 0.0f},
+    {1.0f, 0.0f, 0.0f},
+    {0.0f, -1.0f, 0.0f},
+    {0.0f, 0.0f, 1.0f},
+    {0.0f, 0.0f, -1.0f}
+  };
+
+  int faces[][] = new int[][]
+  {
+    {0, 1, 2, 3},
+    {3, 2, 6, 7},
+    {7, 6, 5, 4},
+    {4, 5, 1, 0},
+    {5, 6, 2, 1},
+    {7, 4, 0, 3}
+  };
+
+  float v[][] = new float[8][3];
+  int i;
+
+  v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+  v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
+  v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+  v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
+  v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+  v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
+
+  for (i = 5; i >= 0; i--) {
+    gl.glBegin(GL.GL_QUADS);
+    gl.glNormal3fv(n[i], 0);
+    gl.glVertex3fv(v[faces[i][0]], 0);
+    gl.glVertex3fv(v[faces[i][1]], 0);
+    gl.glVertex3fv(v[faces[i][2]], 0);
+    gl.glVertex3fv(v[faces[i][3]], 0);
+    gl.glEnd();
+  }
+}
+  //testing the loading of shader
+  private int loadAndCompileShader(GL gl, int type, File location) throws IOException
+    {
+        BufferedReader reader = null;
+        try
+        {
+            //reader = new BufferedReader(new InputStreamReader(location.openStream()));
+            reader = new BufferedReader(new FileReader(location));
+            ArrayList lineList = new ArrayList(100);
+            for (String line = reader.readLine(); line != null; line = reader.readLine())
+            {
+                lineList.add(line + "\n");
+            }
+            String[] lines = (String[]) lineList.toArray(new String[lineList.size()]);
+            int[] lengths = new int[lines.length];
+            for (int i = 0; i < lines.length; i++)
+            {
+                lengths[i] = lines[i].length();
+            }
+            int shader = gl.glCreateShader(type);
+            gl.glShaderSourceARB(shader, lines.length, lines, lengths, 0);
+
+            gl.glCompileShaderARB(shader);
+
+            // Check for compile errors
+            String errors = null;
+		if ((errors = getGLErrorLog(gl, shader)) != null)
+			throw new RuntimeException("Compile error\n" + errors);
+
+            //String error = getGLErrorLog(gl, shader);
+            String error = "some error...";
+
+            int[] compileStatus = {0};
+            gl.glGetObjectParameterivARB(shader, GL.GL_OBJECT_COMPILE_STATUS_ARB, compileStatus, 0);
+            if (compileStatus[0] == 0)
+            {
+              throw new IllegalArgumentException("Shader could not be compiled! " + (error == null ? "" : error));
+            }
+            return shader;
+        }
+        finally
+        {
+            if (reader != null) try{ reader.close(); } catch(Exception ignoreSunsInsanity){}
+        }
+    }
+
+  // Checks for arbitrary GL errors. Could also be accomplished by enabling the DebugGL pipeline
+	private String getGLError(GL gl)
+	{
+		boolean hasError = false;
+		String message = "";
+		for (int glErr = gl.glGetError(); glErr != GL.GL_NO_ERROR; glErr = gl.glGetError())
+		{
+			message += (hasError ? "\n" : "") + glu.gluErrorString(glErr);
+			hasError = true;
+		}
+		return hasError ? message : null;
+	}
+
+	// Checks the info log for compile/link errors
+	private String getGLErrorLog(GL gl, int obj)
+	{
+		boolean hasError = false;
+		int[] infologLength = {0};
+		int[] charsWritten = {0};
+		byte[] infoLog;
+
+		String message = "";
+		String error = getGLError(gl);
+		if (error != null)
+		{
+			message += error;
+			hasError = true;
+		}
+
+		gl.glGetObjectParameterivARB(obj, GL.GL_OBJECT_INFO_LOG_LENGTH_ARB, infologLength, 0);
+		error = getGLError(gl);
+		if (error != null)
+		{
+			message += (hasError ? "\n" : "") + error;
+			hasError = true;
+		}
+
+		if (infologLength[0] > 1)
+		{
+			infoLog = new byte[infologLength[0]];
+			gl.glGetInfoLogARB(obj, infologLength[0], charsWritten, 0, infoLog, 0);
+			message += (hasError ? "\n" : "") + "InfoLog:\n" + new String(infoLog);
+			hasError = true;
+		}
+		error = getGLError(gl);
+		if (error != null)
+		{
+			message += (hasError ? "\n" : "") + error;
+			hasError = true;
+		}
+		return hasError ? message : null;
+	}
 
   public void loadWorldIdentity()
   {

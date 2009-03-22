@@ -170,6 +170,7 @@ public class MouseHandler extends MouseAdapter
     else if (selectedGeom != null && selectedGeom.draggableObject != null) //drag a Geom
     {
       dragGeom();
+      selectedGeom.handleDrag(null);
     }
   }
 

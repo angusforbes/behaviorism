@@ -165,7 +165,7 @@ public class FontHandler
 
   public synchronized TextRenderer createTextRenderer(Font font, int fontStyle, float fontSize)
   {
-    System.out.println("in createTextRenderer : AAA : fontStyle = " + fontStyle + ", fontSize = " + fontSize);
+    //System.out.println("in createTextRenderer : AAA : fontStyle = " + fontStyle + ", fontSize = " + fontSize);
     boolean useAntialias = true;
     if (fontSize < 18f) //then don't anti-alias!
     {
@@ -263,7 +263,7 @@ public class FontHandler
   public synchronized void nextFont(int fontIndex)
   {
     //fontIndex = 0;
-    System.out.println("in nextFont()");
+    //System.out.println("in nextFont()");
     textRenderers.clear();
     this.fontIndex = fontIndex;
 
@@ -312,7 +312,7 @@ public class FontHandler
     fontsReady.set(true);
     changeFonts.set(false);
 
-    System.out.println("out nextFont()");
+    //System.out.println("out nextFont()");
   }
   /*
   for (FontInfo finfo : Main.fonts)
