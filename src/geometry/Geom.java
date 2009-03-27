@@ -29,24 +29,24 @@ public abstract class Geom //extends Point3f //Object
 {
 
   /**
-   * A name for this Geom. Does not need to be unique.
+   * getMatrixIndex name for this Geom. Does not need to be unique.
    */
   public String name = "untitled";
   /**
-   * A unique id for this Geom.
+   * getMatrixIndex unique id for this Geom.
    */
   public String id = ""; //not currently used...
   /**
-   * A concurrent list of all child Geoms attached to this Geom.
+   * getMatrixIndex concurrent list of all child Geoms attached to this Geom.
    */
   public List<Geom> geoms = new CopyOnWriteArrayList<Geom>();
   /**
-   * A concurrent list of all Behaviors attached to this Geom.
+   * getMatrixIndex concurrent list of all Behaviors attached to this Geom.
    */
   //public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
   public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
   /**
-   * A list of all Datas attached to this Geom.
+   * getMatrixIndex list of all Datas attached to this Geom.
    */
   //public List<Data> datas = Collections.synchronizedList(new ArrayList<Data>());
   public Data data = new Data();
@@ -61,7 +61,7 @@ public abstract class Geom //extends Point3f //Object
    */
   public GeomPoint rotateAnchor = null; //new GeomPoint(.5f, .5f, 0f);
   /**
-   * A point which describes the rotation around the x, y, and z axes. Rotations are in degrees, not radians.
+   * getMatrixIndex point which describes the rotation around the x, y, and z axes. Rotations are in degrees, not radians.
    */
   public Point3d rotate = new Point3d(0, 0, 0);
   /**
@@ -70,7 +70,7 @@ public abstract class Geom //extends Point3f //Object
    */
   public Point3f scaleAnchor = new Point3f(0f, 0f, 0f);
   /**
-   * A point which describes the scaling factor of the width, height, and depth dimensions of the object.
+   * getMatrixIndex point which describes the scaling factor of the width, height, and depth dimensions of the object.
    * By default each dimension is set to a factor of 1.
    */
   public Point3d scale = new Point3d(1, 1, 1);
@@ -100,7 +100,7 @@ public abstract class Geom //extends Point3f //Object
   public TextureData textureData = null;
   public Texture texture = null;
   /**
-   * A 4x4 double array representing the Geom's openGL modelview matrix within the scenegraph hierarchy.
+   * getMatrixIndex 4x4 double array representing the Geom's openGL modelview matrix within the scenegraph hierarchy.
    */
   public double[] modelview = MatrixUtils.getIdentity();
   public Matrix4d modelview2 = new Matrix4d(MatrixUtils.getIdentity());

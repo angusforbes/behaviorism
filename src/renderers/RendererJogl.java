@@ -56,7 +56,6 @@ public class RendererJogl implements GLEventListener
   public GLUtessellator tessellationObject = null;
   public GLUnurbs nurbsRenderer = null;
   public GLUquadric quadricRenderer = null;
-  /** Automatically initialized to a default {@link soi3.CamBasic} unless set explicitly by the World */
   public Cam cam = null;
   private FontHandler fontHandler = FontHandler.getInstance();
   /**
@@ -72,7 +71,8 @@ public class RendererJogl implements GLEventListener
    * viewportBounds holds the current viewport bounds (x, y, w, h)
    */
   public static int viewportBounds[] = new int[4];
-  public static float nearPlane = .001f; //1f
+  //public static float nearPlane = .001f; //1f
+  public static float nearPlane = 1f;
   public static float farPlane = 100f;
   public static double frustum[][] = null;
   public static Rectangle2D.Float screenBounds = null;
@@ -249,51 +249,6 @@ drawBox(float size)
     gl.glEnd();
   }
 }
-  //testing the loading of shader
-  private int loadAndCompileShader(GL gl, int type, File location) throws IOException
-    {
-        BufferedReader reader = null;
-        try
-        {
-            //reader = new BufferedReader(new InputStreamReader(location.openStream()));
-            reader = new BufferedReader(new FileReader(location));
-            ArrayList lineList = new ArrayList(100);
-            for (String line = reader.readLine(); line != null; line = reader.readLine())
-            {
-                lineList.add(line + "\n");
-            }
-            String[] lines = (String[]) lineList.toArray(new String[lineList.size()]);
-            int[] lengths = new int[lines.length];
-            for (int i = 0; i < lines.length; i++)
-            {
-                lengths[i] = lines[i].length();
-            }
-            int shader = gl.glCreateShader(type);
-            gl.glShaderSourceARB(shader, lines.length, lines, lengths, 0);
-
-            gl.glCompileShaderARB(shader);
-
-            // Check for compile errors
-            String errors = null;
-		if ((errors = getGLErrorLog(gl, shader)) != null)
-			throw new RuntimeException("Compile error\n" + errors);
-
-            //String error = getGLErrorLog(gl, shader);
-            String error = "some error...";
-
-            int[] compileStatus = {0};
-            gl.glGetObjectParameterivARB(shader, GL.GL_OBJECT_COMPILE_STATUS_ARB, compileStatus, 0);
-            if (compileStatus[0] == 0)
-            {
-              throw new IllegalArgumentException("Shader could not be compiled! " + (error == null ? "" : error));
-            }
-            return shader;
-        }
-        finally
-        {
-            if (reader != null) try{ reader.close(); } catch(Exception ignoreSunsInsanity){}
-        }
-    }
 
   // Checks for arbitrary GL errors. Could also be accomplished by enabling the DebugGL pipeline
 	private String getGLError(GL gl)
@@ -952,6 +907,7 @@ drawBox(float size)
     double y = screenCoords[1];
     double z = screenCoords[2]; //between 0 (nearPlane) and 1 (farPlane)
 
+    //System.out.println("x/y/z = " + x + "/" + y + "/" + z);
 
     //return screen point
     return new Point3f((float) x, (float) y, (float) z);

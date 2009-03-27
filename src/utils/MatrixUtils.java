@@ -206,14 +206,48 @@ public class MatrixUtils
 
     }
   }
- 
+
+  public static void printDoubleVector(double[] dv)
+  {
+
+    System.out.println("*double vector:*");
+    for (int i = 0; i < dv.length; i++)
+    {
+      System.out.printf("%+f ", dv[i]);
+    }
+    System.out.println("");
+
+  }
+
+  public static double[] getTranslationColumnFromMatrix(double[] da)
+  {
+    return getColumnFromMatrix(da, 3);
+  }
+
+  public static double[] getColumnFromMatrix(double[] da, int colNum)
+  {
+    int idx = colNum * 4;
+    return new double[]{da[idx], da[idx+1], da[idx+2], da[idx+3]};
+  }
+  /**
+   * Prints out the 4x4 matrix in column order.
+   * @param da The
+   */
 	public static void printDoubleArray(double[] da)
 	{
 		System.out.println("*double array:*");
-		System.out.printf("%f %f %f %f\n", da[0], da[1], da[2], da[3]);
+		System.out.printf("%+f %+f %+f %+f\n", da[0], da[4], da[8], da[12]);
+		System.out.printf("%+f %+f %+f %+f\n", da[1], da[5], da[9], da[13]);
+		System.out.printf("%+f %+f %+f %+f\n", da[2], da[6], da[10], da[14]);
+		System.out.printf("%+f %+f %+f %+f\n", da[3], da[7], da[11], da[15]);
+	
+    //in row order
+    /*
+    System.out.printf("%f %f %f %f\n", da[0], da[1], da[2], da[3]);
 		System.out.printf("%f %f %f %f\n", da[4], da[5], da[6], da[7]);
 		System.out.printf("%f %f %f %f\n", da[8], da[9], da[10], da[11]);
 		System.out.printf("%f %f %f %f\n", da[12], da[13], da[14], da[15]);
+    */
 	}
 	
   public static double[] getDoubleArrayFromMatrix4d(Matrix4d m4d)
@@ -328,24 +362,19 @@ public class MatrixUtils
     return arr;
   }
 
+  /*
   public static int M(int row, int col)
   {
     return col * 4 + row;
   }
-
-  public static int A(int row, int col)
-  {
-    return ((col<<2) + row);
-  }
-  public static int B(int row, int col)
-  {
-    return ((col<<2) + row);
-  }
-  public static int P(int row, int col)
+  */
+ 
+  public static int getMatrixIndex(int row, int col)
   {
     return ((col<<2) + row);
   }
 
+  /*
 public static double[] matmul34( final double[] a, final double[] b )
  {
    double[] product = new double[16];
@@ -353,46 +382,115 @@ public static double[] matmul34( final double[] a, final double[] b )
   for (int i = 0; i < 3; i++)
   {
     System.out.println("i = " + i);
-       final double ai0=a[A(i,0)],  ai1=a[A(i,1)],  ai2=a[A(i,2)],  ai3=a[A(i,3)];
-    System.out.println("P(i,0) = " + P(i,0));
-    System.out.println("P(i,1) = " + P(i,1));
-    System.out.println("P(i,2) = " + P(i,2));
-    System.out.println("P(i,3) = " + P(i,3));
-    System.out.println("B(i,0) = " + B(i,0));
-    System.out.println("B(i,1) = " + B(i,1));
-    System.out.println("B(i,2) = " + B(i,2));
-    System.out.println("B(i,3) = " + B(i,3));
-    System.out.println("B(2,2) = " + B(2,2));
+       final double ai0=a[getMatrixIndex(i,0)],  ai1=a[getMatrixIndex(i,1)],  ai2=a[getMatrixIndex(i,2)],  ai3=a[getMatrixIndex(i,3)];
+    System.out.println("P(i,0) = " + getMatrixIndex(i,0));
+    System.out.println("P(i,1) = " + getMatrixIndex(i,1));
+    System.out.println("P(i,2) = " + getMatrixIndex(i,2));
+    System.out.println("P(i,3) = " + getMatrixIndex(i,3));
+    System.out.println("B(i,0) = " + getMatrixIndex(i,0));
+    System.out.println("B(i,1) = " + getMatrixIndex(i,1));
+    System.out.println("B(i,2) = " + getMatrixIndex(i,2));
+    System.out.println("B(i,3) = " + getMatrixIndex(i,3));
+    System.out.println("B(2,2) = " + getMatrixIndex(2,2));
 
-       product[P(i,0)] = ai0 * b[B(0,0)] + ai1 * b[B(1,0)] + ai2 * b[B(2,0)];
-       product[P(i,1)] = ai0 * b[B(0,1)] + ai1 * b[B(1,1)] + ai2 * b[B(2,1)];
-       product[P(i,2)] = ai0 * b[B(0,2)] + ai1 * b[B(1,2)] + ai2 * b[B(2,2)];
-       product[P(i,3)] = ai0 * b[B(0,3)] + ai1 * b[B(1,3)] + ai2 * b[B(2,3)] + ai3;
+       product[getMatrixIndex(i,0)] = ai0 * b[getMatrixIndex(0,0)] + ai1 * b[getMatrixIndex(1,0)] + ai2 * b[getMatrixIndex(2,0)];
+       product[getMatrixIndex(i,1)] = ai0 * b[getMatrixIndex(0,1)] + ai1 * b[getMatrixIndex(1,1)] + ai2 * b[getMatrixIndex(2,1)];
+       product[getMatrixIndex(i,2)] = ai0 * b[getMatrixIndex(0,2)] + ai1 * b[getMatrixIndex(1,2)] + ai2 * b[getMatrixIndex(2,2)];
+       product[getMatrixIndex(i,3)] = ai0 * b[getMatrixIndex(0,3)] + ai1 * b[getMatrixIndex(1,3)] + ai2 * b[getMatrixIndex(2,3)] + ai3;
     }
-    product[P(3,0)] = 0;
-    product[P(3,1)] = 0;
-    product[P(3,2)] = 0;
-    product[P(3,3)] = 1;
+    product[getMatrixIndex(3,0)] = 0;
+    product[getMatrixIndex(3,1)] = 0;
+    product[getMatrixIndex(3,2)] = 0;
+    product[getMatrixIndex(3,3)] = 1;
 
     return product;
  }
+ */
 
-  public static double[] matmul4(  final double[] a, final double[] b )
+
+  public static double[] pointToHomogenousCoords(Point3f p3f)
+  {
+    float[] point = MatrixUtils.toArray(p3f);
+
+    return new double[]{point[0], point[1], point[2], 1.0};
+  }
+
+  public static double[] pointToHomogenousCoords(double[] point)
+  {
+    return new double[]{point[0], point[1], point[2], 1.0};
+  }
+
+  public static double[] normalizeHomogeneousVector(double[] clipSpaceVec)
+  {
+    return new double[]{
+      clipSpaceVec[0] / clipSpaceVec[3],
+      clipSpaceVec[1] / clipSpaceVec[3],
+      clipSpaceVec[2] / clipSpaceVec[3]
+    };
+  }
+
+  public static double[] objectCoordsToEyeCoords(double[] objectVec, double[] modelview)
+  {
+    return multiplyMatrixByVector(modelview, objectVec);
+  }
+
+  public static double[] eyeCoordsToClipCoords(double[] eyeVec, double[] projection)
+  {
+    return multiplyMatrixByVector(projection, eyeVec);
+  }
+
+  public static double[] clipCoordsToDeviceCoords(double[] clipVec)
+  {
+    return normalizeHomogeneousVector(clipVec);
+  }
+
+  public static double[] deviceCoordsToWindowCoords(double[] deviceVec, int[] viewport)
+  {
+    return new double[]{
+      viewport[0] + ( ((deviceVec[0] + 1) * (viewport[2])) / 2),
+      viewport[1] + ( ((deviceVec[1] + 1) * (viewport[3])) / 2),
+      (deviceVec[2] + 1) / 2
+    };
+  }
+
+  //returns a double array of size 4, containing the output vector
+  public static double[] multiplyMatrixByVector (final double[] a, final double[] b)
+  {
+    double[] product = new double[4];
+
+    for (int i = 0; i < 4; i++)
+    {
+       final double 
+         ai0=a[getMatrixIndex(i,0)],
+         ai1=a[getMatrixIndex(i,1)],
+         ai2=a[getMatrixIndex(i,2)],
+         ai3=a[getMatrixIndex(i,3)];
+
+       product[getMatrixIndex(i,0)] =
+         ai0 * b[getMatrixIndex(0,0)] +
+         ai1 * b[getMatrixIndex(1,0)] +
+         ai2 * b[getMatrixIndex(2,0)] +
+         ai3 * b[getMatrixIndex(3,0)];
+    }
+
+    return product;
+  }
+
+  public static double[] multiplyMatrixByMatrix(  final double[] a, final double[] b )
   {
     double[] product = new double[16];
-    for (int i = 0; i < 4; i++) {
-       final double ai0=a[A(i,0)], ai1=a[A(i,1)], ai2=a[A(i,2)], ai3=a[A(i,3)];
-      // System.out.println("a1");
-       product[P(i,0)] = ai0 * b[B(0,0)] + ai1 * b[B(1,0)] + ai2 * b[B(2,0)] + ai3 * b[B(3,0)];
-      // System.out.println("a2");
+    for (int i = 0; i < 4; i++)
+    {
+       final double
+         ai0=a[getMatrixIndex(i,0)],
+         ai1=a[getMatrixIndex(i,1)],
+         ai2=a[getMatrixIndex(i,2)],
+         ai3=a[getMatrixIndex(i,3)];
 
-
-       product[P(i,1)] = ai0 * b[B(0,1)] + ai1 * b[B(1,1)] + ai2 * b[B(2,1)] + ai3 * b[B(3,1)];
-      // System.out.println("a3");
-       product[P(i,2)] = ai0 * b[B(0,2)] + ai1 * b[B(1,2)] + ai2 * b[B(2,2)] + ai3 * b[B(3,2)];
-      // System.out.println("a4");
-       product[P(i,3)] = ai0 * b[B(0,3)] + ai1 * b[B(1,3)] + ai2 * b[B(2,3)] + ai3 * b[B(3,3)];
-      // System.out.println("a5");
+       product[getMatrixIndex(i,0)] = ai0 * b[getMatrixIndex(0,0)] + ai1 * b[getMatrixIndex(1,0)] + ai2 * b[getMatrixIndex(2,0)] + ai3 * b[getMatrixIndex(3,0)];
+       product[getMatrixIndex(i,1)] = ai0 * b[getMatrixIndex(0,1)] + ai1 * b[getMatrixIndex(1,1)] + ai2 * b[getMatrixIndex(2,1)] + ai3 * b[getMatrixIndex(3,1)];
+       product[getMatrixIndex(i,2)] = ai0 * b[getMatrixIndex(0,2)] + ai1 * b[getMatrixIndex(1,2)] + ai2 * b[getMatrixIndex(2,2)] + ai3 * b[getMatrixIndex(3,2)];
+       product[getMatrixIndex(i,3)] = ai0 * b[getMatrixIndex(0,3)] + ai1 * b[getMatrixIndex(1,3)] + ai2 * b[getMatrixIndex(2,3)] + ai3 * b[getMatrixIndex(3,3)];
     }
 
     return product;
@@ -400,8 +498,7 @@ public static double[] matmul34( final double[] a, final double[] b )
 
   public static double[] perspective(double fovy, double aspect, double zNear, double zFar)
   {
-
-     double[] m = getIdentity(); //new double[4][4];
+     double[] m = getIdentity();
 
      double sine, cotangent, deltaZ;
      double radians = fovy / 2.0 * Math.PI / 180.0;
@@ -413,7 +510,6 @@ public static double[] matmul34( final double[] a, final double[] b )
      }
      cotangent = Math.cos(radians) / sine;
 
-
      m[0] = cotangent / aspect;
      m[5] = cotangent;
      m[10] = -(zFar + zNear) / deltaZ;
@@ -421,31 +517,16 @@ public static double[] matmul34( final double[] a, final double[] b )
      m[14] = -2 * zNear * zFar / deltaZ;
      m[15] = 0;
      return m;
-
-     //glMultMatrixd(&m[0][0]);
-
-//     __gluMakeIdentityd(&m[0][0]);
-//     m[0][0] = cotangent / aspect;
-//     m[1][1] = cotangent;
-//     m[2][2] = -(zFar + zNear) / deltaZ;
-//     m[2][3] = -1;
-//     m[3][2] = -2 * zNear * zFar / deltaZ;
-//     m[3][3] = 0;
-//     glMultMatrixd(&m[0][0]);
   }
  
   public static double[] rotate(double[] mat, double angle, double x, double y, double z)
   {
     double xx, yy, zz, xy, yz, zx, xs, ys, zs, one_c, s, c;
-    double m[] = MatrixUtils.getIdentity(); //new float[16];
+    double m[] = MatrixUtils.getIdentity();
     boolean optimized = false;
 
-    s = (float) Math.sin( Math.toRadians(angle) ); // * DEG2RAD );
-    c = (float) Math.cos( Math.toRadians(angle) ); // * DEG2RAD );
-
-    //MEMCPY(m, Identity, sizeof(GLfloat)*16);
-
- //#define M(row,col)  m[col*4+row]
+    s = (float) Math.sin( Math.toRadians(angle) ); 
+    c = (float) Math.cos( Math.toRadians(angle) );
 
     if (x == 0.0F)
     {
@@ -455,17 +536,17 @@ public static double[] matmul34( final double[] a, final double[] b )
           {
              optimized = true;
              /* rotate only around z-axis */
-             m[M(0,0)] = c;
-             m[M(1,1)] = c;
+             m[getMatrixIndex(0,0)] = c;
+             m[getMatrixIndex(1,1)] = c;
              if (z < 0.0F)
              {
-                m[M(0,1)] = s;
-                m[M(1,0)] = -s;
+                m[getMatrixIndex(0,1)] = s;
+                m[getMatrixIndex(1,0)] = -s;
              }
              else
              {
-                m[M(0,1)] = -s;
-                m[M(1,0)] = s;
+                m[getMatrixIndex(0,1)] = -s;
+                m[getMatrixIndex(1,0)] = s;
              }
           }
        }
@@ -473,15 +554,15 @@ public static double[] matmul34( final double[] a, final double[] b )
        {
           optimized = true;
           /* rotate only around y-axis */
-          m[M(0,0)] = c;
-          m[M(2,2)] = c;
+          m[getMatrixIndex(0,0)] = c;
+          m[getMatrixIndex(2,2)] = c;
           if (y < 0.0F) {
-             m[M(0,2)] = -s;
-             m[M(2,0)] = s;
+             m[getMatrixIndex(0,2)] = -s;
+             m[getMatrixIndex(2,0)] = s;
           }
           else {
-             m[M(0,2)] = s;
-             m[M(2,0)] = -s;
+             m[getMatrixIndex(0,2)] = s;
+             m[getMatrixIndex(2,0)] = -s;
           }
        }
     }
@@ -491,17 +572,17 @@ public static double[] matmul34( final double[] a, final double[] b )
        {
           optimized = true;
           /* rotate only around x-axis */
-          m[M(1,1)] = c;
-          m[M(2,2)] = c;
+          m[getMatrixIndex(1,1)] = c;
+          m[getMatrixIndex(2,2)] = c;
           if (x < 0.0F)
           {
-             m[M(1,2)] = s;
-             m[M(2,1)] = -s;
+             m[getMatrixIndex(1,2)] = s;
+             m[getMatrixIndex(2,1)] = -s;
           }
           else
           {
-             m[M(1,2)] = -s;
-             m[M(2,1)] = s;
+             m[getMatrixIndex(1,2)] = -s;
+             m[getMatrixIndex(2,1)] = s;
           }
        }
     }
@@ -511,7 +592,6 @@ public static double[] matmul34( final double[] a, final double[] b )
     if (!optimized)
     {
       final float mag = (float) Math.sqrt(x * x + y * y + z * z);
-      //const float mag = (GLfloat) GL_SQRT(x * x + y * y + z * z);
 
        if (mag <= 1.0e-4)
        {
@@ -590,26 +670,26 @@ public static double[] matmul34( final double[] a, final double[] b )
        one_c = 1.0F - c;
 
        /* We already hold the identity-matrix so we can skip some statements */
-       m[M(0,0)] = (one_c * xx) + c;
-       m[M(0,1)] = (one_c * xy) - zs;
-       m[M(0,2)] = (one_c * zx) + ys;
- /*    m[M(0,3)] = 0.0F; */
+       m[getMatrixIndex(0,0)] = (one_c * xx) + c;
+       m[getMatrixIndex(0,1)] = (one_c * xy) - zs;
+       m[getMatrixIndex(0,2)] = (one_c * zx) + ys;
+ /*    m[getMatrixIndex(0,3)] = 0.0F; */
 
-       m[M(1,0)] = (one_c * xy) + zs;
-       m[M(1,1)] = (one_c * yy) + c;
-       m[M(1,2)] = (one_c * yz) - xs;
- /*    m[M(1,3)] = 0.0F; */
+       m[getMatrixIndex(1,0)] = (one_c * xy) + zs;
+       m[getMatrixIndex(1,1)] = (one_c * yy) + c;
+       m[getMatrixIndex(1,2)] = (one_c * yz) - xs;
+ /*    m[getMatrixIndex(1,3)] = 0.0F; */
 
-       m[M(2,0)] = (one_c * zx) - ys;
-       m[M(2,1)] = (one_c * yz) + xs;
-       m[M(2,2)] = (one_c * zz) + c;
- /*    m[M(2,3)] = 0.0F; */
+       m[getMatrixIndex(2,0)] = (one_c * zx) - ys;
+       m[getMatrixIndex(2,1)] = (one_c * yz) + xs;
+       m[getMatrixIndex(2,2)] = (one_c * zz) + c;
+ /*    m[getMatrixIndex(2,3)] = 0.0F; */
 
  /*
-       m[M(3,0)] = 0.0F;
-       m[M(3,1)] = 0.0F;
-       m[M(3,2)] = 0.0F;
-       m[M(3,3)] = 1.0F;
+       m[getMatrixIndex(3,0)] = 0.0F;
+       m[getMatrixIndex(3,1)] = 0.0F;
+       m[getMatrixIndex(3,2)] = 0.0F;
+       m[getMatrixIndex(3,3)] = 1.0F;
  */
     }
        //matrix_multf( mat, m, MAT_FLAG_ROTATION );
@@ -618,7 +698,7 @@ public static double[] matmul34( final double[] a, final double[] b )
     //printDoubleArray(mat);
     //System.out.println("in rotate... rot matrix = " + m);
     //printDoubleArray(m);
-    mat = matmul4( mat, m );
+    mat = multiplyMatrixByMatrix( mat, m );
     //System.out.println("in rotate... mat is");
     //printDoubleArray(mat);
     return mat;

@@ -125,7 +125,7 @@ public class GeomTextOutset extends GeomRect
     }
 
     /**
-     * A convenience method which positions the text within the given box area.
+     * getMatrixIndex convenience method which positions the text within the given box area.
      * Justifications are based on the
      * boundaries of the box, as opposed to the anchor point (as with the "contstrain" methods).
      * The box's x and y coordinates are the anchor of this object.

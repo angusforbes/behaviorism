@@ -85,7 +85,7 @@ public class BehaviorRotate extends BehaviorGeomContinuous
 //	 * @param startNano The start time in nanoseconds
 //	 * @param lengthMS The length it takes to execute the rotation
 //	 * @param rotateVector The vector that defines the rotation
-//	 * @return A BehaviorRotate that can be attached to a Geom
+//	 * @return getMatrixIndex BehaviorRotate that can be attached to a Geom
 //	 */
 //	public static BehaviorRotate newBehaviorRotate(
 //					long startNano, long lengthMS, Point3f rotateVector)

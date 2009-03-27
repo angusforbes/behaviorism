@@ -149,7 +149,7 @@ public class BehaviorScale extends BehaviorGeomContinuous
 //	 * @param startNano
 //	 * @param lengthMS
 //	 * @param scaleVector
-//	 * @return A BehaviorTranslate that can be attached to a Geom
+//	 * @return getMatrixIndex BehaviorTranslate that can be attached to a Geom
 //	 */
 //	public static BehaviorScale newBehaviorScale(
 //					long startNano, long lengthMS, Point3f scaleVector)

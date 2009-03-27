@@ -9,9 +9,9 @@ import behaviors.Behavior;
 import behaviorism.BehaviorismDriver;
 import handlers.MouseHandler;
 import behaviors.geom.GeomUpdater;
-import com.sun.opengl.util.GLUT;
 import com.sun.opengl.util.j2d.TextRenderer;
 import geometry.Geom;
+import geometry.GeomPoint;
 import java.util.ArrayList;
 import java.util.List;
 import javax.media.opengl.*;
@@ -409,9 +409,35 @@ public class VizGeom
           g.state.setState(gl);
         }
 
+        if (g instanceof GeomPoint)
+        {
         //System.out.println("g : " + idx + " : " + g);
-        //MatrixUtils.printDoubleArray(g.modelview);
+        System.out.println("modelview matrix = :");
+        MatrixUtils.printDoubleArray(RendererJogl.modelviewMatrix);
+        System.out.println("projection matrix = :");
+        MatrixUtils.printDoubleArray(RendererJogl.projectionMatrix);
+        System.out.println("point modelview matrix = :");
+        MatrixUtils.printDoubleArray(g.modelview);
+        }
         gl.glLoadMatrixd(g.modelview, 0);
+
+        
+        if (g instanceof GeomPoint)
+        {
+          //object coords --> view coords
+          double[] eyeVec = MatrixUtils.objectCoordsToEyeCoords(
+            MatrixUtils.pointToHomogenousCoords(g.anchor), RendererJogl.modelviewMatrix);
+
+          double[] clipVec = MatrixUtils.eyeCoordsToClipCoords(eyeVec, RendererJogl.projectionMatrix);
+
+          double[] deviceVec = MatrixUtils.clipCoordsToDeviceCoords(clipVec);
+          
+          double[] windowVec = MatrixUtils.deviceCoordsToWindowCoords(deviceVec, RendererJogl.viewportBounds);
+
+           System.out.println("windowVec by hand = ");
+           MatrixUtils.printDoubleVector(windowVec);
+          System.out.println("projected = " + BehaviorismDriver.renderer.projectPoint(g.anchor, RendererJogl.modelviewMatrix));
+        }
 
         //if ((layer.state.DEPTH_TEST == false && g.state == null) || (g.state != null && g.state.DEPTH_TEST == false))
         {

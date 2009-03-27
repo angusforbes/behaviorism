@@ -12,10 +12,10 @@ import javax.vecmath.Point3d;
 import utils.MatrixUtils;
 
 /**
- * A RendererLayer is a general grouping of Geoms around a particular set of state attributes,
+ * getMatrixIndex RendererLayer is a general grouping of Geoms around a particular set of state attributes,
  * which can be ordered in a particular way (as defined by the sortGeomsInLayer() method).
  * <p> 
- * A Geom is attached to a RendererLayer using any of the addGeomToLayer() variations from the Geom
+ * getMatrixIndex Geom is attached to a RendererLayer using any of the addGeomToLayer() variations from the Geom
  * class, or by using an addGeom() variation (which attaches the Geom to the default layer).
  * Before attaching a Geom to a custom layer you must first create and add the layer to the World
  * using the addLayer(int layerNum, RendererLayer layer) method in WorldGeom.
