@@ -869,6 +869,8 @@ drawBox(float size)
 
   }
 
+
+  //TODO use MatrixUtils.project instead.
   /**
    * projectPoint takes a point (with coordinates in a particular modelview)
    * into screen coordinates. The z value will be between 0 and 1 
@@ -878,6 +880,7 @@ drawBox(float size)
    * @param modelview
    * @return
    */
+  @Deprecated
   public Point3f projectPoint(Point3f p3f, double[] modelview)
   {
     double projection[] = new double[16];
@@ -886,9 +889,9 @@ drawBox(float size)
 
     //System.out.println("in projectPoint: p3f = " + p3f);
     //System.out.println("proj...");
-    //MatrixUtils.printDoubleArray(projectionMatrix);
+    //MatrixUtils.printMatrix(projectionMatrix);
     //System.out.println("meodelview...");
-    //MatrixUtils.printDoubleArray(modelview);
+    //MatrixUtils.printMatrix(modelview);
     //System.out.println("viewport = " + Arrays.toString(viewportBounds));
 
     //Don't think we need to get each time!
@@ -912,7 +915,9 @@ drawBox(float size)
     //return screen point
     return new Point3f((float) x, (float) y, (float) z);
   }
+  
 
+  //TODO - replace gluProject with MatrixUtils.project
   public int getWidthOfObjectInPixels(Geom g, float inset)
   {
     //setPerspective3D();

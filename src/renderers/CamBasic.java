@@ -152,7 +152,7 @@ public class CamBasic extends Cam
   
   da[12] = m_StrafeX; da[13] = m_StrafeY; da[14] = m_Zoom; da[15] = 1;
   
-  //MatrixUtils.printDoubleArray(da);	
+  //MatrixUtils.printMatrix(da);
   //gl.glMultMatrixd(da, 0);
   //glu.gluLookAt(m_Position.x, m_Position.y, m_Position.z, center.x, center.y, center.z, m_UpVector.x, m_UpVector.y, m_UpVector.z);
    */

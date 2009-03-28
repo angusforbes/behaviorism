@@ -18,6 +18,7 @@ import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
 import handlers.FontHandler;
 import java.util.Map;
+import javax.vecmath.Point3f;
 import sequences.Sequence;
 import utils.DebugTimer;
 import utils.MatrixUtils;
@@ -413,30 +414,35 @@ public class VizGeom
         {
         //System.out.println("g : " + idx + " : " + g);
         System.out.println("modelview matrix = :");
-        MatrixUtils.printDoubleArray(RendererJogl.modelviewMatrix);
+        MatrixUtils.printMatrix(RendererJogl.modelviewMatrix);
         System.out.println("projection matrix = :");
-        MatrixUtils.printDoubleArray(RendererJogl.projectionMatrix);
+        MatrixUtils.printMatrix(RendererJogl.projectionMatrix);
         System.out.println("point modelview matrix = :");
-        MatrixUtils.printDoubleArray(g.modelview);
+        MatrixUtils.printMatrix(g.modelview);
         }
         gl.glLoadMatrixd(g.modelview, 0);
 
         
         if (g instanceof GeomPoint)
         {
-          //object coords --> view coords
-          double[] eyeVec = MatrixUtils.objectCoordsToEyeCoords(
-            MatrixUtils.pointToHomogenousCoords(g.anchor), RendererJogl.modelviewMatrix);
+          Point3f windowVec = MatrixUtils.project(g.anchor);
+          System.out.println("windowVec = " + windowVec);
 
-          double[] clipVec = MatrixUtils.eyeCoordsToClipCoords(eyeVec, RendererJogl.projectionMatrix);
 
-          double[] deviceVec = MatrixUtils.clipCoordsToDeviceCoords(clipVec);
-          
-          double[] windowVec = MatrixUtils.deviceCoordsToWindowCoords(deviceVec, RendererJogl.viewportBounds);
-
-           System.out.println("windowVec by hand = ");
-           MatrixUtils.printDoubleVector(windowVec);
-          System.out.println("projected = " + BehaviorismDriver.renderer.projectPoint(g.anchor, RendererJogl.modelviewMatrix));
+//          //object coords --> view coords
+//          double[] eyeVec = MatrixUtils.objectCoordsToEyeCoords(
+//            g.anchor,
+//            RendererJogl.modelviewMatrix);
+//
+//          double[] clipVec = MatrixUtils.eyeCoordsToClipCoords(eyeVec, RendererJogl.projectionMatrix);
+//
+//          double[] deviceVec = MatrixUtils.clipCoordsToDeviceCoords(clipVec);
+//
+//          double[] windowVec = MatrixUtils.deviceCoordsToWindowCoords(deviceVec, RendererJogl.viewportBounds);
+//
+//           System.out.println("windowVec by hand = ");
+        //   MatrixUtils.printVector(windowVec);
+          //System.out.println("projected = " + BehaviorismDriver.renderer.projectPoint(g.anchor, RendererJogl.modelviewMatrix));
         }
 
         //if ((layer.state.DEPTH_TEST == false && g.state == null) || (g.state != null && g.state.DEPTH_TEST == false))
@@ -449,7 +455,6 @@ public class VizGeom
         {
            layer.state.setState(gl); //have to revert to normal layer state if the geom has overridden it
         }
-
 
         idx++;
       }

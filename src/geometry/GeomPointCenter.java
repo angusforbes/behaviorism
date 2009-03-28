@@ -5,7 +5,9 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
 import renderers.RendererJogl;
+//TODO - GeomPointCenter should not exist!
 
+@Deprecated
 public class GeomPointCenter extends GeomPoint
 {
 	public GeomPointCenter()
