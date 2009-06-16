@@ -3,10 +3,37 @@
 <!-- some examples of how to customize the build. -->
 <!-- (If you delete it and reopen the project it will be recreated.) -->
 <project name="attribute" default="default" basedir=".">
-    <description>Builds, tests, and runs the project "attribute".</description>
-    <import file="nbproject/build-impl.xml"/>
+  <description>Builds, tests, and runs the project "attribute".</description>
+  <import file="nbproject/build-impl.xml"/>
 
-    <import file="nbproject/profiler-build-impl.xml"/>    <!--
+  <import file="nbproject/profiler-build-impl.xml"/>
+
+  <target name="-post-jar">
+    <echo>Merging shader resources into distribution JAR file.</echo>
+
+    <jar destfile="dist/resources.jar" basedir="resources"/>
+
+    <jar destfile="tmp.jar" duplicate="fail" index="true">
+      <zipgroupfileset dir="dist" includes="*.jar"/>
+    </jar>
+
+    <copy file="tmp.jar" tofile="dist/behaviorism.jar" overwrite="true"/>
+
+    <echo>Cleaning up temporary files.</echo>
+    <delete file="tmp.jar"/>
+    <delete file="dist/resources.jar"/>
+    
+    <echo>Done merging shader resources.</echo>
+
+  <!--<copy todir="build/classes/hey">
+    <fileset dir="sql"/>
+  </copy>
+-->
+    <!-- Empty placeholder for easier customization. -->
+        <!-- You can override this target in the ../build.xml file. -->
+  </target>
+
+    <!--
 
     There exist several targets which are by default empty and which can be 
     used for execution of your tasks. These targets are usually executed 

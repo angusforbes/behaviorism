@@ -410,6 +410,7 @@ public class VizGeom
           g.state.setState(gl);
         }
 
+        /*
         if (g instanceof GeomPoint)
         {
         //System.out.println("g : " + idx + " : " + g);
@@ -420,11 +421,13 @@ public class VizGeom
         System.out.println("point modelview matrix = :");
         MatrixUtils.printMatrix(g.modelview);
         }
+         */
         gl.glLoadMatrixd(g.modelview, 0);
 
-        
+        /*
         if (g instanceof GeomPoint)
         {
+          MatrixUtils.printVector(MatrixUtils.pointToHomogenousCoords(g.anchor));
           Point3f windowVec = MatrixUtils.project(g.anchor);
           System.out.println("windowVec = " + windowVec);
 
@@ -444,7 +447,8 @@ public class VizGeom
         //   MatrixUtils.printVector(windowVec);
           //System.out.println("projected = " + BehaviorismDriver.renderer.projectPoint(g.anchor, RendererJogl.modelviewMatrix));
         }
-
+        */
+        
         //if ((layer.state.DEPTH_TEST == false && g.state == null) || (g.state != null && g.state.DEPTH_TEST == false))
         {
           invisiblePickingGeoms.add(g);
@@ -469,7 +473,7 @@ public class VizGeom
     for (Geom g : invisiblePickingGeoms)
     {
       gl.glLoadMatrixd(g.modelview, 0);
-      g.drawPickingBackground(gl);
+      g.drawPickingBackground(gl); //TO DO handle picking backgorunds!
     }
     }
     

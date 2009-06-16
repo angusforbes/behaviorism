@@ -336,17 +336,23 @@ public class GeomUtils
     return new Point3f(xxx / geoms.size(), yyy / geoms.size(), 0f);
   }
 
-  public static Point3f centerOfPoints(List<Point3f> polyPoints3f)
+  public static Point3f centerOfPoints(List<? extends Point3f> polyPoints3f)
   {
     float xxx = 0f;
     float yyy = 0f;
+    float zzz = 0f;
 
     for (int i = 0; i < polyPoints3f.size(); i++)
     {
       xxx += polyPoints3f.get(i).x;
       yyy += polyPoints3f.get(i).y;
+      zzz += polyPoints3f.get(i).z;
     }
-    return new Point3f(xxx / polyPoints3f.size(), yyy / polyPoints3f.size(), 0f);
+    return new Point3f(
+      xxx / polyPoints3f.size(),
+      yyy / polyPoints3f.size(), 
+      zzz / polyPoints3f.size()
+      );
   }
 
   public static Point3f centerOfMass(GeomPoly poly)
@@ -674,6 +680,7 @@ public class GeomUtils
   return (float)(Math.sqrt(val));
   }
    */
+
   public static float getDistanceBetweenPoints(Point3f p1, Point3f p2)
   {
     return p1.distance(p2);
@@ -1366,6 +1373,70 @@ public class GeomUtils
     p2_a.y = m * -num + b;
     p2_b.x = num;
     p2_b.y = m * num + b;
+  }
+
+  public static List<Point3f> getDiskPerpindicularToLineSegment(float radius, Point3f p1, Point3f p2)
+  {
+    List<Point3f> points = new ArrayList<Point3f>();
+    
+    Point3f r = new Point3f();
+    Point3f s = new Point3f();
+    getPlanePerpindicularToLineSegment(p1, p2, r, s);
+
+    Vector3f n = new Vector3f();
+    double dtheta = (Math.PI * 2.0) / 36;
+    double theta = 0;
+    for (int i = 0; i <= 36; i++)
+    {
+      theta = dtheta * i;
+      n.x =  (float) (r.x * Math.cos(theta) + s.x * Math.sin(theta) );
+      n.y =  (float) (r.y * Math.cos(theta) + s.y * Math.sin(theta));
+      n.z =  (float) (r.z * Math.cos(theta) + s.z * Math.sin(theta));
+      n.normalize();
+      
+      points.add(
+        new Point3f(
+         (float) (p1.x + (radius * r.x * Math.cos(theta)) + s.x * (radius * Math.sin(theta))),
+         (float) (p1.y + (radius * r.y * Math.cos(theta)) + s.y * (radius * Math.sin(theta))),
+         (float) (p1.z + (radius * r.z * Math.cos(theta)) + s.z * (radius * Math.sin(theta)))
+        //(float) (p1.y + r.y * Math.cos(theta) + s.y * Math.sin(theta)),
+        //(float) (p1.z + r.z * Math.cos(theta) + s.z * Math.sin(theta))
+        ));
+    }
+   
+    return points;
+  }
+  /**
+   *
+   * @param p1 the end point we are placng the perpindicular plane at
+   * @param p2 the other end point
+   * @param r r - p1 = one vector of the perpindicular plane
+   * @param s s - p1 = the other vector of the perpindicular plane
+   */
+  public static void getPlanePerpindicularToLineSegment(Point3f p1, Point3f p2, Point3f r, Point3f s)
+  {
+   //Point3f n;
+   Vector3f p1p2 = new Vector3f();
+   Vector3f rv = new Vector3f();
+   Vector3f sv = new Vector3f();
+   Vector3f randomp = new Vector3f();
+   p1p2.sub(p1,p2);
+
+   //XYZ n,p,r,s,p1p2;
+   //double theta,dtheta;
+
+   randomp.x = Utils.randomFloat(); /* Create a random vector */
+   randomp.y = Utils.randomFloat();
+   randomp.z = Utils.randomFloat();
+
+   rv.cross(p1p2, randomp);
+   sv.cross(p1p2, rv);
+   rv.normalize();
+   sv.normalize();
+
+   r.set(rv);
+   s.set(sv);
+
 
   }
 
@@ -1441,8 +1512,11 @@ public class GeomUtils
     return p2;
   }
 
-  /* pass in an empty p2_a and p2_b and it is the shifted line distance "length" away from it */
-  public static void getShiftedLine(float length, Point3f p1_a, Point3f p1_b,
+  //should be called get parallel line?
+  /* pass in an empty p2_a and p2_b and it is the shifted line distance "length" away from the p1 line */
+  public static void getShiftedLine(
+    float length,
+    Point3f p1_a, Point3f p1_b,
     Point3f p2_a, Point3f p2_b)
   {
     float dx = p1_b.x - p1_a.x;

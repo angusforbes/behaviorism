@@ -105,6 +105,10 @@ public class GeomGluNurbsCurve extends Geom
     GLUnurbs nurbs = BehaviorismDriver.renderer.nurbsRenderer;
 
     glu.gluBeginCurve(nurbs);
+//    glu.gluNurbsCurve(nurbs,
+//      numKnots, knotArray, stride, controlArray, order, GL.GL_MAP1_TEXTURE_COORD_2);
+//    glu.gluNurbsCurve(nurbs,
+//      numKnots, knotArray, stride, controlArray, order, GL.GL_MAP1_NORMAL);
     glu.gluNurbsCurve(nurbs,
       numKnots, knotArray, stride, controlArray, order, GL.GL_MAP1_VERTEX_3);
     glu.gluEndCurve(nurbs);

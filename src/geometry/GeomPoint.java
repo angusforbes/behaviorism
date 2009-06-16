@@ -82,7 +82,6 @@ public class GeomPoint extends Geom
   }
   */
   
-  
   public void setPos(float xx, float yy, float zz)
   {
     anchor.set(xx, yy, zz);

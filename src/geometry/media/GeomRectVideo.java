@@ -6,6 +6,8 @@ package geometry.media;
 
 import geometry.*;
 import com.omnividea.FobsConfiguration;
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureData;
 import com.sun.opengl.util.texture.TextureIO;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -44,6 +46,8 @@ import javax.media.util.BufferToImage;
 /* MUST hava jmf.properties, jmf.jar, fobs4jmf.dll, fobs4jmf.jar in classpath/library path!!! */
 public class GeomRectVideo extends GeomRect implements Renderer, ControllerListener
 {
+  Texture texture;
+  TextureData textureData;
 	//Geom variables
 
 	private Processor p = null;

@@ -2,8 +2,8 @@
  * BehaviorScale.java
  * Created on May 26, 2007, 3:03 PM
  */
-
 package behaviors.geom.continuous;
+
 import geometry.Geom;
 import behaviors.Behavior.LoopEnum;
 import javax.vecmath.Point3f;
@@ -12,56 +12,71 @@ import utils.MatrixUtils;
 
 public class BehaviorScale extends BehaviorGeomContinuous
 {
-    public static BehaviorScale scale(
-    long startTime, 
-    long lengthMS, 
+
+  public static BehaviorScale scale(
+    long startTime,
+    long lengthMS,
     Point3f scaleVector)
   {
     return new BehaviorScale(
-      new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(scaleVector)).loop(LoopEnum.ONCE) );
+      new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(scaleVector)).loop(LoopEnum.ONCE));
   }
 
-
-    public static BehaviorScale scale(
-      Geom g,
+  public static BehaviorScale scale(
+    Geom g,
     long startTime,
     long lengthMS,
     Point3f scaleVector)
   {
 
-      BehaviorScale bs = new BehaviorScale(
+    BehaviorScale bs = new BehaviorScale(
       new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(scaleVector)).loop(
-        LoopEnum.ONCE )
-       );
+      LoopEnum.ONCE));
 
-      g.attachBehavior(bs);
+    g.attachBehavior(bs);
 
-      return bs;
+    return bs;
+  }
+
+  public static BehaviorScale scale(
+    Geom g,
+    long startTime,
+    long lengthMS,
+    LoopEnum loop,
+    Point3f scaleVector)
+  {
+
+    BehaviorScale bs = new BehaviorScale(
+      new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(scaleVector)).loop(
+      loop));
+
+    g.attachBehavior(bs);
+
+    return bs;
   }
 
   public static BehaviorScale scaleTo(
-      Geom g,
+    Geom g,
     long startTime,
     long lengthMS,
     Point3f endScaleVector)
   {
-      Point3f ranges = GeomUtils.subtractPoint3f(endScaleVector, MatrixUtils.toPoint3f(g.scale));
+    Point3f ranges = GeomUtils.subtractPoint3f(endScaleVector, MatrixUtils.toPoint3f(g.scale));
 
-      BehaviorScale bs = new BehaviorScale(
+    BehaviorScale bs = new BehaviorScale(
       new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(ranges)).loop(
-        LoopEnum.ONCE )
-       );
+      LoopEnum.ONCE));
 
-      g.attachBehavior(bs);
+    g.attachBehavior(bs);
 
-      return bs;
+    return bs;
   }
 
   public BehaviorScale(ContinuousBehaviorBuilder builder)
   {
     super(builder);
   }
-  
+
   @Override
   public void updateGeom(Geom g)
   {
@@ -263,7 +278,6 @@ public class BehaviorScale extends BehaviorGeomContinuous
 //				offset_y -= (range_y * percentage * direction);
 //				offset_z -= (range_z * percentage * direction);
 //	}	
-
 }
 
 

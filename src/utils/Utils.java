@@ -92,7 +92,69 @@ public class Utils
   {
     return System.nanoTime();
   }
-		
+
+  public static long nowMillis()
+  {
+    return nanosToMillis(now());
+  }
+  /**
+   * Normalizes a set of values with an aribitray total
+   * so that their total is an specified value.
+   *
+   * @param totalRange
+   * @param vals
+   * @return the normalized array of values
+   */
+  public static double[] normalizeValues(double totalRange, double ... vals)
+  {
+    double[] times = new double[vals.length];
+
+    double totalVal = 0;
+    for (double v : vals)
+    {
+      totalVal += v;
+    }
+
+    int idx = 0;
+    for (double v : vals)
+    {
+      double percentage = v / totalVal;
+      times[idx] = (totalRange * percentage);
+
+      idx++;
+    }
+    return times;
+  }
+
+  /**
+   * Normalizes a set of time values with an aribitray total
+   * so that their total is a specified time.
+   * For example, if the input parameter totalTime is 10000L and the input parameter vals are {15.0, 2.0, 3.0}
+   * then the output would be the array {7500L, 1000L, 1500L}.
+   * @param totalTime The time we are normalizing into.
+   * @param vals A list of unnormalized doubles representing some amount of time in relation to the other vals.
+   * @return the normalized array of times.
+   */
+  public static long[] normalizeTimes(long totalTime, double ... vals)
+  {
+    long[] times = new long[vals.length];
+
+    double totalVal = 0;
+    for (double v : vals)
+    {
+      totalVal += v;
+    }
+
+    int idx = 0;
+    for (double v : vals)
+    {
+      double percentage = v / totalVal;
+      times[idx] = (long) (totalTime * percentage);
+      idx++;
+    }
+    return times;
+  }
+
 	/** 
 	 * a convenience method that wraps Thread.sleep(long milliseconds) without 
 	 * requiring the try/catch block and which checks for invalid values.  
@@ -158,7 +220,7 @@ public class Utils
 		}
   }
 
-	
+
 	/**
 	 * wrapper for Math.random.
 	 * @return
@@ -244,7 +306,7 @@ public class Utils
 	 * @param max
 	 * @return a float that is greater than or equal to min and less than or equal to max
 	 */
-  public static float randomFloat(float min, float max)
+  public static float randomFloat(double min, double max)
   {
     return (float) ( (randomFloat() * (max - min)) + min );
   }
@@ -418,7 +480,26 @@ public class Utils
     String str = "";
     for (int i = 0; i < len; i++)
     {
-      str += "" + ((char)randomInt(60,110) );
+      //str += "" + ((char)randomInt(60,110) );
+      str += "" + ((char)randomInt(97,122) );
+    }
+
+    return str;
+  }
+
+  public static String randomVowels(int min, int max)
+	{
+		return randomVowels(randomInt(min, max));
+	}
+
+  public static String randomVowels(int len)
+  {
+    char[] vowels = new char[]{'a', 'e', 'i', 'o', 'u', 'y'};
+    String str = "";
+    for (int i = 0; i < len; i++)
+    {
+      //str += "" + ((char)randomInt(60,110) );
+      str += "" + vowels[randomInt(0, vowels.length - 1)] ;
     }
 
     return str;
@@ -502,7 +583,9 @@ public class Utils
 	 * @param list
 	 * @param objs
 	 */
-  public static <T> void addTo(List<T> list, T ... objs)
+  //public static <T> void addTo(List<T> list, T ... objs)
+  //public static <T> void addTo(Collection<T> list, T ... objs)
+  public static <T> void addTo(Collection<T> list, T ... objs)
   {
     for (T t : objs)
     {
@@ -747,5 +830,27 @@ public class Utils
 		System.out.println("");
 	}
 
+  public static void printMemory()
+  {
+   int mb = 1024*1024;
 
+     //Getting the runtime reference from system
+     Runtime runtime = Runtime.getRuntime();
+
+     System.out.println("##### Heap utilization statistics [MB] #####");
+
+     //Print used memory
+     System.out.println("Used Memory:"
+           + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+
+     //Print free memory
+     System.out.println("Free Memory:"
+           + runtime.freeMemory() / mb);
+
+       //Print total available memory
+      System.out.println("Total Memory:" + runtime.totalMemory() / mb);
+
+       //Print Maximum available memory
+        System.out.println("Max Memory:" + runtime.maxMemory() / mb);
+}
 }

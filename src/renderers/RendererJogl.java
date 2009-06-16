@@ -14,8 +14,6 @@ import geometry.GeomRect;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.*;
 import com.sun.opengl.util.*;
-import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureIO;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
@@ -24,17 +22,11 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import handlers.FontHandler;
 import java.awt.Point;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import shaders.FragmentShader;
-import shaders.Program;
-import shaders.VertexShader;
 import utils.GeomUtils;
 import utils.MatrixUtils;
 import utils.Utils;
@@ -147,11 +139,25 @@ public class RendererJogl implements GLEventListener
     System.out.println("GLSL version = " + gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION));
 
 
-    gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);                    // Black Background
-    //gl.glEnable(gl.GL_LIGHT0);					// Enable Default Light (Quick And Dirty)	( NEW )
-    //gl.glEnable(gl.GL_LIGHTING);				// Enable Lighting				( NEW )
-    //gl.glEnable(gl.GL_COLOR_MATERIAL);				// Enable Coloring Of Material			( NEW )
-    //gl.glShadeModel(gl.GL_SMOOTH);                              // Enable Smooth Shading
+
+    //gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);                    // Black Background
+    gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a);                    // Black Background
+
+//    gl.glEnable(gl.GL_LIGHT0);					// Enable Default Light (Quick And Dirty)	( NEW )
+//    //gl.glEnable(gl.GL_LIGHTING);				// Enable Lighting				( NEW )
+    gl.glEnable(gl.GL_COLOR_MATERIAL);				// Enable Coloring Of Material			( NEW )
+    gl.glShadeModel(gl.GL_SMOOTH);                              // Enable Smooth Shading
+    //gl.glShadeModel(gl.GL_FLAT);
+
+    gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[]{0.2f, 0.2f, 0.2f, 1f}, 0);
+    gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, new float[]{0f, 0f, 2f, 1f}, 0);
+
+  // setup the material properties
+  //gl.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE);
+  gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[]{.6f, .6f, .6f, 1.0f}, 0);
+  gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[]{1f, 1f, 1f, 1.0f}, 0);
+  gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[]{50f}, 0);
+
 
     //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
     gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
@@ -169,6 +175,8 @@ public class RendererJogl implements GLEventListener
     gl.glHint(GL.GL_POINT_SMOOTH_HINT, GL.GL_NICEST);	// Make round points, not square points
     gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);		// Antialias the lines
 
+    gl.glEnable(GL.GL_AUTO_NORMAL);
+
     //gl.glDepthMask(false); //may have to futz with for overlays!
     gl.glDepthMask(true); //may have to futz with for overlays!
 
@@ -183,13 +191,12 @@ public class RendererJogl implements GLEventListener
 
     //set up global nurbs renderer
     nurbsRenderer = glu.gluNewNurbsRenderer();
-
     quadricRenderer = glu.gluNewQuadric();
 
     //Utils.sleep(1000);
 
     // 0 = do *not* synch with refresh rate (ie fast as possible), 1 = synch with refresh rate (ie always 60fps)
-    gl.setSwapInterval(1); //1 
+    gl.setSwapInterval(1); //1
 
     //animator = new FPSAnimator(glDrawable, 60, false);
     //animator = new FPSAnimator(glDrawable, 5, true);
@@ -323,7 +330,13 @@ drawBox(float size)
    
     if (VizGeom.EXPLICITLY_CALCULATE_MODELVIEW == true)
     {
-      projectionMatrix = MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
+      //projectionMatrix = MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
+      projectionMatrix = MatrixUtils.perspective(
+        cam.fovy,
+        ((float) BehaviorismDriver.canvasWidth) / BehaviorismDriver.canvasHeight,
+        RendererJogl.nearPlane,
+        RendererJogl.farPlane);
+
       modelviewMatrix = cam.perspective();
     }
     else
@@ -342,9 +355,10 @@ drawBox(float size)
       gl.glGetDoublev(gl.GL_PROJECTION_MATRIX, projectionMatrix, 0);
       gl.glGetDoublev(gl.GL_MODELVIEW_MATRIX, modelviewMatrix, 0);
     }
+
     if (BehaviorismDriver.renderer.currentWorld != null && boundsHaveChanged == true)
     {
-      System.out.println("boundsHaveChanged!!!");
+      //System.out.println("boundsHaveChanged!!!");
       Point3f lowerleft = MatrixUtils.toPoint3f(rayIntersect(BehaviorismDriver.renderer.currentWorld, 0, (int) screenBounds.getHeight(), new Point3d()));
       Point3f upperright = MatrixUtils.toPoint3f(rayIntersect(BehaviorismDriver.renderer.currentWorld, (int) screenBounds.getWidth(), 0, new Point3d()));
 
@@ -357,7 +371,6 @@ drawBox(float size)
       worldBoundaryPoints.get(2).setPos(upperright.x, upperright.y, 0f);
       worldBoundaryPoints.get(3).setPos(lowerleft.x, upperright.y, 0f);
 
-      boundsHaveChanged = false;
     }
 
   //extractFrustum();
@@ -406,12 +419,18 @@ drawBox(float size)
   @Override
   public void display(GLAutoDrawable drawable)
   {
-    gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-
-    if (currentWorld == null)
+    if (BehaviorismDriver.doneShutdown.get() == true) //then we are in the process of closing the openGL context
     {
       return;
     }
+
+    if (currentWorld == null) //check if its been setup...
+    {
+      return;
+    }
+
+    gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a);                    // Black Background
+    gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
     if (cam == null)
     {
@@ -434,6 +453,22 @@ drawBox(float size)
 
     BehaviorismDriver.viz.drawDebuggingInfo(gl);
     //gl.glFlush(); //is this necessary?
+
+    //set this false here so that geoms that need to recalc if bounds have changed will know
+    //that screen has been reshaped.
+    boundsHaveChanged = false;
+
+    if (BehaviorismDriver.isShutdown.get() == true)
+    {
+      System.err.println("in RendererJogl : cleaning up resources... ");
+    Set<WorldGeom> worlds = BehaviorismDriver.renderer.worlds.keySet();
+        for (WorldGeom w : worlds)
+        {
+          w.cleanUp();
+        }
+        System.err.println("in RendererJogl : we have disposed of all resources... ");
+        BehaviorismDriver.doneShutdown.set(true);
+    }
   }
 
   @Override

@@ -29,6 +29,7 @@ public class GeomGlutSphere extends Geom
 
   public void draw(GL gl, GLU glu, float offset)
   {
+    gl.glLineWidth(1f);
     gl.glColor4f(r, g, b, a);
     if (isSolid == true)
     {

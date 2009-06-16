@@ -51,10 +51,13 @@ public class ImageData extends Data implements Comparator
   @Override
   public Geom makeShape()
   {
+    return null;
+    /*
     Geom g = new GeomImage(url);
     g.determineRotateAnchor(RotateEnum.CENTER);
     g.determineScaleAnchor(ScaleEnum.CENTER);
     return g;
+     */
   }  
 
 	

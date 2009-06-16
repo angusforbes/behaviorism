@@ -111,12 +111,35 @@ public class Colorf //extends Color
 		return rgs;
 	}
 
+  public static Colorf invert(Colorf c)
+  {
+    return new Colorf(1f - c.r, 1f - c.g, 1f - c.b, c.a);
+  }
+
+  public Colorf invert()
+  {
+    r = 1f - r;
+    g = 1f - g;
+    b = 1f - b;
+
+    return this;
+  }
+
   public static Colorf desaturate(Colorf saturatedColor)
   {
     float gs = (saturatedColor.r + saturatedColor.g + saturatedColor.b) / 3f;
     return new Colorf(gs, gs, gs, saturatedColor.a);
   }
-  
+
+  public Colorf desaturate()
+  {
+    float gs = (r + g + b) / 3f;
+    r = gs;
+    g = gs;
+    b = gs;
+    return this;
+  }
+
   public Colorf(Color javaColor)
   {
     this.r = javaColor.getRed() / 255f;

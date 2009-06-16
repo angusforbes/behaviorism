@@ -473,13 +473,13 @@ public class MatrixUtils
       };
   }
 
-  public static double[] normalizeHomogeneousVector(double[] clipSpaceVec)
+  public static double[] normalizeHomogeneousVector(double[] vec)
   {
     return new double[]
       {
-        clipSpaceVec[0] / clipSpaceVec[3],
-        clipSpaceVec[1] / clipSpaceVec[3],
-        clipSpaceVec[2] / clipSpaceVec[3]
+        vec[0] / vec[3],
+        vec[1] / vec[3],
+        vec[2] / vec[3]
       };
   }
 

@@ -31,12 +31,11 @@ import utils.MatrixUtils;
  */
 public class MouseHandler extends MouseAdapter
 {
+
   public static Point mousePixel = new Point();
   public static Point3f mouseWorld = new Point3f();
   public static Point3f mouseGeom = new Point3f();
-
   public static Point3f debugWorldPoint = new Point3f(0f, 0f, 0f);
-
   public static Point3f debugSelectPoint = new Point3f(0f, 0f, 0f);
   public static Point3f debugMousePoint = new Point3f(0f, 0f, 0f);
   public static Point3f zeroPt = new Point3f(0f, 0f, 0f);
@@ -113,10 +112,9 @@ public class MouseHandler extends MouseAdapter
 
   private static Point3f worldPtToSelctedGeomPt(Point3f mouseWorld, Geom selectedGeom)
   {
-   return MatrixUtils.toPoint3f(
-     MatrixUtils.getWorldPointInGeomCoordinates(
-      MatrixUtils.toPoint3d(mouseWorld), BehaviorismDriver.renderer.modelviewMatrix, selectedGeom.modelview )
-   );
+    return MatrixUtils.toPoint3f(
+      MatrixUtils.getWorldPointInGeomCoordinates(
+      MatrixUtils.toPoint3d(mouseWorld), BehaviorismDriver.renderer.modelviewMatrix, selectedGeom.modelview));
   }
 
   private static void processMousePressing()
@@ -130,35 +128,35 @@ public class MouseHandler extends MouseAdapter
 
     Point2D.Float ptPixel = new Point2D.Float((float) mx, (float) my);
 
-      pickGeom(BehaviorismDriver.renderer.currentWorld.geoms, ptPixel);
+    pickGeom(BehaviorismDriver.renderer.currentWorld.geoms, ptPixel);
 
-      if (selectedGeom != null)
-      {
-        mouseGeom = worldPtToSelctedGeomPt(mouseWorld, selectedGeom.clickableObject);
-        //hmm, or selectableObject??
+    if (selectedGeom != null)
+    {
+      mouseGeom = worldPtToSelctedGeomPt(mouseWorld, selectedGeom.clickableObject);
+      //hmm, or selectableObject??
 
-        /*
-        System.out.println("you picked " + selectedGeom);
       
-       Point3d p3d_a = MatrixUtils.getGeomPointInAbsoluteCoordinates(
-         new Point3d(0, 0, 0), selectedGeom.modelview);
-       Point3d p3d_b = MatrixUtils.getGeomPointInAbsoluteCoordinates(
-         new Point3d(selectedGeom.w, selectedGeom.h, 0), selectedGeom.modelview);
-  
-         System.out.println("in abs coords it's anchor is " + MatrixUtils.toString(p3d_a) + 
-           " and other corner is " + MatrixUtils.toString(p3d_b));
-        */
-       
-        
-        determineOffsetPointForDragging(ptWorld);
+      System.out.println("you picked " + selectedGeom);
+      
+      Point3d p3d_a = MatrixUtils.getGeomPointInAbsoluteCoordinates(
+      new Point3d(0, 0, 0), selectedGeom.modelview);
+      Point3d p3d_b = MatrixUtils.getGeomPointInAbsoluteCoordinates(
+      new Point3d(selectedGeom.w, selectedGeom.h, 0), selectedGeom.modelview);
 
-        //this is done here so that handleClick can 
-        //be called as soon as the correct selectGeom is chosen
-        if (selectedGeom != null && button == 1)
-        {
-          selectedGeom.handleClick(null);
-        }
+      System.out.println("in abs coords it's anchor is " + MatrixUtils.toString(p3d_a) +
+      " and other corner is " + MatrixUtils.toString(p3d_b));
+       
+
+
+      determineOffsetPointForDragging(ptWorld);
+
+      //this is done here so that handleClick can
+      //be called as soon as the correct selectGeom is chosen
+      if (selectedGeom != null && button == 1)
+      {
+        selectedGeom.handleClick(null);
       }
+    }
   }
 
   public static void processMouseDragging()
@@ -169,7 +167,23 @@ public class MouseHandler extends MouseAdapter
     }
     else if (selectedGeom != null && selectedGeom.draggableObject != null) //drag a Geom
     {
+      //Hmm this is default behavior... to move the object along with the mouse
       dragGeom();
+
+      //but also can be customized...
+      /** temp **/
+      double coords[] = BehaviorismDriver.renderer.getWorldCoordsForScreenCoord(mx, my);
+
+      Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
+      System.out.println("ptWorld = " + ptWorld);
+      debugWorldPoint = MatrixUtils.toPoint3f(ptWorld);
+      mouseWorld.set(ptWorld);
+
+      if (selectedGeom != null)
+      {
+        mouseGeom = worldPtToSelctedGeomPt(mouseWorld, selectedGeom.clickableObject);
+      }
+      /** end temp **/
       selectedGeom.handleDrag(null);
     }
   }
@@ -264,33 +278,33 @@ public class MouseHandler extends MouseAdapter
     {
       selectedGeom = selectedGeom.selectableObject;
     }
-    //OKAY what we reallly want to do
-    //is get every geom in ***Camera Coordinates***
-    //then we know the depth value in those terms
-    //now we get a list of  -- hmm I have to think about this more when the camera is actually working!
+  //OKAY what we reallly want to do
+  //is get every geom in ***Camera Coordinates***
+  //then we know the depth value in those terms
+  //now we get a list of  -- hmm I have to think about this more when the camera is actually working!
         /*
-    //get list of all possible Geoms that might conceivably be selected
-    List<Geom> possibleGeoms = new ArrayList<Geom>();
-    selectPossibleGeoms(geoms, possibleGeoms, ptPixel); //recursive function to visit all active geoms
-    
-    //if none, then we are deselecting, return
-    if (possibleGeoms.size() == 0)
-    {
-    selectedGeom = null;
-    isDragging = false;
-    return;
-    }
-    
-    
-    //else get a sublist containing all Geoms with the closest z-value and in case there is more than one, choose
-    //the last one that was rendered (which will also be the last one in the sub-list).
-    //List<Geom> 
-     */
+  //get list of all possible Geoms that might conceivably be selected
+  List<Geom> possibleGeoms = new ArrayList<Geom>();
+  selectPossibleGeoms(geoms, possibleGeoms, ptPixel); //recursive function to visit all active geoms
 
-    //this was commented out before, so it might cause problems
-    //but in principle it is the right thing to do!
+  //if none, then we are deselecting, return
+  if (possibleGeoms.size() == 0)
+  {
+  selectedGeom = null;
+  isDragging = false;
+  return;
+  }
 
-    //BehaviorismDriver.renderer.currentWorld.adjustZOrder(selectedGeom);
+
+  //else get a sublist containing all Geoms with the closest z-value and in case there is more than one, choose
+  //the last one that was rendered (which will also be the last one in the sub-list).
+  //List<Geom>
+   */
+
+  //this was commented out before, so it might cause problems
+  //but in principle it is the right thing to do!
+
+  //BehaviorismDriver.renderer.currentWorld.adjustZOrder(selectedGeom);
   }
 
   /**
@@ -378,7 +392,7 @@ public class MouseHandler extends MouseAdapter
   @Override
   public void mouseClicked(MouseEvent e)
   {
-    System.out.println("CLICK COUNT = " +e.getClickCount());
+    System.out.println("CLICK COUNT = " + e.getClickCount());
     if (e.getClickCount() == 2)
     {
       System.out.println("in MouseHandler : double click : button = " + button);
@@ -398,7 +412,6 @@ public class MouseHandler extends MouseAdapter
       }
 
     }
-   
     else if (e.getClickCount() == 1)//single click
     {
       System.out.println("in MouseHandler : single click : button = " + button);
@@ -408,14 +421,13 @@ public class MouseHandler extends MouseAdapter
         mx = e.getX();
         my = e.getY();
         mousePixel.setLocation(mx, my);
-    
+
         selectedGeom.handleClick(e);
       }
     }
-    
+
   }
 
-  
   @Override
   public void mousePressed(MouseEvent e)
   {
@@ -440,7 +452,7 @@ public class MouseHandler extends MouseAdapter
       selectedGeom.handleClick(e);
     }
   }
-  
+
   @Override
   public void mouseDragged(MouseEvent e)
   {

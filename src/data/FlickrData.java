@@ -174,7 +174,9 @@ public class FlickrData extends ImageData
   @Override
   public Geom makeShape()
   {
+    return null;
 
+    /*
     GeomImage g = new GeomImage(url);
     g.determineRotateAnchor(RotateEnum.CENTER);
     g.determineScaleAnchor(ScaleEnum.CENTER);
@@ -184,13 +186,13 @@ public class FlickrData extends ImageData
 
     String test = "";
 
-    /*
-    String test = photoset + ":" + title + ": ";
+    
+    //test += photoset + ":" + title + ": ";
     for (String tag : tags)
     {
-    test += tag + " ";
+    //test += tag + " ";
     }
-     */
+    
 
     test += id;
 
@@ -208,6 +210,7 @@ public class FlickrData extends ImageData
     this.photoGeom = g;
 
     return g;
+     */
   }
 
   /*

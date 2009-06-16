@@ -136,7 +136,7 @@ public class KeyboardHandler implements KeyListener
 		}
 		if (keys[KeyEvent.VK_ESCAPE])
 		{
-			BehaviorismDriver.cleanup();
+			BehaviorismDriver.shutDown();
 			//RendererJogl.animator.stop();
 			//System.exit(0);
 			return;

@@ -99,9 +99,8 @@ public abstract class WorldGeom extends GeomPoint //does this make sense?
     
     System.out.println("sb:" + sb);
     return new GeomRect(sb.x, sb.y, 0f, sb.width, sb.height);
-
   }
-  
+
   //hmm think about this a bit more...
   public GeomPoly getWorldGeom()
   {

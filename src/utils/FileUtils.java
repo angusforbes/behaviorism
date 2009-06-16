@@ -8,7 +8,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +67,7 @@ public class FileUtils
     {
       return Arrays.asList(children);
     }
-    
+
     return new ArrayList<String>(); //empty list
   }
 
@@ -178,7 +179,6 @@ public class FileUtils
 
   }
 
-  
   public static void sortFilesAlphabetically(List<File> files)
   {
 
@@ -192,7 +192,7 @@ public class FileUtils
     });
 
   }
-  
+
   public static BufferedImage loadBufferedImageFromFile(String filename)
   {
     return Utils.toBufferedImage(loadImageFromFile(toCrossPlatformFilename(filename)));
@@ -232,15 +232,14 @@ public class FileUtils
     {
       mue.printStackTrace();
     }
-    
+
     System.out.println("loading image " + url);
     Image img = Toolkit.getDefaultToolkit().getImage(url);
     System.out.println("done loading image " + url);
     return img;
-    //return new MyImageIcon(url).getImage();
+  //return new MyImageIcon(url).getImage();
   }
 
-   
   public static BufferedImage loadBufferedImageFromURL(URL url)
   {
     return Utils.toBufferedImage(loadImageFromURL(url));
@@ -252,10 +251,67 @@ public class FileUtils
     Image img = Toolkit.getDefaultToolkit().getImage(url);
     System.out.println("done loading image " + url);
     return img;
-  
-    
-    //return new ImageIcon(url).getImage();
 
+
+  //return new ImageIcon(url).getImage();
+
+  }
+
+  public static URI toURI(URL url)
+  {
+    try
+    {
+      return url.toURI();
+    }
+    catch (URISyntaxException e)
+    {
+      e.printStackTrace();
+    }
+
+    return null;
+  }
+
+  public static URI toURI(String filename)
+  {
+    return (new File(filename)).toURI();
+  }
+
+  public static URI toURI(File file)
+  {
+    return file.toURI();
+  }
+
+  public static URL toURL(URI uri)
+  {
+    try
+    {
+      return uri.toURL();
+    }
+    catch (MalformedURLException mue)
+    {
+      mue.printStackTrace();
+    }
+
+    return null;
+
+  }
+
+  public static URL toURL(String filename)
+  {
+    return toURL(new File(filename));
+  }
+
+  public static URL toURL(File file)
+  {
+    try
+    {
+      return file.toURI().toURL();
+    }
+    catch (MalformedURLException mue)
+    {
+      mue.printStackTrace();
+    }
+    return null;
   }
 
   public static void saveImageToFile(BufferedImage bi, String filename, String format)

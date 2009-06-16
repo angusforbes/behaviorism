@@ -69,6 +69,15 @@ public class Program
     }
   }
 
+  public boolean isReady()
+  {
+    if (programId <= 0)
+    {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Creates and installs this Program and its associated Shaders. Loads and compiles the associated shaders
    * (if they are not already installed. Links the associated shaders.
@@ -109,10 +118,13 @@ public class Program
 
     System.out.println("programId = " + programId);
     //map all available uniform variables
-    bind(gl);
+
+    gl.glUseProgram(programId); //bind
+
     mapUniforms(gl);
     mapAttributes(gl);
-    unbind(gl);
+
+    gl.glUseProgram(0); //unbind
   }
 
   /**
@@ -123,6 +135,15 @@ public class Program
   public int uniform(String varName)
   {
     return uniformToIdMap.get(varName);
+  }
+
+  /**
+   * Passes the uniforms to the bound Program. This should be overwritten 
+   * by Program subclasses. See ConvolutionProgram for an example. 
+   * @param gl
+   */
+  public void uniforms(GL gl)
+  {
   }
 
   /**
@@ -147,12 +168,14 @@ public class Program
    */
   public void mapUniforms(GL gl)
   {
+    System.out.println("IN mapUniforms()");
     int[] length = new int[1];
     int[] size = new int[1];
     int[] type = new int[1];
     byte[] name = new byte[256];
     int[] count = new int[1];
 
+    System.out.println("count[0] = " + count[0]);
     gl.glGetProgramiv(programId, GL.GL_ACTIVE_UNIFORMS, count, 0);
     for (int i = 0; i < count[0]; i++)
     {
@@ -232,6 +255,7 @@ public class Program
   public void bind(GL gl)
   {
     gl.glUseProgram(programId);
+    uniforms(gl);
   }
 
   /**

@@ -26,6 +26,24 @@ public class BehaviorTranslate extends BehaviorGeomContinuous
         );
   }
 
+
+  public static BehaviorTranslate translate(
+    Geom g,
+    long startTime,
+    long lengthMS,
+    LoopEnum loop,
+    Point3f ranges)
+  {
+    BehaviorTranslate bt = new BehaviorTranslate(
+      new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(ranges)).loop(
+        loop )
+       );
+
+    g.attachBehavior(bt);
+
+    return bt;
+  }
+
   public static BehaviorTranslate translate(
     Geom g,
     long startTime, 

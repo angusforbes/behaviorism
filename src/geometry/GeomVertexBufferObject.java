@@ -18,7 +18,7 @@ import utils.Utils;
  */
 public class GeomVertexBufferObject extends Geom 
 {
-	int numTriangles = 5000;
+	int numTriangles = 50;
 	int numPoints = numTriangles * 3;
 
 

@@ -24,12 +24,11 @@ import java.awt.event.*;
 import java.awt.image.MemoryImageSource;
 import javax.swing.*;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import utils.Utils;
 import worlds.WorldGeom;
 
@@ -61,7 +60,9 @@ public class BehaviorismDriver
   public boolean useCursor = true;
 
   public String applicationName = "Untitled";
-  
+  public static AtomicBoolean isShutdown = new AtomicBoolean(false);
+  public static AtomicBoolean doneShutdown = new AtomicBoolean(false);
+
   public static void main(String []args)
   {
     new BehaviorismDriver();
@@ -182,7 +183,7 @@ public class BehaviorismDriver
       @Override
       public void windowClosing(WindowEvent e)
       {
-        cleanup();
+        shutDown();
       }
     });
    
@@ -351,14 +352,27 @@ public class BehaviorismDriver
     }
   }
 
-  public static void cleanup()
+  public static void shutDown()
   {
     new Thread(new Runnable()
     {
       public void run()
       {
+        System.err.println("DISPOSING OF RESOURCES...");
+        isShutdown.set(true);
+
+        while (doneShutdown.get() == false)
+        {
+          Utils.sleep(10);
+        }
+
+        System.err.println("STOPPING GL THREAD...");
+
         BehaviorismDriver.renderer.animator.stop();
-               
+
+        System.err.println("EXITING...");
+        
+
         System.exit(0);
       }
     }).start();

@@ -20,12 +20,95 @@ import javax.vecmath.Point3f;
  */
 public class EffectUtils {
 
-    public static void effectZoomOut(Geom g, long startNano, long lengthMS, boolean includeChildren) {
+
+
+    public static void effectFadeAndZoomIn(Geom g, long startNano, long lengthMS, boolean includeChildren) {
+        Behavior b1 = BehaviorScale.scale(startNano, lengthMS,
+                new Point3f((float) g.scale.x * 1f, (float) g.scale.y * 1f, 0f));
+
+        g.attachBehavior(b1);
+
+
+        Behavior b2 = BehaviorRGBA.colorChange(startNano, lengthMS,
+                new Colorf(g.r, g.g, g.b, g.a));
+
+        g.attachBehavior(b2);
+        g.setColor(0f, 0f, 0f, 0f);
+
+        g.scale.x = 0f;
+        g.scale.y = 0f;
+        g.scale.z = 0f;
+
+        //BehaviorGeom b2 = new BehaviorIsActive(startNano, 0L); //simple
+        //g.attachBehavior(b2);
+        BehaviorIsActive.activateAtNano(g, startNano);
+
+        if (includeChildren == true) {
+            for (Geom cg : g.geoms) {
+                effectFadeAndZoomIn(cg, startNano, lengthMS, includeChildren);
+            }
+        }
+    }
+
+    public static void effectZoomIn(Geom g, long startNano, long lengthMS, boolean includeChildren) {
         Behavior b = BehaviorScale.scale(startNano, lengthMS,
-                new Point3f((float) -g.scale.x, (float) -g.scale.y, 0f));
+                new Point3f((float) g.scale.x * 1f, (float) g.scale.y * 1f, 0f));
+
         g.attachBehavior(b);
 
-        BehaviorIsDone.destroyAtMillis(g, Utils.nanoPlusMillis(startNano, lengthMS), 0, false);
+        g.scale.x = 0f;
+        g.scale.y = 0f;
+        g.scale.z = 0f;
+
+        //BehaviorGeom b2 = new BehaviorIsActive(startNano, 0L); //simple
+        //g.attachBehavior(b2);
+        BehaviorIsActive.activateAtNano(g, startNano);
+
+        if (includeChildren == true) {
+            for (Geom cg : g.geoms) {
+                effectZoomIn(cg, startNano, lengthMS, includeChildren);
+            }
+        }
+    }
+
+        public static void effectFadeAndZoomOut(Geom g, long startNano, long lengthMS, boolean includeChildren) {
+        //Behavior b = BehaviorScale.scale(startNano, lengthMS,
+        //        new Point3f((float) -g.scale.x, (float) -g.scale.y, 0f));
+        Behavior b1 = BehaviorScale.scale(startNano, lengthMS,
+                new Point3f((float)-1f, -1f, 0f));
+        g.attachBehavior(b1);
+
+        Behavior b2 = BehaviorRGBA.colorChange(startNano, lengthMS,
+                Colorf.distance(g.r, g.g, g.b, g.a,
+                0f, 0f, 0f, 0f));
+        g.attachBehavior(b2);
+
+
+        //BehaviorIsActive.activateAtNano(g, startNano);
+
+        //BehaviorIsDone.destroyAtMillis(g, Utils.nanoPlusMillis(startNano, lengthMS), 0, false);
+
+        //BehaviorGeom b2 = new BehaviorIsDone(startNano, lengthMS);
+        //g.attachBehavior(b2);
+
+        if (includeChildren == true) {
+            for (Geom cg : g.geoms) {
+                effectFadeAndZoomOut(cg, startNano, lengthMS, includeChildren);
+            }
+        }
+    }
+
+    public static void effectZoomOut(Geom g, long startNano, long lengthMS, boolean includeChildren) {
+        //Behavior b = BehaviorScale.scale(startNano, lengthMS,
+        //        new Point3f((float) -g.scale.x, (float) -g.scale.y, 0f));
+        Behavior b = BehaviorScale.scale(startNano, lengthMS,
+                new Point3f((float)-1f, -1f, 0f));
+        g.attachBehavior(b);
+
+
+        //BehaviorIsActive.activateAtNano(g, startNano);
+
+        //BehaviorIsDone.destroyAtMillis(g, Utils.nanoPlusMillis(startNano, lengthMS), 0, false);
 
         //BehaviorGeom b2 = new BehaviorIsDone(startNano, lengthMS);
         //g.attachBehavior(b2);
@@ -48,6 +131,7 @@ public class EffectUtils {
 
         //BehaviorGeom b2 = new BehaviorIsDone(startNano, lengthMS);
         //g.attachBehavior(b2);
+        //BehaviorIsActive.activateAtNano(g, startNano);
 
 
         if (includeChildren == true) {
@@ -69,7 +153,7 @@ public class EffectUtils {
         //BehaviorGeom b2 = new BehaviorIsActive(startNano, 0L); //simple 
         //g.attachBehavior(b2);
 
-        //BehaviorIsActive.activateAtNano(g, startNano);
+        BehaviorIsActive.activateAtNano(g, startNano);
 
         if (includeChildren == true) {
             for (Geom cg : g.geoms) {
@@ -100,27 +184,7 @@ public class EffectUtils {
         }
     }
 
-    public static void effectZoomIn(Geom g, long startNano, long lengthMS, boolean includeChildren) {
-        Behavior b = BehaviorScale.scale(startNano, lengthMS,
-                new Point3f((float) g.scale.x * 1f, (float) g.scale.y * 1f, 0f));
-
-        g.attachBehavior(b);
-
-        g.scale.x = 0f;
-        g.scale.y = 0f;
-        g.scale.z = 0f;
-
-        //BehaviorGeom b2 = new BehaviorIsActive(startNano, 0L); //simple 
-        //g.attachBehavior(b2);
-        BehaviorIsActive.activateAtNano(g, startNano);
-
-        if (includeChildren == true) {
-            for (Geom cg : g.geoms) {
-                effectZoomIn(cg, startNano, lengthMS, includeChildren);
-            }
-        }
-    }
-
+  
     public static void effectFallDown(List<Geom> geomList, long startNano, long lengthMS) {
         GeomUtils.sortGeomsByDistanceToLine(geomList,
                 new Point3f(-10f, -10f, 0f), new Point3f(+10f, -10f, 0f),

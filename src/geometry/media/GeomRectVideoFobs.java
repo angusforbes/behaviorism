@@ -12,7 +12,9 @@ import behaviors.geom.continuous.BehaviorRotate;
 import behaviors.geom.continuous.BehaviorScale;
 import com.omnividea.FobsConfiguration;
 //import net.sf.fmj.media.renderer.video.*;
+import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
+import com.sun.opengl.util.texture.TextureData;
 import com.sun.opengl.util.texture.TextureIO;
 import data.VideoData;
 import java.awt.Point;
@@ -55,6 +57,9 @@ import utils.Utils;
 
 public class GeomRectVideoFobs extends GeomRect implements Renderer, ControllerListener
 {
+   Texture texture;
+  TextureData textureData;
+
   //Geom variables
   public Colorf backgroundColor = null; //background of entire bounds
   //public float insetPercentage = .15f;

@@ -15,7 +15,7 @@ import geometry.text.GeomText2;
 import geometry.text.GeomTextFlow;
 import geometry.GeomVertexBufferObject;
 import geometry.RotateEnum;
-import geometry.media.GeomVideoJMC;
+import geometry.media.GeomVideo;
 import renderers.State;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,6 +24,8 @@ import handlers.YouTubeHandler;
 import handlers.FontHandler;
 import java.awt.event.KeyEvent;
 import renderers.CamBasic;
+import textures.TextureVideo;
+import utils.FileUtils;
 import utils.Utils;
 
 //TODO: delete this line as well!
@@ -117,14 +119,14 @@ public class WorldDemo1 extends WorldGeom {
      String mov1 = "file:/Users/angus/Projects/JMCTest/kung.mov";
      String mov2 = "file:/Users/angus/Projects/JMCTest/kfc.mov";
      //we need a more fully feature video geom player...
-     vh = (GeomRect) GeomVideoJMC.makeVideoHolder(new Point3f(), mov2, BorderEnum.RECTANGLE, .2f);
-     addGeom(vh);
+//     vh = (GeomRect) GeomRectVideoFobs.makeVideoHolder(new Point3f(), mov2, BorderEnum.RECTANGLE, .2f);
+//     addGeom(vh);
 
 
-     //Geom g = new GeomVideoJMC(mov1);
-     //addGeom(g);
-     //Geom g2 = new GeomVideoJMC(mov2);
-     //addGeom(g2);
+     Geom g = new GeomVideo(new TextureVideo(FileUtils.toURI(mov1)));
+     addGeom(g);
+//     Geom g2 = new GeomVideo(mov2);
+//     addGeom(g2);
    }
 
    public boolean checkKeys(boolean[] keys, boolean[] keysPressing)

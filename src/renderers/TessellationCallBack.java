@@ -38,6 +38,10 @@ public class TessellationCallBack implements GLUtessellatorCallback
       {
         gl.glColor3dv(pointer, 3);
       }
+      if (pointer.length == 5)
+      {
+        gl.glTexCoord2dv(pointer, 3);
+      }
       gl.glVertex3dv(pointer, 0);
     }
     

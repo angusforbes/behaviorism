@@ -4,9 +4,6 @@ package geometry;
 import renderers.State;
 import behaviors.Behavior;
 //import behaviors.BehaviorIsActive;
-import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureData;
-import com.sun.opengl.util.texture.TextureIO;
 import data.Data;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -21,6 +18,7 @@ import behaviors.geom.discrete.BehaviorIsActive;
 import java.util.Arrays;
 import javax.vecmath.Matrix4d;
 import renderers.RendererJogl;
+import textures.TextureImage;
 import utils.MatrixUtils;
 import utils.Utils;
 import worlds.WorldGeom;
@@ -97,8 +95,9 @@ public abstract class Geom //extends Point3f //Object
   public boolean isSelectable = false; //ie, can it be selected by a mouseClick?
   public boolean isVisible = true; //ie, is it currently within the view frustum? (if no, can't be picked)
   public boolean isAttached = false; //ie, is it attached to the scenegraph (has it been drawn once?)
-  public TextureData textureData = null;
-  public Texture texture = null;
+  //public TextureData textureData = null;
+  //public Texture texture = null;
+  public List<TextureImage> textures = null;
   /**
    * getMatrixIndex 4x4 double array representing the Geom's openGL modelview matrix within the scenegraph hierarchy.
    */
@@ -223,7 +222,6 @@ public abstract class Geom //extends Point3f //Object
    */
   public void drawPickingBackground(GL gl)
   {
-
   }
 
   public void transform2()
@@ -614,16 +612,6 @@ public abstract class Geom //extends Point3f //Object
     this.z = p3f.z;
   }
 
-  public void setPos(Point3f p3f, float w, float h)
-  {
-    anchor.set(p3f);
-    this.x = p3f.x;
-    this.y = p3f.y;
-    this.z = p3f.z;
-    this.w = w;
-    this.h = h;
-  }
-
   public void setPos(float x, float y, float z)
   {
     anchor.set(x, y, z);
@@ -632,6 +620,33 @@ public abstract class Geom //extends Point3f //Object
     this.z = z;
   }
 
+  /**
+   * Defaults to rotating and scaling around the center (maybe make this an option?)
+   * @param p3f
+   * @param w
+   * @param h
+   */
+  public void setPos(Point3f p3f, float w, float h)
+  {
+    anchor.set(p3f);
+    this.x = p3f.x;
+    this.y = p3f.y;
+    this.z = p3f.z;
+    this.w = w;
+    this.h = h;
+
+    this.scaleAnchor = new Point3f(w * .5f, h * .5f, 0f);
+    this.rotateAnchor = new GeomPoint(w * .5f, h * .5f, 0f);
+  }
+
+  /**
+   * Defaults to rotating and scaling around the center (maybe make this an option?)
+   * @param x
+   * @param y
+   * @param z
+   * @param w
+   * @param h
+   */
   public void setPos(float x, float y, float z, float w, float h)
   {
     anchor.set(x, y, z);
@@ -640,6 +655,22 @@ public abstract class Geom //extends Point3f //Object
     this.z = z;
     this.w = w;
     this.h = h;
+
+    this.scaleAnchor = new Point3f(w * .5f, h * .5f, 0f);
+    this.rotateAnchor = new GeomPoint(w * .5f, h * .5f, 0f);
+  }
+
+  public void setPos(Point3f p3f, float w, float h, Point3f scaleAnchor, GeomPoint rotateAnchor)
+  {
+    anchor.set(p3f);
+    this.x = p3f.x;
+    this.y = p3f.y;
+    this.z = p3f.z;
+    this.w = w;
+    this.h = h;
+
+    this.scaleAnchor = scaleAnchor;
+    this.rotateAnchor = rotateAnchor;
   }
 
   public Colorf getColor()
@@ -687,6 +718,64 @@ public abstract class Geom //extends Point3f //Object
       behaviors.add(b);
     }
   }
+
+  /**
+   * Handles initialization and update of textures.
+   * If textureData is not yet available, return false.
+   * If textureData is loaded, but texture not yet create, create texture.
+   * If textureData has changed, update the texture.
+   * @return true if all textures are ready, false otherwise.
+   */
+  final public boolean updateTextures()
+  {
+    if (this.textures == null)
+    {
+      return true;
+    }
+
+    for (TextureImage ti : this.textures)
+    {
+      if (!ti.updateTexture())
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  final public void bindTexture(int which)
+  {
+    this.textures.get(which).texture.bind();
+  }
+
+  /**
+   * shouldn't ever have to use this!
+   * @param which
+   * @return
+   */
+  final public int getTextureId(int which)
+  {
+    return this.textures.get(which).texture.getTextureObject();
+  }
+
+  final public void attachTexture(TextureImage ti)
+  {
+    if (textures == null)
+    {
+      textures = new ArrayList<TextureImage>();
+    }
+
+    textures.add(ti);
+    ti.attachedGeoms.add(this);
+  }
+
+  final public void detachTexture(TextureImage ti)
+  {
+    textures.remove(ti);
+    ti.attachedGeoms.remove(this);
+  }
+
 //  
 //  public void attachBehavior(GeomUpdater b)
 //  {
@@ -696,7 +785,6 @@ public abstract class Geom //extends Point3f //Object
 //    }
 //  }
 //  
-
   /** attach a Data object of some sort to this Geom */
   /*
   public void attachData(Data d)
@@ -778,39 +866,42 @@ public abstract class Geom //extends Point3f //Object
   return new Point3f(scaledPosX, scaledPosY, scaledPosZ);
   }
    */
+  /*
   @Deprecated
   public boolean checkBinding()
   {
-    if (isReady == false)
-    {
-      return false;
-    }
-
-    if (isBound == false)
-    {
-      bind();
-    }
-
-    return true;
+  if (isReady == false)
+  {
+  return false;
   }
 
+  if (isBound == false)
+  {
+  bind();
+  }
+
+  return true;
+  }
+   */
+
+  /*
   //will figure this out later!
   @Deprecated
   public void bind() //bind textureData to texture
   {
-    //normalized_height = maxSize;
-    //normalized_width = (float) ((float)textureData.getWidth() / (float)textureData.getHeight()) * maxSize;
+  //normalized_height = maxSize;
+  //normalized_width = (float) ((float)textureData.getWidth() / (float)textureData.getHeight()) * maxSize;
 
-    texture = TextureIO.newTexture(textureData);
+  texture = TextureIO.newTexture(textureData);
 
-    //normalizeSize();
+  //normalizeSize();
 
-    isBound = true;
+  isBound = true;
 
   //textureData.dispose();
   //textureData = null;
   }
-
+   */
   public GeomPoint getRotateAnchor()
   {
     return rotateAnchor;
@@ -917,7 +1008,6 @@ public abstract class Geom //extends Point3f //Object
   {
     //System.out.println("Geom superclass releaseAction : I shouldn't be here... i should be with my children!");
   }
-
 
   public final void handleDrag(MouseEvent e)
   {
@@ -1146,18 +1236,47 @@ public abstract class Geom //extends Point3f //Object
     return sum;
   }
 
+  //TO DO - need to fix this to work with list of textures...
+  /**
+   * Recursively calls the dispose() method this Geom and all attached children.
+   * This is called automatically upon application shutdown.
+   */
+  final public void cleanUp()
+  {
+    dispose();
+    for (Geom geom : geoms)
+    {
+      geom.cleanUp();
+    }
+  }
+
+  /**
+   * Disposes all special resources assoicated with this Geom. By default
+   * this doesn't do anything, but this method should be overwritten
+   * by classes that use an external native library, such as an audio library, etc. 
+   * Note that normal disposal for textures, etc, is automatically by the cleanUp() method.
+   */
   public void dispose()
   {
-    if (texture != null)
+    if (textures != null)
     {
-      //System.out.println("disposing texture... ");
-      texture.dispose();
-      texture = null;
+      for (TextureImage texture : textures)
+      {
+        texture.dispose();
+      }
     }
-    if (textureData != null)
-    {
-      textureData.flush();
-      textureData = null;
-    }
+  /*
+  if (texture != null)
+  {
+  //System.out.println("disposing texture... ");
+  texture.dispose();
+  texture = null;
+  }
+  if (textureData != null)
+  {
+  textureData.flush();
+  textureData = null;
+  }
+   */
   }
 }

@@ -14,7 +14,6 @@ import utils.Utils;
  */
 public class GeomDisplayList extends Geom
 {
-
 	public int displayListNum = -1;
 	Geom geom = null;
 

@@ -20,7 +20,25 @@ public class BehaviorRotate extends BehaviorGeomContinuous
     return new BehaviorRotate(
       new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(rotateVector)).loop(LoopEnum.ONCE) );
   }
-  
+
+
+  public static BehaviorRotate rotate(
+    Geom g,
+    long startTime,
+    long lengthMS,
+    LoopEnum loop,
+    Point3f rotateVector)
+  {
+
+    BehaviorRotate bs = new BehaviorRotate(
+      new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(rotateVector)).loop(
+      loop));
+
+    g.attachBehavior(bs);
+
+    return bs;
+  }
+
   public BehaviorRotate(ContinuousBehaviorBuilder builder)
   {
     super(builder);

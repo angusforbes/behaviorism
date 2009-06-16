@@ -227,12 +227,13 @@ public class GeomRect extends Geom
   {
     boolean depthTest = RendererJogl.getBoolean(gl, GL.GL_DEPTH_TEST);
 
+    
     if (depthTest == false && isSelectable == true)
     {
       gl.glEnable(GL.GL_DEPTH_TEST);
 
       gl.glColor4f(0f, 0f, 0f, 0f);
-      gl.glBegin(gl.GL_POLYGON);
+      gl.glBegin(gl.GL_QUADS);
       gl.glVertex3f(0f, 0f, offset);
       gl.glVertex3f(w, 0f, offset);
       gl.glVertex3f(w, h, offset);
@@ -241,27 +242,16 @@ public class GeomRect extends Geom
 
       gl.glDisable(GL.GL_DEPTH_TEST);
     }
-
-    float w = this.w;
-    float h = this.h;
-    if (isBold)
-    {
-      w *= 1.1f;
-      h *= 1.1f;
-    }
-
-
-    //System.out.println("here");
-
+    
+    
     gl.glColor4f(r, g, b, a);
-    gl.glBegin(gl.GL_POLYGON);
+    gl.glBegin(gl.GL_QUADS);
     gl.glVertex3f(0f, 0f, offset);
     gl.glVertex3f(w, 0f, offset);
     gl.glVertex3f(w, h, offset);
     gl.glVertex3f(0f, h, offset);
 
     gl.glEnd();
-
   }
 
   public void normalizeSizeByWidth(int fw, int fh, float normalized)
@@ -1018,6 +1008,22 @@ public class GeomRect extends Geom
   return true;
   }
    */
+  }
+
+  public void drawSquare(GL gl, float x, float y, float w, float h)
+  {
+    gl.glBegin(GL.GL_QUADS);
+
+    gl.glTexCoord2f(0, 0);
+    gl.glVertex2f(x, y);
+    gl.glTexCoord2f(1, 0);
+    gl.glVertex2f(x + w, y);
+    gl.glTexCoord2f(1, 1);
+    gl.glVertex2f(x + w, y + h);
+    gl.glTexCoord2f(0, 1);
+    gl.glVertex2f(x, y + h);
+
+    gl.glEnd();
   }
 
   public String toString()
