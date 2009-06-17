@@ -34,15 +34,14 @@ import worlds.WorldGeom;
 
 public class RendererJogl implements GLEventListener
 {
+
   public Map<WorldGeom, Boolean> worlds = new ConcurrentHashMap<WorldGeom, Boolean>();
   public WorldGeom currentWorld = null;
   public VizGeom viz = null;
-  
   public static GLUT glut;
   public static GLU glu;
   public GL gl;
   public GLAutoDrawable glDrawable;
-  //public static Animator animator;
   public Animator animator;
   public TessellationCallBack tessellationCallback = null;
   public GLUtessellator tessellationObject = null;
@@ -76,7 +75,6 @@ public class RendererJogl implements GLEventListener
    * at (0, 0, -10) and pointing toward the origin.
    * @param cam An instance of a {@link soi3.Cam}.
    */
- 
   public void installWorld(WorldGeom world)
   {
     installWorld(world, true, true);
@@ -100,11 +98,11 @@ public class RendererJogl implements GLEventListener
     {
       currentWorld = world;
     }
-      
+
     this.cam = currentWorld.cam;
     boundsHaveChanged = true;
   }
-  
+
   public void activateWorld(WorldGeom world, boolean isCurrent)
   {
     worlds.put(world, true);
@@ -114,16 +112,16 @@ public class RendererJogl implements GLEventListener
       currentWorld = world;
     }
   }
-  
+
   public Cam getCamera()
-  { 
+  {
     return this.cam;
   }
 
   @Override
   public void init(GLAutoDrawable drawable)
   {
-   
+
     //init worldBoundaryPoints with 4 blank points...
     worldBoundaryPoints = new ArrayList<GeomPoint>();
     Utils.addTo(worldBoundaryPoints, new GeomPoint(), new GeomPoint(), new GeomPoint(), new GeomPoint());
@@ -149,14 +147,29 @@ public class RendererJogl implements GLEventListener
     gl.glShadeModel(gl.GL_SMOOTH);                              // Enable Smooth Shading
     //gl.glShadeModel(gl.GL_FLAT);
 
-    gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[]{0.2f, 0.2f, 0.2f, 1f}, 0);
-    gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, new float[]{0f, 0f, 2f, 1f}, 0);
+    gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[]
+      {
+        0.2f, 0.2f, 0.2f, 1f
+      }, 0);
+    gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, new float[]
+      {
+        0f, 0f, 2f, 1f
+      }, 0);
 
-  // setup the material properties
-  //gl.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE);
-  gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[]{.6f, .6f, .6f, 1.0f}, 0);
-  gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[]{1f, 1f, 1f, 1.0f}, 0);
-  gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[]{50f}, 0);
+    // setup the material properties
+    //gl.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE);
+    gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[]
+      {
+        .6f, .6f, .6f, 1.0f
+      }, 0);
+    gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[]
+      {
+        1f, 1f, 1f, 1.0f
+      }, 0);
+    gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[]
+      {
+        50f
+      }, 0);
 
 
     //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -193,141 +206,103 @@ public class RendererJogl implements GLEventListener
     nurbsRenderer = glu.gluNewNurbsRenderer();
     quadricRenderer = glu.gluNewQuadric();
 
-    //Utils.sleep(1000);
-
     // 0 = do *not* synch with refresh rate (ie fast as possible), 1 = synch with refresh rate (ie always 60fps)
-    gl.setSwapInterval(1); //1
+    gl.setSwapInterval(1); //0
 
     //animator = new FPSAnimator(glDrawable, 60, false);
     //animator = new FPSAnimator(glDrawable, 5, true);
     animator = new Animator(glDrawable);
-    //animator.setRunAsFastAsPossible(true);
+    animator.setRunAsFastAsPossible(true);
     //animator.setRunAsFastAsPossible(false);
 
     animator.start();
-    
+
 
   }
-
-  float zoomval = 1f;
-  int z_var, xc_var, yc_var;
-  float xcval, ycval;
-  int textureID = -1;
-
-  public void
-drawBox(float size)
-{
-  float n[][] = new float[][] {
-    {-1.0f, 0.0f, 0.0f},
-    {0.0f, 1.0f, 0.0f},
-    {1.0f, 0.0f, 0.0f},
-    {0.0f, -1.0f, 0.0f},
-    {0.0f, 0.0f, 1.0f},
-    {0.0f, 0.0f, -1.0f}
-  };
-
-  int faces[][] = new int[][]
+ 
+  //put this in its own Geom!!!
+  public void drawBox(float size)
   {
-    {0, 1, 2, 3},
-    {3, 2, 6, 7},
-    {7, 6, 5, 4},
-    {4, 5, 1, 0},
-    {5, 6, 2, 1},
-    {7, 4, 0, 3}
-  };
+    float n[][] = new float[][]
+    {
+      {
+        -1.0f, 0.0f, 0.0f
+      },
+      {
+        0.0f, 1.0f, 0.0f
+      },
+      {
+        1.0f, 0.0f, 0.0f
+      },
+      {
+        0.0f, -1.0f, 0.0f
+      },
+      {
+        0.0f, 0.0f, 1.0f
+      },
+      {
+        0.0f, 0.0f, -1.0f
+      }
+    };
 
-  float v[][] = new float[8][3];
-  int i;
+    int faces[][] = new int[][]
+    {
+      {
+        0, 1, 2, 3
+      },
+      {
+        3, 2, 6, 7
+      },
+      {
+        7, 6, 5, 4
+      },
+      {
+        4, 5, 1, 0
+      },
+      {
+        5, 6, 2, 1
+      },
+      {
+        7, 4, 0, 3
+      }
+    };
 
-  v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
-  v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
-  v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
-  v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
-  v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
-  v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
+    float v[][] = new float[8][3];
+    int i;
 
-  for (i = 5; i >= 0; i--) {
-    gl.glBegin(GL.GL_QUADS);
-    gl.glNormal3fv(n[i], 0);
-    gl.glVertex3fv(v[faces[i][0]], 0);
-    gl.glVertex3fv(v[faces[i][1]], 0);
-    gl.glVertex3fv(v[faces[i][2]], 0);
-    gl.glVertex3fv(v[faces[i][3]], 0);
-    gl.glEnd();
-  }
-}
+    v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+    v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
+    v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+    v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
+    v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+    v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
 
-  // Checks for arbitrary GL errors. Could also be accomplished by enabling the DebugGL pipeline
-	private String getGLError(GL gl)
-	{
-		boolean hasError = false;
-		String message = "";
-		for (int glErr = gl.glGetError(); glErr != GL.GL_NO_ERROR; glErr = gl.glGetError())
-		{
-			message += (hasError ? "\n" : "") + glu.gluErrorString(glErr);
-			hasError = true;
-		}
-		return hasError ? message : null;
-	}
-
-	// Checks the info log for compile/link errors
-	private String getGLErrorLog(GL gl, int obj)
-	{
-		boolean hasError = false;
-		int[] infologLength = {0};
-		int[] charsWritten = {0};
-		byte[] infoLog;
-
-		String message = "";
-		String error = getGLError(gl);
-		if (error != null)
-		{
-			message += error;
-			hasError = true;
-		}
-
-		gl.glGetObjectParameterivARB(obj, GL.GL_OBJECT_INFO_LOG_LENGTH_ARB, infologLength, 0);
-		error = getGLError(gl);
-		if (error != null)
-		{
-			message += (hasError ? "\n" : "") + error;
-			hasError = true;
-		}
-
-		if (infologLength[0] > 1)
-		{
-			infoLog = new byte[infologLength[0]];
-			gl.glGetInfoLogARB(obj, infologLength[0], charsWritten, 0, infoLog, 0);
-			message += (hasError ? "\n" : "") + "InfoLog:\n" + new String(infoLog);
-			hasError = true;
-		}
-		error = getGLError(gl);
-		if (error != null)
-		{
-			message += (hasError ? "\n" : "") + error;
-			hasError = true;
-		}
-		return hasError ? message : null;
-	}
-
-  public void loadWorldIdentity()
-  {
-    gl.glLoadIdentity();
+    for (i = 5; i >= 0; i--)
+    {
+      gl.glBegin(GL.GL_QUADS);
+      gl.glNormal3fv(n[i], 0);
+      gl.glVertex3fv(v[faces[i][0]], 0);
+      gl.glVertex3fv(v[faces[i][1]], 0);
+      gl.glVertex3fv(v[faces[i][2]], 0);
+      gl.glVertex3fv(v[faces[i][3]], 0);
+      gl.glEnd();
+    }
   }
 
   /**
-   * setPerspective3D sets up the modelviewMatrix for the 
-   * current world after positioning the camera
+   * Sets up the modelviewMatrix for the
+   * current world after positioning the camera.
    */
   public void setPerspective3D()
   {
     if (cam == null)
     {
+      System.out.println("cam is null...");
       return;
     }
-    
+
     //gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
-   
+
     if (VizGeom.EXPLICITLY_CALCULATE_MODELVIEW == true)
     {
       //projectionMatrix = MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
@@ -389,25 +364,23 @@ drawBox(float size)
     }
     else
     {
-    //gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
-    gl.glMatrixMode(gl.GL_PROJECTION);
-    gl.glLoadIdentity();
-    glu.gluPerspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
+      //gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
+      gl.glMatrixMode(gl.GL_PROJECTION);
+      gl.glLoadIdentity();
+      glu.gluPerspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
 
-    gl.glMatrixMode(gl.GL_MODELVIEW);
-    gl.glLoadIdentity();
+      gl.glMatrixMode(gl.GL_MODELVIEW);
+      gl.glLoadIdentity();
 
-    cam.resetPerspective(gl, glu);
+      cam.resetPerspective(gl, glu);
     }
   }
 
   /**
-   * setPerspective2D switches to orthographic projection
-   * (eg, for printing debug text and points).
+   * Switches to an orthographic projection.
    */
   public void setPerspective2D()
   {
-    //gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
     gl.glMatrixMode(gl.GL_PROJECTION);
     gl.glLoadIdentity();
     glu.gluOrtho2D(0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight, 0);
@@ -429,6 +402,7 @@ drawBox(float size)
       return;
     }
 
+    gl = drawable.getGL();
     gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a);                    // Black Background
     gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
@@ -437,13 +411,11 @@ drawBox(float size)
       return;
     }
 
-    gl = drawable.getGL();
-
     if (fontHandler.changeFonts.get() == true)
     {
       fontHandler.nextFont(fontHandler.fontIndex);
     }
- 
+
     BehaviorismDriver.viz.draw(gl, glu);
 
     //fontHandler.fontsReady.set(false);
@@ -461,13 +433,13 @@ drawBox(float size)
     if (BehaviorismDriver.isShutdown.get() == true)
     {
       System.err.println("in RendererJogl : cleaning up resources... ");
-    Set<WorldGeom> worlds = BehaviorismDriver.renderer.worlds.keySet();
-        for (WorldGeom w : worlds)
-        {
-          w.cleanUp();
-        }
-        System.err.println("in RendererJogl : we have disposed of all resources... ");
-        BehaviorismDriver.doneShutdown.set(true);
+      Set<WorldGeom> worlds = BehaviorismDriver.renderer.worlds.keySet();
+      for (WorldGeom w : worlds)
+      {
+        w.cleanUp();
+      }
+      System.err.println("in RendererJogl : we have disposed of all resources... ");
+      BehaviorismDriver.doneShutdown.set(true);
     }
   }
 
@@ -478,7 +450,10 @@ drawBox(float size)
 
     BehaviorismDriver.canvasWidth = width;
     BehaviorismDriver.canvasHeight = height;
-    viewportBounds = new int[]{0,0,width,height};
+    viewportBounds = new int[]
+      {
+        0, 0, width, height
+      };
 
     RendererJogl.screenBounds = new Rectangle2D.Float(0, 0, width, height);
 
@@ -514,24 +489,23 @@ drawBox(float size)
 
     if (VizGeom.EXPLICITLY_CALCULATE_MODELVIEW)
     {
-      projection= MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
+      projection = MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
       modelview = cam.perspective();
       viewport = viewportBounds;
-      //gl.glGetIntegerv(gl.GL_VIEWPORT, viewport, 0);
+    //gl.glGetIntegerv(gl.GL_VIEWPORT, viewport, 0);
     }
     else
     {
-    gl.glLoadIdentity();
+      gl.glLoadIdentity();
 
-    setPerspective3D();
+      setPerspective3D();
 
-    gl.glGetDoublev(gl.GL_MODELVIEW_MATRIX, modelview, 0);
-    gl.glGetDoublev(gl.GL_PROJECTION_MATRIX, projection, 0);
-    gl.glGetIntegerv(gl.GL_VIEWPORT, viewport, 0);
+      gl.glGetDoublev(gl.GL_MODELVIEW_MATRIX, modelview, 0);
+      gl.glGetDoublev(gl.GL_PROJECTION_MATRIX, projection, 0);
+      gl.glGetIntegerv(gl.GL_VIEWPORT, viewport, 0);
     }
     //invert y value properly
     y = (int) ((float) viewport[3] - (float) y);
-
 
     //get z value from scene
     FloatBuffer zBuf = FloatBuffer.allocate(1);
@@ -693,14 +667,12 @@ drawBox(float size)
   return (windowCoords);
   }
    */
-  
   public Rectangle2D.Float getScreenRectangleForWorldCoords(GeomRect gr)
   {
     Path2D.Float p2d = getScreenShapeForWorldCoords(gr);
     return GeomUtils.pathToRect(p2d);
   }
-  
-  
+
   //gluProject maps object coords to screen coords
   //public Shape getScreenShapeForWorldCoords(GL gl, GLU glu, Geom g)
   public Path2D.Float getScreenShapeForWorldCoords(Geom g)
@@ -732,40 +704,39 @@ drawBox(float size)
     return p2f;
   }
 
-  
   public List<Float> getScreenRectInGeomCoordnates(Geom g, Rectangle2D.Float r2f)
   {
-    return getScreenRectInGeomCoordnates(g, (int)r2f.x, (int)r2f.y, (int)r2f.width, (int)r2f.height);
+    return getScreenRectInGeomCoordnates(g, (int) r2f.x, (int) r2f.y, (int) r2f.width, (int) r2f.height);
   }
-  
+
   public List<Float> getScreenRectInGeomCoordnates(Geom g, int x, int y, int w, int h)
   {
     List<Float> geomPts = new ArrayList<Float>();
 
-    Point3d p3f_xy = rayIntersect(g, (int)x, (int)y);
-    Point3d p3f_wh = rayIntersect(g, (int)(x + w), (int)(y + h));
+    Point3d p3f_xy = rayIntersect(g, (int) x, (int) y);
+    Point3d p3f_wh = rayIntersect(g, (int) (x + w), (int) (y + h));
 
     geomPts.add((float) p3f_xy.x);
     geomPts.add((float) p3f_xy.y);
     geomPts.add((float) (p3f_wh.x - p3f_xy.x));
     geomPts.add((float) (p3f_wh.y - p3f_xy.y));
-    
+
     return geomPts;
   }
-  
+
   public List<Point3f> getScreenPointsInGeomCoordnates(Geom g, List<Point3f> screenPts)
   {
     List<Point3f> geomPts = new ArrayList<Point3f>();
 
     for (Point3f s_p3f : screenPts)
     {
-      Point3f g_p3f = MatrixUtils.toPoint3f(rayIntersect(g, (int)s_p3f.x, (int)s_p3f.y));
+      Point3f g_p3f = MatrixUtils.toPoint3f(rayIntersect(g, (int) s_p3f.x, (int) s_p3f.y));
       geomPts.add(g_p3f);
     }
-    
+
     return geomPts;
   }
-  
+
   public Point3d rayIntersect(Geom g, int x, int y)
   {
     return rayIntersect(g, x, y, new Point3d());
@@ -794,11 +765,11 @@ drawBox(float size)
     }
     else
     {
-    //setPerspective3D();
-    //setWorldCoords();
-    //gl.glGetDoublev(gl.GL_MODELVIEW_MATRIX, modelview, 0);
-    gl.glGetDoublev(gl.GL_PROJECTION_MATRIX, projection, 0);
-    gl.glGetIntegerv(gl.GL_VIEWPORT, viewport, 0);
+      //setPerspective3D();
+      //setWorldCoords();
+      //gl.glGetDoublev(gl.GL_MODELVIEW_MATRIX, modelview, 0);
+      gl.glGetDoublev(gl.GL_PROJECTION_MATRIX, projection, 0);
+      gl.glGetIntegerv(gl.GL_VIEWPORT, viewport, 0);
     }
     //invert y value properly
     y = (int) ((float) viewport[3] - (float) y);
@@ -950,7 +921,7 @@ drawBox(float size)
     //return screen point
     return new Point3f((float) x, (float) y, (float) z);
   }
-  
+
 
   //TODO - replace gluProject with MatrixUtils.project
   public int getWidthOfObjectInPixels(Geom g, float inset)
@@ -999,7 +970,7 @@ drawBox(float size)
 
     return new Point((int) x1, (int) y1);
   }
-  
+
   public int getXOfObjectInPixels(Geom g, double[] modelview, double[] projection, int[] viewport)
   {
     double screenCoords[] = new double[3];
@@ -1013,7 +984,7 @@ drawBox(float size)
 
     return (int) x1;
   }
-  
+
   public int getYOfObjectInPixels(Geom g, double[] modelview, double[] projection, int[] viewport)
   {
     double screenCoords[] = new double[3];
@@ -1027,6 +998,7 @@ drawBox(float size)
 
     return (int) y1;
   }
+
   public int getWidthOfObjectInPixels(Geom g, float inset, double[] modelview, double[] projection, int[] viewport)
   {
     //setPerspective3D();
@@ -1125,7 +1097,7 @@ drawBox(float size)
     double x2 = windowCoords[0];
     double y2 = windowCoords[1];
 
-    
+
     glu.gluProject(inset, 0f, 0f,
       modelview, 0,
       projection, 0,
@@ -1136,13 +1108,12 @@ drawBox(float size)
     double y3 = windowCoords[1];
 
     int insetdist = (int) (GeomUtils.euclidianDistance(x1, y1, x3, y3));
- 
+
     //return (int) ((GeomUtils.euclidianDistance(x1, y1, x2, y2)) * (1f - inset));
-    int dist =  (int) (GeomUtils.euclidianDistance(x1, y1, x2, y2));
+    int dist = (int) (GeomUtils.euclidianDistance(x1, y1, x2, y2));
 
     return dist - insetdist;
   }
-  
 
   public Path2D.Float projectGeomRect(GeomRect g,
     double[] modelview, double[] projection, int[] viewport)
@@ -1233,9 +1204,9 @@ drawBox(float size)
     }
 
     p2f.closePath();
-    
+
     //GeomUtils.printPath(p2f);
-    
+
     return p2f;
   }
 

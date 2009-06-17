@@ -1,6 +1,7 @@
 /* Geom.java - Created on July 12, 2007, 7:52 PM */
 package geometry;
 
+import behaviorism.BehaviorismDriver;
 import renderers.State;
 import behaviors.Behavior;
 //import behaviors.BehaviorIsActive;
@@ -13,10 +14,8 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
-import behaviorism.BehaviorismDriver;
 import behaviors.geom.discrete.BehaviorIsActive;
 import java.util.Arrays;
-import javax.vecmath.Matrix4d;
 import renderers.RendererJogl;
 import textures.TextureImage;
 import utils.MatrixUtils;
@@ -49,7 +48,6 @@ public abstract class Geom //extends Point3f //Object
   /**
    * A root Data node that can hold various types of Data attached to this Geom.
    */
-  //public List<Data> datas = Collections.synchronizedList(new ArrayList<Data>());
   public Data data = new Data();
 
   /** this will soon be deprecated-- we should be using just regular x,y,z */
@@ -103,7 +101,7 @@ public abstract class Geom //extends Point3f //Object
 
   //various flags for rendering, texturing, picking, timing, etc.
 
-  public boolean isTransformed = false; //if true, we will update the transformation matrix
+  public boolean isTransformed = true; //if true, we will update the transformation matrix
 
   public boolean isActive = false; //if true, it will be displayed
   public boolean isDone = false; //if true, it will be removed
@@ -166,6 +164,9 @@ public abstract class Geom //extends Point3f //Object
    * @param offset
    */
   public abstract void draw(GL gl, GLU glu, float offset);
+
+
+
 
   /**
    * Checks to see if the entire Geom is completely viewable within the screen bounds.
@@ -242,27 +243,42 @@ public abstract class Geom //extends Point3f //Object
   {
   }
 
+  //if camera is transformed, then everything must be transofrmed?
   public void transform2()
   {
-    if (parent != null)
+    if (!isTransformed)
+    {
+      return;
+//
+//      if (parent == null && (BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed))
+//      {
+//        isTransformed = true;
+//      }
+//      else if(parent != null && parent.isTransformed)
+//      {
+//        isTransformed = true;
+//      }
+//      else
+//      {
+//        return;
+//      }
+       // return; //because nothing has changed
+    }
+
+    System.out.println("Geom (" + this.name + ") is transformed!");
+    
+    //System.out.println(this + " class=" + getClass());
+    if (parent != null) // && parent.isTransformed == true)
     {
       modelview = Arrays.copyOf(parent.modelview, 16);
     }
-    else
+    else //if (camera.isTransformed) check first if camera has changed!
     {
       modelview = Arrays.copyOf(RendererJogl.modelviewMatrix, 16);
     }
-    // translate command
-    //System.out.println("in transform2, before translate:");
-    //MatrixUtils.printDoubleArray(modelview);
+
 
     modelview = MatrixUtils.translate(modelview, anchor.x, anchor.y, anchor.z);
-
-//    System.out.println("in transform2, after translate:");
-//    MatrixUtils.printDoubleArray(modelview);
-//
-//    System.out.println("in transform2, beofre rotate:");
-//    MatrixUtils.printDoubleArray(modelview);
 
     if (rotateAnchor != null)
     {
@@ -270,41 +286,14 @@ public abstract class Geom //extends Point3f //Object
       modelview = MatrixUtils.rotate(modelview, rotate.x, 1f, 0f, 0f);
       modelview = MatrixUtils.rotate(modelview, rotate.y, 0f, 1f, 0f);
       modelview = MatrixUtils.rotate(modelview, rotate.z, 0f, 0f, 1f);
-
       modelview = MatrixUtils.translate(modelview, -rotateAnchor.anchor.x, -rotateAnchor.anchor.y, -rotateAnchor.anchor.z);
     }
-//    System.out.println("in transform2, after rotate:");
-//    MatrixUtils.printDoubleArray(modelview);
-//
-//    System.out.println("in transform2, before scale:");
-//    MatrixUtils.printDoubleArray(modelview);
 
     modelview = MatrixUtils.translate(modelview, scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
     modelview = MatrixUtils.scale(modelview, scale.x, scale.y, scale.z);
     modelview = MatrixUtils.translate(modelview, -scaleAnchor.x, -scaleAnchor.y, -scaleAnchor.z);
 
-//    System.out.println("in transform2, after scale:");
-//    MatrixUtils.printDoubleArray(modelview);
-
-//    gl.glTranslatef(anchor.x, anchor.y, anchor.z);
-//
-//    // rotate commands
-//    if (rotateAnchor != null)
-//    {
-//      gl.glTranslatef(rotateAnchor.anchor.x, rotateAnchor.anchor.y, rotateAnchor.anchor.z);
-//      gl.glRotatef((float) rotate.x, 1.0f, 0.0f, 0.0f);
-//      gl.glRotatef((float) rotate.y, 0.0f, 1.0f, 0.0f);
-//      //System.out.println("rotate y = " + (float)rotate.y);
-//      gl.glRotatef((float) rotate.z, 0.0f, 0.0f, 1.0f);
-//      gl.glTranslatef(-rotateAnchor.anchor.x, -rotateAnchor.anchor.y, -rotateAnchor.anchor.z);
-//    }
-//
-//    // scale commands
-//    gl.glTranslatef(scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
-//    gl.glScalef((float) scale.x, (float) scale.y, (float) scale.z);
-//    gl.glTranslatef(-scaleAnchor.x, -scaleAnchor.y, -scaleAnchor.z);
-//
-//
+    //isTransformed = false;
   }
 
   /**
@@ -316,6 +305,7 @@ public abstract class Geom //extends Point3f //Object
    */
   public void transform(GL gl, GLU glu)
   {
+    System.out.println("in transform() old-- WHY?");
     // translate command
     double[] temp = new double[16];
     //gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, temp, 0);
@@ -612,22 +602,123 @@ public abstract class Geom //extends Point3f //Object
     }
   }
 
-  /*
-  public void setPos(Point3d p3d)
+
+  public void anchorX(float x)
   {
-  Point3f p3f = MatrixUtils.toPoint3f(p3d);
-  anchor.set(p3f);
-  this.x = p3f.x;
-  this.y = p3f.y;
-  this.z = p3f.z;
+    if (x != anchor.x)
+    {
+      anchor.setX(x);
+      isTransformed = true;
+    }
   }
-   */
+
+  public void anchorY(float y)
+  {
+    if (y != anchor.y)
+    {
+      anchor.setY(y);
+      isTransformed = true;
+    }
+  }
+
+  public void anchorZ(float z)
+  {
+    if (z != anchor.z)
+    {
+      anchor.setZ(z);
+      isTransformed = true;
+    }
+  }
+
+  public void moveX(float x)
+  {
+    if (x != 0f)
+    {
+      anchor.setX(anchor.x + x);
+      isTransformed = true;
+    }
+  }
+
+  public void moveY(float y)
+  {
+    if (y != 0f)
+    {
+      anchor.setY(anchor.y + y);
+      isTransformed = true;
+    }
+  }
+
+  public void moveZ(float z)
+  {
+    if (z != 0f)
+    {
+      anchor.setZ(anchor.z + z);
+      isTransformed = true;
+    }
+  }
+
+  public void scaleX(float x)
+  {
+    System.out.println("in scaleX ... x = " + x);
+    if (x != 0f)
+    {
+      scale.setX(scale.x + x);
+      isTransformed = true;
+    }
+  }
+
+  public void scaleY(float y)
+  {
+    if (y != 0f)
+    {
+      scale.setY(scale.y + y);
+      isTransformed = true;
+    }
+  }
+
+  public void scaleZ(float z)
+  {
+    if (z != 0f)
+    {
+      scale.setZ(scale.z + z);
+      isTransformed = true;
+    }
+  }
+
+  public void rotateX(float x)
+  {
+    if (x != 0f)
+    {
+      rotate.setX(rotate.x + x);
+      isTransformed = true;
+    }
+  }
+
+  public void rotateY(float y)
+  {
+    if (y != 0f)
+    {
+      rotate.setY(rotate.y + y);
+      isTransformed = true;
+    }
+  }
+
+  public void rotateZ(float z)
+  {
+    if (z != 0f)
+    {
+      rotate.setZ(rotate.z + z);
+      isTransformed = true;
+    }
+  }
+  
   public void setPos(Point3f p3f)
   {
-    anchor.set(p3f);
-    //this.x = p3f.x;
-    //this.y = p3f.y;
-    //this.z = p3f.z;
+    if (!this.anchor.equals(p3f))
+    {
+      anchor.set(p3f);
+      isTransformed = true;
+    }
   }
 
   public void setPos(float x, float y, float z)
@@ -637,29 +728,12 @@ public abstract class Geom //extends Point3f //Object
       anchor.set(x, y, z);
       isTransformed = true;
     }
-
-    //this.x = x;
-    //this.y = y;
-    //this.z = z;
-
   }
 
-  /**
-   * Defaults to rotating and scaling around the center (maybe make this an option?)
-   * @param p3f
-   * @param w
-   * @param h
-   */
   /*
-  public void setPos(Point3f p3f, float w, float h)
-  {
-    anchor.set(p3f);
-    this.w = w;
-    this.h = h;
-
     this.scaleAnchor = new Point3f(w * .5f, h * .5f, 0f);
     this.rotateAnchor = new GeomPoint(w * .5f, h * .5f, 0f);
-  }
+  
   */
 
   /**

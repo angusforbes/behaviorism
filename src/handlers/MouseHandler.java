@@ -145,8 +145,6 @@ public class MouseHandler extends MouseAdapter
 
       System.out.println("in abs coords it's anchor is " + MatrixUtils.toString(p3d_a) +
       " and other corner is " + MatrixUtils.toString(p3d_b));
-       
-
 
       determineOffsetPointForDragging(ptWorld);
 
@@ -200,15 +198,18 @@ public class MouseHandler extends MouseAdapter
 
     if (button == 1)
     {
+      System.out.println("drag camera 1");
       cam.moveX(xDif * 0.01f);
       cam.moveY(yDif * -0.01f);
     }
     else if (button == 2)
     {
+      System.out.println("drag camera 2");
       cam.moveZ(yDif * 0.05f);
     }
     else if (button == 3)
     {
+      System.out.println("drag camera 3");
       cam.changeHeading(xDif * 0.5);
       cam.changePitch(yDif * 0.5);
     }
@@ -218,20 +219,23 @@ public class MouseHandler extends MouseAdapter
   {
     if (button == 1)
     {
-      selectedGeom.draggableObject.anchor = new Point3f(BehaviorismDriver.renderer.rayIntersect(selectedGeom.draggableObject, mx, my, offsetPt));
+      System.out.println("HERE - button 1 drag...");
+      selectedGeom.draggableObject.setPos(new Point3f(BehaviorismDriver.renderer.rayIntersect(selectedGeom.draggableObject, mx, my, offsetPt)));
     }
     else if (button == 2)
     {
+      System.out.println("HERE - button 2 drag...");
       int yDif = my - pre_my;
-      selectedGeom.draggableObject.scale.x += (yDif * .02f);
-      selectedGeom.draggableObject.scale.y += (yDif * .02f);
+      selectedGeom.draggableObject.scaleX(yDif * .02f);
+      selectedGeom.draggableObject.scaleY(yDif * .02f);
     }
     else if (button == 3)
     {
+      System.out.println("HERE - button 3 drag...");
       int xDif = mx - pre_mx;
       int yDif = my - pre_my;
-      selectedGeom.draggableObject.rotate.x += yDif;
-      selectedGeom.draggableObject.rotate.y += xDif;
+      selectedGeom.draggableObject.rotateX(yDif);
+      selectedGeom.draggableObject.rotateY(xDif);
     }
   }
 
@@ -503,14 +507,17 @@ public class MouseHandler extends MouseAdapter
   @Override
   public void mouseWheelMoved(MouseWheelEvent e)
   {
+    System.out.println("mouseWheelMoved...");
     int notches = e.getWheelRotation();
 
     if (notches < 0) //moved up 
     {
+      System.out.println("up");
       BehaviorismDriver.renderer.getCamera().moveZ(notches * 0.05f);
     }
     else //moved down
     {
+      System.out.println("down");
       BehaviorismDriver.renderer.getCamera().moveZ(notches * 0.05f);
     }
   }

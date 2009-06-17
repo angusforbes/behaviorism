@@ -1,7 +1,3 @@
-/*
- * Viz.java
- * Created on January 27, 2007, 3:19 PM
- */
 package renderers;
 
 import renderers.layers.RendererLayer;
@@ -11,27 +7,23 @@ import handlers.MouseHandler;
 import behaviors.geom.GeomUpdater;
 import com.sun.opengl.util.j2d.TextRenderer;
 import geometry.Geom;
-import geometry.GeomPoint;
 import java.util.ArrayList;
 import java.util.List;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
 import handlers.FontHandler;
 import java.util.Map;
-import javax.vecmath.Point3f;
 import sequences.Sequence;
-import utils.DebugTimer;
-import utils.MatrixUtils;
 import utils.Utils;
 
 public class VizGeom
 {
+
   /**
    * Sets whether or not we calculate the modelview matricies ourselves as we
    * traverse the scenegraph. Seems to work, but experimental...
    */
   public static boolean EXPLICITLY_CALCULATE_MODELVIEW = true; //false; //true;
-
   public static boolean drawDebugFrameRate = true;
   public static boolean drawDebugGeom = false;
   public static boolean drawDebugGrid = false;
@@ -50,156 +42,103 @@ public class VizGeom
   public long stepSize = 20L;
   public boolean isStepping = false;
   public static float vizOffset = .00001f;
-  //public List<Geom> attachedGeoms = new ArrayList<Geom>();
-  int ccc = 0;
+  private List<Geom> invisiblePickingGeoms = new ArrayList<Geom>(); //thinking...
+
+  private void processBehaviors(Geom g)
+  {
+    for (int i = g.behaviors.size() - 1; i >= 0; i--)
+    {
+      Behavior b = g.behaviors.get(i);
+
+      processBehavior(b, g);
+
+      if (b.isActive == true && b.isPaused == false)
+      {
+        if (b instanceof GeomUpdater)
+        {
+          ((GeomUpdater) b).updateGeom(g);
+        }
+      }
+    }
+  }
 
   private void processBehavior(Behavior b, Geom g)
   {
     if (b.isDone == true && Behavior.debugBehaviors == false) //don't remove if just stepping...
-        {
-          g.behaviors.remove(b);
-          b.isActive = false;
-          //BehaviorismDriver.renderer.currentWorld.behaviors.remove(b);
-          b.dispose();
-          //b = null;
-          return;
-        }
- 
-        if (reverse == true)
-        {
-          System.out.println("reverse is true...");
-          //b.reverse();
-          b.changeSpeed(2f);
-        }
+    {
+      g.behaviors.remove(b);
+      b.isActive = false;
+      b.dispose();
+      return;
+    }
 
-        if (isStepping == true)
-        {
-          //System.out.println("step = " + step);
-          //System.out.println("stepSize = " + stepSize);
-          if (step != 0)
-          {
-            b.step(currentNano, Utils.millisToNanos((long) (step * stepSize)));
-            //b.isPaused = false;
-          }
-          else
-          {
-            System.out.println("pausing... allegedly...");
-            b.pause(currentNano);
-            //b.isPaused = true;
-          }
-        }
-        else //not globally paused
-        {
-          if (b.isPaused == true) //locally paused
-          {
-            b.pause(currentNano);
-          }
-          else //not globally or locally paused
-          {
-            //b.isPaused = false;
-            b.tick(currentNano);
-          }
-        }
+    if (reverse == true)
+    {
+      System.out.println("reverse is true...");
+      //b.reverse();
+      b.changeSpeed(2f);
+    }
+
+    if (isStepping == true)
+    {
+      if (step != 0)
+      {
+        b.step(currentNano, Utils.millisToNanos((long) (step * stepSize)));
+      }
+      else
+      {
+        System.out.println("pausing... allegedly...");
+        b.pause(currentNano);
+      }
+    }
+    else //not globally paused
+    {
+      if (b.isPaused == true) //locally paused
+      {
+        b.pause(currentNano);
+      }
+      else //not globally or locally paused
+      {
+        b.tick(currentNano);
+      }
+    }
   }
 
-  DebugTimer timer1 = new DebugTimer();
-  DebugTimer timer2 = new DebugTimer();
+  /**
+   * Draws each element in the scene graph. The steps to render these elements includes the following:
+   * 1. Set up the camera; 2. Update any high-level sequences; 3. Determine the modelview matrix of each
+   * element in the scene graph; 4. Process each layer of geometry as needed (ie, sort and set state);
+   * 5. Render the geometry to the framebuffer.
+   * @param gl
+   * @param glu
+   */
   public void draw(GL gl, GLU glu)
   {
     this.currentNano = System.nanoTime();
     this.offset = 0f; //reset offset
 
-
     // update camera & set up projectionMatrix & basic modelview using camera
     updateCameraBehavior();
-    BehaviorismDriver.renderer.setPerspective3D();
 
-    //System.out.println("sequences size = " + BehaviorismDriver.renderer.currentWorld.sequences.size());
-    Sequence.executeSequences(BehaviorismDriver.renderer.currentWorld.sequences, this.currentNano);    //tick on registered Behaviors...
-    //synchronized (BehaviorismDriver.renderer.currentWorld.behaviors)
-    {
-      /*
-      //System.out.println("registered behaviors size = " + BehaviorismDriver.renderer.currentWorld.behaviors.size());
-      for (int ii = BehaviorismDriver.renderer.currentWorld.behaviors.size() - 1; ii >= 0; ii--)
-      {
-        //BehaviorGeom b = BehaviorismDriver.renderer.currentWorld.behaviors.get(ii);
-        Behavior b = BehaviorismDriver.renderer.currentWorld.behaviors.get(ii);
-        //removals must be done first
-        if (b.isDone == true && Behavior.debugBehaviors == false) //don't remove if just stepping...
-        {
-          BehaviorismDriver.renderer.currentWorld.behaviors.remove(b);
-          continue;
-        }
+    // execute high=level sequences
+    Sequence.executeSequences(BehaviorismDriver.renderer.currentWorld.sequences, this.currentNano);
 
-        processBehavior(b);
-     
-        
-        /////////
-        if (reverse == true)
-        {
-          //b.reverse();
-          b.changeSpeed(2f);
-        }
-
-        if (isStepping == true)
-        {
-          if (step != 0)
-          {
-            b.step(currentNano, Utils.millisToNanos((long) (step * stepSize)));
-          }
-          else
-          {
-            b.pause(currentNano);
-          }
-        }
-        else //not globally paused
-        {
-          if (b.isPaused == true) //locally paused
-          {
-            b.pause(currentNano);
-          }
-          else //not globally or locally paused
-          {
-            b.tick(currentNano);
-          }
-        }
-         /////////
-      }
-    */    
-    }
-     
-    reverse = false;
-
-    //NO, not here, we are drawing stuff only via layers now
-//    if (BehaviorismDriver.renderer.currentWorld.state != null)
-//    {
-//      BehaviorismDriver.renderer.currentWorld.state.setState(gl);
-//    }
-
-    //RendererLayer.clearGeoms(BehaviorismDriver.renderer.currentWorld.layers);
-    //can we do this only if there is an actual change?
+    // clear layers -- bleh (think about...)
     for (Map.Entry<Integer, RendererLayer> entry : BehaviorismDriver.renderer.currentWorld.layers.entrySet())
     {
       RendererLayer layer = entry.getValue();
-      layer.attachedGeoms.clear();
+      layer.attachedGeoms.clear(); //can we do this only if there is an actual change?
     }
-    //attachedGeoms.clear();
 
+    //traverse scene graph to determine each element's transformation matrix
+    traverseGeoms(gl, glu, BehaviorismDriver.renderer.currentWorld.geoms,
+      BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed,
+      offset);
+    BehaviorismDriver.renderer.currentWorld.isTransformed = false;
+    BehaviorismDriver.renderer.cam.isTransformed = false;
 
-    //NO - we don't need to push and pop attrib bits here
-    //gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
-
-    //timer1.resetTime();
-    traverseGeoms(gl, glu, BehaviorismDriver.renderer.currentWorld.geoms, currentNano, 0, 0f);
-    //System.out.println("time in traverseGeom = " + timer1.resetTime());
-
-    //gl.glPopAttrib();
-
-    //timer1.resetTime();
+    //iterate through layers and render each element to screen.
     drawGeoms(gl, glu);
-    //System.out.println("time in drawGeoms = " + timer1.resetTime());
-
-  
   }
 
   private void updateCameraBehavior()
@@ -231,143 +170,55 @@ public class VizGeom
         }
       }
     }
+
+    BehaviorismDriver.renderer.setPerspective3D();
   }
 
-  public void traverseGeoms(GL gl, GLU glu, List<Geom> geoms, long currentNano, int level, float prevOffset)
+  private void traverseGeoms(GL gl, GLU glu, List<Geom> geoms, boolean parentTransformed, float prevOffset) //, long currentNano, int level, float prevOffset)
   {
-     // System.out.println("in traverseGeoms : geoms.size = " + geoms.size());
-    //update the behaviors that are attached to
-    //synchronized (geoms)
+    List<Geom> scheduledForRemovalGeoms = new ArrayList<Geom>();
+
+    for (Geom g : geoms)
     {
-      List<Geom> scheduledForRemovalGeoms = new ArrayList<Geom>();
+      processBehaviors(g);
 
-      //draw coordinates based on updates made by behaviors.
-      //for (Geom g : geoms)
-      for (int num = 0; num < geoms.size(); num++)
+      offset = prevOffset + vizOffset; //.00001f; //ideal, works good on my nvidia card
+
+      if (parentTransformed == true) //ie, if the parent has changed, then the children need to change too.
       {
-        Geom g = geoms.get(num);
-        //System.out.println("Geom class = " + g.getClass());
-        //if (BehaviorismDriver.renderer.currentWorld.isPaused != true)
-        {
-          for (int i = g.behaviors.size() - 1; i >= 0; i--)
-          {
-            Behavior b = g.behaviors.get(i);
-        //    System.out.println("about to process behavior " + b);
-
-            processBehavior(b, g);
-            
-          //  System.out.println("is (" + b + ") active/isPaused = " + b.isActive + "/" + b.isPaused);
-            if (b.isActive == true && b.isPaused == false)
-            {
-            //  System.out.println("is " + b + " an instanceof GeomUpdater?");
-              if (b instanceof GeomUpdater)
-              {
-              //  System.out.println("yes...");
-                //b.change(g);
-                //System.out.println("about to update behavior " + b);
-                ((GeomUpdater) b).updateGeom(g);
-              }
-              else
-              {
-               // System.out.println("no " + b.getClass() + " is not an instance of GeomUpdater!!!");
-
-              }
-            }
-
-//            if (b.isDone == true && Behavior.debugBehaviors == false)
-//            {
-//              g.behaviors.remove(b);
-//              b.dispose();
-//            }
-          }
-        }
-
-        /*
-        if (g.state != null)
-        {
-          g.state.setState(gl);
-        }
-        */
-       // gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS); //PUSH current state onto attribute stack
-        //float offset = calculateOffset(level, num, prevOffset);
-        //offset += .0005f; //.00001f;
-        offset += vizOffset; //.00001f; //ideal, works good on my nvidia card
-        //offset += .0002f; //seems good for ati card
-
-        //LOGIC HERE
-        //1. execute geom's transformation and store the new matirx in the geom's modelview
-        //2. if it is viewable/active, then make sure that it is attached
-
-        if (EXPLICITLY_CALCULATE_MODELVIEW == true) //testing if this is faster to calc transformations ourselves...
-        {
-          g.transform2(); //EXPERIMENTAL ONE
-          BehaviorismDriver.renderer.currentWorld.layers.get(g.layerNum).attachedGeoms.add(g);
-          traverseGeoms(gl, glu, g.geoms, currentNano, level + 1, offset);
-
-        }
-        else
-        {
-          gl.glPushMatrix(); ////PUSH current matrix onto stack
-          g.transform(gl, glu); //REAL ONE
-          BehaviorismDriver.renderer.currentWorld.layers.get(g.layerNum).attachedGeoms.add(g);
-          //if (g.isSelectable == true)
-          //if (g.isActive == true && g.isVisible == true)
-          {
-            gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, g.modelview, 0);
-            g.isAttached = true;
-          }
-          traverseGeoms(gl, glu, g.geoms, currentNano, level + 1, offset);
-          gl.glPopMatrix(); //POP matrix off stack and return to previoeus matrix
-        }
-        //gl.glPopAttrib(); //POP attributes off stack and return to previous state
-
-        
-        if (g.isDone == true)
-        {
-            //System.out.println("geom is DONE!");
-          scheduledForRemovalGeoms.add(g);
-        }
-
+        g.isTransformed = true;
       }
 
-      for (Geom g : scheduledForRemovalGeoms)
+      g.transform2(); //EXPERIMENTAL ONE
+      BehaviorismDriver.renderer.currentWorld.layers.get(g.layerNum).attachedGeoms.add(g);
+      traverseGeoms(gl, glu, g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
+
+      g.isTransformed = false;
+
+
+      if (g.isDone == true)
       {
-        g.dispose();
-
-        
-        geoms.remove(g);
-        g = null;
+        scheduledForRemovalGeoms.add(g);
       }
-    } // end sync
+    }
+
+    for (Geom g : scheduledForRemovalGeoms)
+    {
+      g.dispose();
+      geoms.remove(g);
+      g = null;
+    }
   }
 
-  /*
-  private float calculateOffset(int level, int num, float prevOffset)
-  {
-    float offset = (float) (prevOffset + (Math.pow(10, -3 - level) * (num + 1)));
-    //System.out.printf("in calculateOffset() : level=%d, num=%d offset = %f\n", level, num, offset);
-    return offset;
-  }
-  */
-
-  /*
-  public void transformGeom(GL gl, GLU glu, Geom g)
-  {
-    g.transform(gl, glu);
-  }
-  */
-
-  List<Geom> invisiblePickingGeoms = new ArrayList<Geom>();
-
+  //need to clean this up a bit...
   public void drawGeoms(GL gl, GLU glu)
   {
-    if (EXPLICITLY_CALCULATE_MODELVIEW == true)
-    {
-      gl.glMatrixMode(gl.GL_PROJECTION);
-      gl.glLoadMatrixd(RendererJogl.projectionMatrix, 0);
-      gl.glMatrixMode(gl.GL_MODELVIEW);
-      //gl.glLoadMatrixd(cam.modelview);
-    }
+    gl.glMatrixMode(gl.GL_PROJECTION);
+    gl.glLoadMatrixd(RendererJogl.projectionMatrix, 0);
+    gl.glMatrixMode(gl.GL_MODELVIEW);
+
+    //gl.glPushMatrix();
+
 
     invisiblePickingGeoms.clear();
     for (Map.Entry<Integer, RendererLayer> entry : BehaviorismDriver.renderer.currentWorld.layers.entrySet())
@@ -377,16 +228,16 @@ public class VizGeom
 
       layer.sortGeomsInLayer();
 
-      
+
       layer.state.setState(gl);
-   
+
 
 
       int idx = 0;
       for (Geom g : layer.attachedGeoms)
       {
         //System.out.println("idx " + idx + " : g is a " + g.getClass());
-   
+
         if (!g.isActive)
         {
           continue;
@@ -427,28 +278,27 @@ public class VizGeom
         /*
         if (g instanceof GeomPoint)
         {
-          MatrixUtils.printVector(MatrixUtils.pointToHomogenousCoords(g.anchor));
-          Point3f windowVec = MatrixUtils.project(g.anchor);
-          System.out.println("windowVec = " + windowVec);
+        MatrixUtils.printVector(MatrixUtils.pointToHomogenousCoords(g.anchor));
+        Point3f windowVec = MatrixUtils.project(g.anchor);
+        System.out.println("windowVec = " + windowVec);
 
 
-//          //object coords --> view coords
-//          double[] eyeVec = MatrixUtils.objectCoordsToEyeCoords(
-//            g.anchor,
-//            RendererJogl.modelviewMatrix);
-//
-//          double[] clipVec = MatrixUtils.eyeCoordsToClipCoords(eyeVec, RendererJogl.projectionMatrix);
-//
-//          double[] deviceVec = MatrixUtils.clipCoordsToDeviceCoords(clipVec);
-//
-//          double[] windowVec = MatrixUtils.deviceCoordsToWindowCoords(deviceVec, RendererJogl.viewportBounds);
-//
-//           System.out.println("windowVec by hand = ");
+        //          //object coords --> view coords
+        //          double[] eyeVec = MatrixUtils.objectCoordsToEyeCoords(
+        //            g.anchor,
+        //            RendererJogl.modelviewMatrix);
+        //
+        //          double[] clipVec = MatrixUtils.eyeCoordsToClipCoords(eyeVec, RendererJogl.projectionMatrix);
+        //
+        //          double[] deviceVec = MatrixUtils.clipCoordsToDeviceCoords(clipVec);
+        //
+        //          double[] windowVec = MatrixUtils.deviceCoordsToWindowCoords(deviceVec, RendererJogl.viewportBounds);
+        //
+        //           System.out.println("windowVec by hand = ");
         //   MatrixUtils.printVector(windowVec);
-          //System.out.println("projected = " + BehaviorismDriver.renderer.projectPoint(g.anchor, RendererJogl.modelviewMatrix));
+        //System.out.println("projected = " + BehaviorismDriver.renderer.projectPoint(g.anchor, RendererJogl.modelviewMatrix));
         }
-        */
-        
+         */
         //if ((layer.state.DEPTH_TEST == false && g.state == null) || (g.state != null && g.state.DEPTH_TEST == false))
         {
           invisiblePickingGeoms.add(g);
@@ -457,7 +307,7 @@ public class VizGeom
 
         if (g.state != null) //individual geoms can still override layer... should this be allowed??? this is slow
         {
-           layer.state.setState(gl); //have to revert to normal layer state if the geom has overridden it
+          layer.state.setState(gl); //have to revert to normal layer state if the geom has overridden it
         }
 
         idx++;
@@ -465,18 +315,21 @@ public class VizGeom
     }
 
     //draw invisiblePickingGeoms
-   
+
     if (invisiblePickingGeoms.size() > 0)
     {
-    gl.glEnable(GL.GL_DEPTH_TEST);
+      gl.glEnable(GL.GL_DEPTH_TEST);
 
-    for (Geom g : invisiblePickingGeoms)
-    {
-      gl.glLoadMatrixd(g.modelview, 0);
-      g.drawPickingBackground(gl); //TO DO handle picking backgorunds!
+      for (Geom g : invisiblePickingGeoms)
+      {
+        gl.glLoadMatrixd(g.modelview, 0);
+        g.drawPickingBackground(gl); //TO DO handle picking backgorunds!
+      }
     }
-    }
-    
+
+  //gl.glPopMatrix();
+  //BehaviorismDriver.renderer.setPerspective3D();
+
   }
 
   public void drawGeom(GL gl, GLU glu, Geom g, float offset)
@@ -543,56 +396,57 @@ public class VizGeom
    */
   public void drawGrid(GL gl)
   {
-    //gl.glColor4f(1f, 1f, 1f, 1f);
-    //BehaviorismDriver.renderer.glut.glutSolidSphere(2, 2, 2);
-
-    float minx = -5f,
-      miny = -5f;
-    float maxx = 5f,
-      maxy = 5f;
-    float inc = 1f;
-
-    gl.glColor4f(1f, 1f, 1f, 1f);
-
-    //test draw frid lines
-    gl.glLineWidth(.5f);
-    gl.glBegin(gl.GL_LINES);
-    for (float x = minx; x <= maxx; x += inc)
+    gl.glPushMatrix();
     {
-      gl.glVertex3f(x, miny, 0f);
-      gl.glVertex3f(x, maxy, 0f);
-    }
-    for (float y = miny; y <= maxy; y += inc)
-    {
-      gl.glVertex3f(minx, y, 0f);
-      gl.glVertex3f(maxx, y, 0f);
-    }
+      gl.glLoadMatrixd(BehaviorismDriver.renderer.cam.modelview, 0);
 
-    gl.glEnd();
+      float minx = -5f,
+        miny = -5f;
+      float maxx = 5f,
+        maxy = 5f;
+      float inc = 1f;
 
-    //test draw grid points
-    gl.glPointSize(4f);
-    gl.glBegin(gl.GL_POINTS);
-    for (float x = minx; x <= maxx; x += inc)
-    {
+      gl.glColor4f(1f, 1f, 1f, 1f);
+
+      //draw grid lines
+      gl.glLineWidth(.5f);
+      gl.glBegin(gl.GL_LINES);
+      for (float x = minx; x <= maxx; x += inc)
+      {
+        gl.glVertex2f(x, miny);
+        gl.glVertex2f(x, maxy);
+      }
       for (float y = miny; y <= maxy; y += inc)
       {
-        gl.glVertex3f(x, y, 0f);
+        gl.glVertex2f(minx, y);
+        gl.glVertex2f(maxx, y);
       }
-    }
-    gl.glEnd();
+      gl.glEnd();
 
-    //test draw origin
-    gl.glPointSize(8f);
-    gl.glBegin(gl.GL_POINTS);
-    gl.glVertex3f(0f, 0f, 0f);
-    gl.glEnd();
+      //draw grid points
+      gl.glPointSize(4f);
+      gl.glBegin(gl.GL_POINTS);
+      for (float x = minx; x <= maxx; x += inc)
+      {
+        for (float y = miny; y <= maxy; y += inc)
+        {
+          gl.glVertex3f(x, y, 0f);
+        }
+      }
+      gl.glEnd();
+
+      //draw origin
+      gl.glPointSize(8f);
+      gl.glBegin(gl.GL_POINTS);
+      gl.glVertex3f(0f, 0f, 0f);
+      gl.glEnd();
+    }
+    gl.glPopMatrix();
 
   }
 
   public void drawDebuggingInfo(GL gl)
   {
-
     if (drawDebugGrid == true)
     {
       drawGrid(gl);
@@ -609,7 +463,7 @@ public class VizGeom
 
     if (VizGeom.drawDebugMouseDraggedPoint == true)
     {
-      BehaviorismDriver.viz.drawDebugSelect(gl);
+      BehaviorismDriver.viz.drawDebugSelectPoint(gl);
     }
 
     if (VizGeom.drawDebugMouseMovedPoint == true)
@@ -618,13 +472,13 @@ public class VizGeom
     }
   }
 
-  /** this method takes the pixel position of the mouse (returned from the MouseMotionListener,
-   * as handled by the MouseHandler) and renders an indicator of it on the screen (using 
-   * orthographic projectionMatrix).
+  /** 
+   * Draws the current pixel position of the mouse as a green point. This position is returned from the MouseMotionListener,
+   * as handled by the MouseHandler.
    * 
    * @param gl
    */
-  public void drawDebugMousePoint(GL gl)
+  private void drawDebugMousePoint(GL gl)
   {
     if (MouseHandler.debugMousePoint != null)
     {
@@ -632,13 +486,19 @@ public class VizGeom
       gl.glPointSize(10f);
 
       gl.glBegin(gl.GL_POINTS);
-      gl.glVertex3f(MouseHandler.debugMousePoint.x, MouseHandler.debugMousePoint.y, MouseHandler.debugMousePoint.z);
-      //gl.glVertex2f(MouseHandler.debugMousePoint.x, MouseHandler.debugMousePoint.y);
+      gl.glVertex2f(MouseHandler.debugMousePoint.x, MouseHandler.debugMousePoint.y);
       gl.glEnd();
     }
   }
 
-  public void drawDebugSelect(GL gl)
+  /**
+   * Draws the pixel position of the last point the mouse was clicked as a red point.
+   * This position is returned from the MouseMotionListener,
+   * as handled by the MouseHandler.
+   *
+   * @param gl
+   */
+  private void drawDebugSelectPoint(GL gl)
   {
     if (MouseHandler.debugSelectPoint != null)
     {
@@ -646,22 +506,18 @@ public class VizGeom
       gl.glPointSize(10f);
 
       gl.glBegin(gl.GL_POINTS);
-      gl.glVertex3f(MouseHandler.debugSelectPoint.x, MouseHandler.debugSelectPoint.y, MouseHandler.debugSelectPoint.z);
-
+      gl.glVertex2f(MouseHandler.debugSelectPoint.x, MouseHandler.debugSelectPoint.y);
       gl.glEnd();
     }
   }
 
-  public void drawFrameRate(GL gl)
+  private void drawFrameRate(GL gl)
   {
     this.frames++;
-    this.nowTime = Utils.nanosToMillis(currentNano); // / 1000000); //System.currentTimeMillis();
-    //System.out.println("time between frames = " + (nowTime - lastTime));
+    this.nowTime = Utils.nanosToMillis(currentNano);
 
     if (this.nowTime > this.lastTime + 1000)
     {
-
-      //System.out.println("" + this.frames + " perSec");
       this.lastTime = this.nowTime;
       this.fps = this.frames * 1;
       this.frames = 0;
@@ -670,25 +526,14 @@ public class VizGeom
     if (FontHandler.getInstance().textRenderers.size() > 0)
     {
       TextRenderer tr = (FontHandler.getInstance().textRenderers.get(0)); //just get smallest font
-      //TextRenderer tr = new TextRenderer(new Font("Arial", Font.PLAIN, 36), true, true, null, false)  ;
-               
+
       if (tr != null)
       {
-      
-       // TextRenderHack.fixIt( tr );
- 
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER,0);
-        tr.setUseVertexArrays(false);
-      
-        tr.beginRendering((int) (BehaviorismDriver.canvasWidth), (int) (BehaviorismDriver.canvasHeight));
+        tr.beginRendering(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
         tr.setColor(1f, 1f, 1f, 1f);
-        //tr.draw("fps: " + this.fps, 15, 10);
-        tr.draw("fps: " + this.fps, 75, 75);
+        tr.draw("fps: " + this.fps, 5, 5);
         tr.endRendering();
-
-        tr.flush();
       }
     }
-
   }
 }

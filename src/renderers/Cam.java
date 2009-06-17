@@ -30,7 +30,7 @@ public abstract class Cam extends GeomPoint
   public double zNear; //the	distance from the viewer to the	near clipping plane (always positive).
   public double zFar; //the	distance from the viewer to the	far clipping plane (always positive).
 
-  public double[] modelview = MatrixUtils.getIdentity();
+  //public double[] modelview = MatrixUtils.getIdentity();
 
   public void changeHeading(double degrees)
   {
@@ -66,6 +66,7 @@ public abstract class Cam extends GeomPoint
     return MatrixUtils.getIdentity();
   }
 
+  /*
   public void moveX(float x)
   {
   }
@@ -77,7 +78,8 @@ public abstract class Cam extends GeomPoint
   public void moveZ(float z)
   {
   }
-
+  */
+  
   public void moveTo(float x, float y, float z, long when, long howfast)
   {
   }

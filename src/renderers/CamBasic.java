@@ -161,21 +161,25 @@ public class CamBasic extends Cam
   @Override
   public void changePitch(double degrees)
   {
-    rotate.x += degrees;
+    rotateX(+(float)degrees);
+    //rotate.x += degrees;
   }
 
   @Override
   public void changeHeading(double degrees)
   {
-    rotate.y += degrees;
+    rotateY(+(float)degrees);
+    //rotate.y += degrees;
   }
 
   @Override
   public void changeYaw(double degrees)
   {
-    rotate.z += degrees;
+    rotateZ(+(float)degrees);
+    //rotate.z += degrees;
   }
 
+  /*
   @Override
   public void moveX(float x)
   {
@@ -193,7 +197,7 @@ public class CamBasic extends Cam
   {
     anchor.z += z;
   }
-
+  */
   @Override
   public void moveTo(float x, float y, float z, long when, long howfast)
   {
