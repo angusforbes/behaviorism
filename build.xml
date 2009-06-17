@@ -13,7 +13,7 @@
 
     <jar destfile="dist/resources.jar" basedir="resources"/>
 
-    <jar destfile="tmp.jar" duplicate="fail" index="true">
+    <jar destfile="tmp.jar" index="true">
       <zipgroupfileset dir="dist" includes="*.jar"/>
     </jar>
 

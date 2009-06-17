@@ -186,7 +186,8 @@ public class GeomRect extends Geom
       {
         gl.glBegin(GL.GL_POINTS);
         {
-          Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.z);
+          //Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.z);
+          Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.anchor.z);
           Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(test, RendererJogl.modelviewMatrix, modelview);
           gl.glColor4f(1f, 0f, 0f, 1f);
           //gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
@@ -204,13 +205,17 @@ public class GeomRect extends Geom
 //          gl.glVertex3f(r2f.x + r2f.width, r2f.y + r2f.height, this.z);
 //          gl.glVertex3f(r2f.x, r2f.y + r2f.height, this.z);
 
-            Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX(), r2f.getY(), this.z), RendererJogl.modelviewMatrix, modelview);
+            //float cz = this.z;
+            float cz = this.anchor.z;
+
+
+            Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX(), r2f.getY(), cz), RendererJogl.modelviewMatrix, modelview);
             gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
-            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX() + r2f.getWidth(), r2f.getY(), this.z), RendererJogl.modelviewMatrix, modelview);
+            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX() + r2f.getWidth(), r2f.getY(), cz), RendererJogl.modelviewMatrix, modelview);
             gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
-            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX() + r2f.getWidth(), r2f.getY() + r2f.getHeight(), this.z), RendererJogl.modelviewMatrix, modelview);
+            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX() + r2f.getWidth(), r2f.getY() + r2f.getHeight(), cz), RendererJogl.modelviewMatrix, modelview);
             gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
-            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX(), r2f.getY() + r2f.getHeight(), this.z), RendererJogl.modelviewMatrix, modelview);
+            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX(), r2f.getY() + r2f.getHeight(), cz), RendererJogl.modelviewMatrix, modelview);
             gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
 
           }
@@ -291,8 +296,8 @@ public class GeomRect extends Geom
     }
     else
     {
-      this.x = (float)this.rectangle.getX();
-      this.y = (float)this.rectangle.getY();
+     // this.x = (float)this.rectangle.getX();
+     // this.y = (float)this.rectangle.getY();
       this.anchor.x = (float)this.rectangle.getX();
       this.anchor.y = (float)this.rectangle.getY();
       this.w = (float)this.rectangle.getWidth();
@@ -335,12 +340,14 @@ public class GeomRect extends Geom
       this.h = floats.get(3);
      */
       
-    this.x = (float)bounds.getX();
-    this.y = (float)bounds.getY();
+    //this.x = (float)bounds.getX();
+    //this.y = (float)bounds.getY();
+    this.anchor.x = (float)bounds.getX();
+    this.anchor.y = (float)bounds.getY();
     this.w = (float)bounds.getWidth();
     this.h = (float)bounds.getHeight();
-    this.anchor.x = this.x;
-    this.anchor.y = this.y;
+//    this.anchor.x = this.x;
+//   this.anchor.y = this.y;
     
     scaleAnchor = new Point3f(this.w * .5f, this.h * .5f, 0f);
     //EffectUtils.effectZoomIn(this, System.nanoTime(), 200L, true);
@@ -652,7 +659,8 @@ public class GeomRect extends Geom
         borderRect2.registerDraggableObject(returnGeom);
 
       
-        returnGeom.setPos(ox, oy, origGeom.z); 
+        //returnGeom.setPos(ox, oy, origGeom.z);
+        returnGeom.setPos(ox, oy, origGeom.anchor.z);
         //returnGeom.setPos(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z); 
       
         return returnGeom;
@@ -700,7 +708,8 @@ public class GeomRect extends Geom
         borderRect2.registerDraggableObject(returnGeom);
 
 
-        returnGeom.setPos(ox, oy, origGeom.z);
+        //returnGeom.setPos(ox, oy, origGeom.z);
+        returnGeom.setPos(ox, oy, origGeom.anchor.z);
         //returnGeom.setPos(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z);
 
         return returnGeom;
@@ -772,7 +781,8 @@ public class GeomRect extends Geom
         borderRect2.registerClickableObject(returnGeom);
         borderRect2.registerDraggableObject(returnGeom);
       
-        returnGeom.setPos(ox, oy, geom.z); 
+        //returnGeom.setPos(ox, oy, geom.z);
+        returnGeom.setPos(ox, oy, geom.anchor.z);
       
         return returnGeom;
     }
@@ -849,7 +859,8 @@ public class GeomRect extends Geom
         borderRect2.registerDraggableObject(returnGeom);
 
       
-        returnGeom.setPos(ox, oy, geom.z); 
+        //returnGeom.setPos(ox, oy, geom.z);
+        returnGeom.setPos(ox, oy, geom.anchor.z);
         //returnGeom.setPos(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z); 
       
         return returnGeom;

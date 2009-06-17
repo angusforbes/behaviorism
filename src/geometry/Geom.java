@@ -27,48 +27,56 @@ public abstract class Geom //extends Point3f //Object
 {
 
   /**
-   * getMatrixIndex name for this Geom. Does not need to be unique.
+   * A name for this Geom. Does not need to be unique.
    */
   public String name = "untitled";
+
   /**
-   * getMatrixIndex unique id for this Geom.
+   * A unique id for this Geom.
    */
   public String id = ""; //not currently used...
+
   /**
-   * getMatrixIndex concurrent list of all child Geoms attached to this Geom.
+   * A List of all child Geoms attached to this Geom.
    */
   public List<Geom> geoms = new CopyOnWriteArrayList<Geom>();
+
   /**
-   * getMatrixIndex concurrent list of all Behaviors attached to this Geom.
+   * A List of all Behaviors attached to this Geom.
    */
-  //public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
   public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
+
   /**
-   * getMatrixIndex list of all Datas attached to this Geom.
+   * A root Data node that can hold various types of Data attached to this Geom.
    */
   //public List<Data> datas = Collections.synchronizedList(new ArrayList<Data>());
   public Data data = new Data();
+
   /** this will soon be deprecated-- we should be using just regular x,y,z */
   public Point3f anchor = new Point3f(0f, 0f, 0f);
-  public float x = 0f;
-  public float y = 0f;
-  public float z = 0f;
+
+  //public float x = 0f;
+  //public float y = 0f;
+  //public float z = 0f;
+
   /**
    * The relative point (in parent's coordinates) around which the object is to rotate.
    * By default it is set to be the lower left corner of the object
    */
+  //tell me why this is a GeomPoint again???
   public GeomPoint rotateAnchor = null; //new GeomPoint(.5f, .5f, 0f);
   /**
    * getMatrixIndex point which describes the rotation around the x, y, and z axes. Rotations are in degrees, not radians.
    */
   public Point3d rotate = new Point3d(0, 0, 0);
+  
   /**
    * The relative point (in parent's coordinates) around which the object is to scale.
    * By default it is set to be the lower left corner of the object
    */
   public Point3f scaleAnchor = new Point3f(0f, 0f, 0f);
   /**
-   * getMatrixIndex point which describes the scaling factor of the width, height, and depth dimensions of the object.
+   * Point which describes the scaling factor of the width, height, and depth dimensions of the object.
    * By default each dimension is set to a factor of 1.
    */
   public Point3d scale = new Point3d(1, 1, 1);
@@ -79,14 +87,24 @@ public abstract class Geom //extends Point3f //Object
   public float h = 1f;
   public float d = 0f;
   /** we are not really using this... should we be? Looks we are *always* using ScaleEnum.CENTER (in the transform) */
+
   @Deprecated
   public ScaleEnum scaleDirection = ScaleEnum.NE; //default
+
   public float r = (float) Math.random();
   public float g = (float) Math.random();
   public float b = (float) Math.random();
   public float a = 1f;
-  public float area = 0f;
+  
+  
+  @Deprecated
+  public float area = 0f; //i think i was using this for an picking alogrithm. it was a dumb idea. this shouldn't be stored.
+
+
   //various flags for rendering, texturing, picking, timing, etc.
+
+  public boolean isTransformed = false; //if true, we will update the transformation matrix
+
   public boolean isActive = false; //if true, it will be displayed
   public boolean isDone = false; //if true, it will be removed
   public boolean isTextured = false; //if true, we will handle texture coords
@@ -102,8 +120,8 @@ public abstract class Geom //extends Point3f //Object
    * getMatrixIndex 4x4 double array representing the Geom's openGL modelview matrix within the scenegraph hierarchy.
    */
   public double[] modelview = MatrixUtils.getIdentity();
-  public Matrix4d modelview2 = new Matrix4d(MatrixUtils.getIdentity());
-  public double[] modelview3 = MatrixUtils.getIdentity(); //(MatrixUtils.getIdentity());
+  //public Matrix4d modelview2 = new Matrix4d(MatrixUtils.getIdentity());
+  //public double[] modelview3 = MatrixUtils.getIdentity(); //(MatrixUtils.getIdentity());
   //.setIdentity();
   /**
    * An object representing the current set of openGL states of this Geom.
@@ -607,17 +625,23 @@ public abstract class Geom //extends Point3f //Object
   public void setPos(Point3f p3f)
   {
     anchor.set(p3f);
-    this.x = p3f.x;
-    this.y = p3f.y;
-    this.z = p3f.z;
+    //this.x = p3f.x;
+    //this.y = p3f.y;
+    //this.z = p3f.z;
   }
 
   public void setPos(float x, float y, float z)
   {
-    anchor.set(x, y, z);
-    this.x = x;
-    this.y = y;
-    this.z = z;
+    if (x != anchor.x && y != anchor.y && z != anchor.z)
+    {
+      anchor.set(x, y, z);
+      isTransformed = true;
+    }
+
+    //this.x = x;
+    //this.y = y;
+    //this.z = z;
+
   }
 
   /**
@@ -626,18 +650,17 @@ public abstract class Geom //extends Point3f //Object
    * @param w
    * @param h
    */
+  /*
   public void setPos(Point3f p3f, float w, float h)
   {
     anchor.set(p3f);
-    this.x = p3f.x;
-    this.y = p3f.y;
-    this.z = p3f.z;
     this.w = w;
     this.h = h;
 
     this.scaleAnchor = new Point3f(w * .5f, h * .5f, 0f);
     this.rotateAnchor = new GeomPoint(w * .5f, h * .5f, 0f);
   }
+  */
 
   /**
    * Defaults to rotating and scaling around the center (maybe make this an option?)
@@ -647,31 +670,34 @@ public abstract class Geom //extends Point3f //Object
    * @param w
    * @param h
    */
+  /*
   public void setPos(float x, float y, float z, float w, float h)
   {
     anchor.set(x, y, z);
-    this.x = x;
-    this.y = y;
-    this.z = z;
+    //this.x = x;
+    //this.y = y;
+    //this.z = z;
     this.w = w;
     this.h = h;
 
     this.scaleAnchor = new Point3f(w * .5f, h * .5f, 0f);
     this.rotateAnchor = new GeomPoint(w * .5f, h * .5f, 0f);
   }
-
+  */
+  /*
   public void setPos(Point3f p3f, float w, float h, Point3f scaleAnchor, GeomPoint rotateAnchor)
   {
     anchor.set(p3f);
-    this.x = p3f.x;
-    this.y = p3f.y;
-    this.z = p3f.z;
+    //this.x = p3f.x;
+    //this.y = p3f.y;
+    //this.z = p3f.z;
     this.w = w;
     this.h = h;
 
     this.scaleAnchor = scaleAnchor;
     this.rotateAnchor = rotateAnchor;
   }
+  */
 
   public Colorf getColor()
   {
@@ -806,6 +832,9 @@ public abstract class Geom //extends Point3f //Object
   }
    */
   ////replace this with dot product code!!!
+
+  //The following 3 methods should be removed. The same functionality is in GeomUtils!
+  @Deprecated
   public static float getAngleBetweenGeoms(Geom g1, Geom g2)
   {
     //just 2d angle, not solid angle
@@ -816,6 +845,7 @@ public abstract class Geom //extends Point3f //Object
   }
 
   //replace this with Euclidian distance code!!!
+  @Deprecated
   public static float getDistanceBetweenGeoms(Geom g1, Geom g2)
   {
     //just 2d distance // now 3d
@@ -826,6 +856,7 @@ public abstract class Geom //extends Point3f //Object
     return (float) Math.sqrt(ny * ny + nx * nx + nz * nz);
   }
 
+  @Deprecated
   public static Point3f getNormalVectorBetweenGeoms(Geom g1, Geom g2)
   {
     //just 2d distance // now 3d
@@ -954,19 +985,10 @@ public abstract class Geom //extends Point3f //Object
     this.scaleAnchor = scaleAnchor;
   }
 
-  public static List<Point3f> getAnchorPointsForGeoms(List<Geom> gs)
-  {
-    List<Point3f> p3fs = new ArrayList<Point3f>();
-
-    for (Geom g : gs)
-    {
-      p3fs.add(g.anchor);
-    }
-
-    return p3fs;
-  }
 
   /* changes the coordinates of the Geom so that it center will be on a specified point */
+  //this is silly. put it somwhere else
+  @Deprecated
   public void centerGeom(Point3f centerPt)
   {
     this.anchor.x = centerPt.x - (this.w * .5f);
@@ -1126,6 +1148,12 @@ public abstract class Geom //extends Point3f //Object
   /**
    * Reduces the visual prominence of this node and its children.
    */
+  
+  // who uses this???? I think it was from the IGERT demo... should remove or move it into to the igert project
+  /*
+  @Deprecated
+  public boolean isBold;
+  @Deprecated
   public void fade()
   {
     Colorf c = getColor();
@@ -1141,11 +1169,9 @@ public abstract class Geom //extends Point3f //Object
       myg.fade();
     }
   }
-  /**
-   * Increases the visual prominence of this node.
-   */
-  public boolean isBold;
-
+  */
+  //TO DO: I don't know who uses these anymore. I think maybe Basak used them??? They shouldn't be here!
+  /*
   public Point3f getMinAnchor()
   {
     Point3d geomPt_wc;
@@ -1235,7 +1261,8 @@ public abstract class Geom //extends Point3f //Object
     }
     return sum;
   }
-
+  */
+  
   //TO DO - need to fix this to work with list of textures...
   /**
    * Recursively calls the dispose() method this Geom and all attached children.

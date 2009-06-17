@@ -27,7 +27,20 @@ public class GeomBlob extends Geom
     this.scale.y = 1f;
     this.scale.z = 1f;
   }
-  
+
+
+  public List<Point3f> getAnchorPointsForGeoms(List<Geom> gs)
+  {
+    List<Point3f> p3fs = new ArrayList<Point3f>();
+
+    for (Geom g : gs)
+    {
+      p3fs.add(g.anchor);
+    }
+
+    return p3fs;
+  }
+
   public List<BlobElement> makeBlobFromPoints()
   {
     float blobDist = .2f;
@@ -35,7 +48,7 @@ public class GeomBlob extends Geom
     centerGeom.anchor = centerPt;
     //Point3f centerPt = new Point3f(0f, 0f, 0f);
     
-    List<Point3f> pts = Geom.getAnchorPointsForGeoms(gpts);
+    List<Point3f> pts = getAnchorPointsForGeoms(gpts);
     synchronized(gpts)
     {
       //GeomUtils.sortPointsByAngle(new GeomPoint(centerPt), gpts, -1);

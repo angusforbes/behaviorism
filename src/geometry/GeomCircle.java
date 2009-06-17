@@ -105,7 +105,8 @@ public class GeomCircle extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (outerRadius * Math.cos(Math.toRadians(angle)))),
           (float) (0 + (outerRadius * Math.sin(Math.toRadians(angle)))),
-          z));
+          anchor.z //z
+          ));
         angle += inc;
 
       }
@@ -114,7 +115,8 @@ public class GeomCircle extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (innerRadius * Math.cos(Math.toRadians(angle)))),
           (float) (0 + (innerRadius * Math.sin(Math.toRadians(angle)))),
-          z));
+          anchor.z //z
+          ));
         angle -= inc;
       }
     }
@@ -126,7 +128,8 @@ public class GeomCircle extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (outerRadius * Math.cos(Math.toRadians(angle)))),
           (float) (0 + (outerRadius * Math.sin(Math.toRadians(angle)))),
-          z));
+          anchor.z //z
+          ));
         angle += inc;
 
       }
@@ -138,7 +141,8 @@ public class GeomCircle extends GeomPoly
         {
           this.vertices.add(new GeomPoint((float) (0 + (innerRadius * Math.cos(Math.toRadians(angle)))),
             (float) (0 + (innerRadius * Math.sin(Math.toRadians(angle)))),
-            z));
+            anchor.z //z
+            ));
           angle -= inc;
         }
       }

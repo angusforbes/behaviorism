@@ -117,7 +117,8 @@ public class GeomEllipse extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (outerW * Math.cos(Math.toRadians(angle)))),
                 (float)(0 + (outerH * Math.sin(Math.toRadians(angle)))),
-                z));
+                anchor.z //z
+                ));
         angle+=inc;
         
       }
@@ -129,14 +130,17 @@ public class GeomEllipse extends GeomPoly
         //        z));
 				if (borderSize <= 0f)
 				{
-					this.vertices.add(new GeomPoint(0f, 0f, z));
+					//this.vertices.add(new GeomPoint(0f, 0f, z));
+					this.vertices.add(new GeomPoint(0f, 0f, anchor.z));
 				}
 				else
 				{
 					//this.verts.add(new GeomPoint((float) (0f + ((outerW-(outerW * borderSize)) * Math.cos(Math.toRadians(angle)))),
 				//					(float)(0f + ((outerH-(outerH * borderSize)) * Math.sin(Math.toRadians(angle)))), z));
 						this.vertices.add(new GeomPoint((float) (0f + ((outerW-borderSize) * Math.cos(Math.toRadians(angle)))),
-                (float)(0f + ((outerH-borderSize) * Math.sin(Math.toRadians(angle)))), z));
+                (float)(0f + ((outerH-borderSize) * Math.sin(Math.toRadians(angle)))), 
+                anchor.z //z
+                ));
 				
 				}
         angle-=inc;
@@ -150,7 +154,8 @@ public class GeomEllipse extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (outerW * Math.cos(Math.toRadians(angle)))),
                 (float)(0 + (outerH * Math.sin(Math.toRadians(angle)))),
-                z));
+                anchor.z //z
+                ));
         angle+=inc;
         
       }
@@ -162,7 +167,8 @@ public class GeomEllipse extends GeomPoly
         {
 					this.vertices.add(new GeomPoint((float) (0f + ((outerW-borderSize) * Math.cos(Math.toRadians(angle)))),
                 (float)(0f + ((outerH-borderSize) * Math.sin(Math.toRadians(angle)))),
-                z));
+                anchor.z //z
+                ));
 				
           //this.verts.add(new GeomPoint((float) (0 + (innerW * Math.cos(Math.toRadians(angle)))),
           //        (float)(0 + (innerH * Math.sin(Math.toRadians(angle)))),

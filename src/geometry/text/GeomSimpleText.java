@@ -139,6 +139,10 @@ public class GeomSimpleText extends GeomRect
   private void drawBounds(GL gl)
   {
     gl.glBegin(gl.GL_QUADS);
+    float x = anchor.x;
+    float y = anchor.y;
+    float z = anchor.z;
+
     gl.glVertex3f(x, y, z);
     gl.glVertex3f(x + w, y, z);
     gl.glVertex3f(x + w, y + h, z);

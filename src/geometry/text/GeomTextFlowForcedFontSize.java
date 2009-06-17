@@ -808,8 +808,10 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
     {
       for (int i = 0; i < this.numLines; i++)
       {
-        gl.glVertex3f(0f, (this.h) - (inc * (i + 1)), this.z);
-        gl.glVertex3f(this.w, (this.h) - (inc * (i + 1)), this.z);
+        //gl.glVertex3f(0f, (this.h) - (inc * (i + 1)), this.z);
+        //gl.glVertex3f(this.w, (this.h) - (inc * (i + 1)), this.z);
+        gl.glVertex3f(0f, (this.h) - (inc * (i + 1)), this.anchor.z);
+        gl.glVertex3f(this.w, (this.h) - (inc * (i + 1)), this.anchor.z);
       }
     }
     gl.glEnd();

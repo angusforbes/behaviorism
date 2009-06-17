@@ -75,6 +75,9 @@ public class GeomVideo extends GeomRect
 
       TextureCoords textureCoords = this.textures.get(0).texture.getImageTexCoords();
 
+      float x = anchor.x;
+      float y = anchor.y;
+
       gl.glTexCoord2f(textureCoords.left(), textureCoords.bottom());
       gl.glVertex2f(x, y);
       gl.glTexCoord2f(textureCoords.right(), textureCoords.bottom());
