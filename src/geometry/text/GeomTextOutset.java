@@ -18,7 +18,7 @@ import handlers.FontHandler;
 import java.util.Arrays;
 import java.util.List;
 import javax.vecmath.Vector3f;
-import renderers.Cam;
+import renderers.cameras.Cam;
 import utils.MatrixUtils;
 import utils.RenderUtils;
 

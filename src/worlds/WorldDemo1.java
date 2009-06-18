@@ -23,7 +23,7 @@ import javax.vecmath.Point3f;
 import handlers.YouTubeHandler;
 import handlers.FontHandler;
 import java.awt.event.KeyEvent;
-import renderers.CamBasic;
+import renderers.cameras.CamBasic;
 import textures.TextureVideo;
 import utils.FileUtils;
 import utils.Utils;

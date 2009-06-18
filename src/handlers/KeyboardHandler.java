@@ -9,7 +9,7 @@ import renderers.VizGeom;
 import geometry.media.GeomRectVideoFobs;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import renderers.Cam;
+import renderers.cameras.Cam;
 
 /** 
  * KeyboardHandler is a wrapper for KeyListener supporting various modes

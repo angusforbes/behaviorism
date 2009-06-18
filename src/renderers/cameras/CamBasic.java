@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package renderers;
+package renderers.cameras;
 
 import behaviors.Behavior;
 import behaviors.geom.continuous.BehaviorTranslate;
@@ -48,7 +48,9 @@ public class CamBasic extends Cam
     this.fovy = 45;
   }
   
-  /** return camera to original setup, with original x and y translation and no rotation.
+
+  /**
+   * Returns camera to original setup, with original x and y translation and no rotation.
    * This resets to the original placement, except we are still
    * moving the camera along the current z-axis. This method is used for calculating
    * a good looking text size.
@@ -56,37 +58,11 @@ public class CamBasic extends Cam
   @Override
   public void resetPerspective(GL gl, GLU glu)
   {
-    //set perspective
-//    gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
-//    gl.glMatrixMode(gl.GL_PROJECTION);
-//    gl.glLoadIdentity();
-//    glu.gluPerspective(this.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
-
-//    gl.glMatrixMode(gl.GL_MODELVIEW);
-//    gl.glLoadIdentity();
-
-    //gl.glTranslatef(-resetAnchor.x, -resetAnchor.y, -resetAnchor.z);
-    
-    //real one...
-    //gl.glTranslatef(-resetAnchor.x, -resetAnchor.y, -anchor.z);
- 
-    //set original rotation
-    
     //set original location 
     gl.glTranslatef(resetAnchor.x, resetAnchor.y, resetAnchor.z);
-
   }
-
-  /*
-  @Deprecated
-  public double[] resetPerspective()
-  {
-    modelview = MatrixUtils.getIdentity();
-    MatrixUtils.translate(modelview, resetAnchor.x, resetAnchor.y, resetAnchor.z);
-    return modelview;
-  }
-  */
-
+  
+  @Override
   public double[] perspective()
   {
     modelview = MatrixUtils.getIdentity();

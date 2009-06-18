@@ -4,6 +4,7 @@
  */
 package renderers;
 
+import renderers.cameras.Cam;
 import behaviorism.BehaviorismDriver;
 import handlers.MouseHandler;
 import handlers.KeyboardHandler;

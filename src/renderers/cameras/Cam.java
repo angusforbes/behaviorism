@@ -6,7 +6,7 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-package renderers;
+package renderers.cameras;
 
 import geometry.GeomPoint;
 import javax.media.opengl.glu.GLU;

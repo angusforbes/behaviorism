@@ -17,7 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.vecmath.Point3d;
-import renderers.Cam;
+import renderers.cameras.Cam;
 import utils.GeomUtils;
 import utils.MatrixUtils;
 import utils.RenderUtils;
