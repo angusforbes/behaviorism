@@ -30,7 +30,7 @@ public class RendererJogl implements GLEventListener
 
   public Map<WorldGeom, Boolean> worlds = new ConcurrentHashMap<WorldGeom, Boolean>();
   public WorldGeom currentWorld = null;
-  public VizGeom viz = null;
+  public SceneGraph viz = null;
   public static GLUT glut;
   public static GLU glu;
   public GL gl;
@@ -117,9 +117,13 @@ public class RendererJogl implements GLEventListener
    */
   public void setPerspective3D()
   {
+    //can these conditions ever occur?
     if (cam == null)
     {
-      System.out.println("cam is null...");
+      return;
+    }
+    if (currentWorld == null)
+    {
       return;
     }
 
@@ -131,13 +135,13 @@ public class RendererJogl implements GLEventListener
 
     modelviewMatrix = cam.perspective();
 
-    if (BehaviorismDriver.renderer.currentWorld != null && boundsHaveChanged == true)
+    if(boundsHaveChanged == true)
     {
       //System.out.println("boundsHaveChanged!!!");
       Point3f lowerleft = MatrixUtils.toPoint3f(
-        RenderUtils.rayIntersect(BehaviorismDriver.renderer.currentWorld, 0, (int) screenBounds.getHeight(), new Point3d()));
+        RenderUtils.rayIntersect(currentWorld, 0, (int) screenBounds.getHeight(), new Point3d()));
       Point3f upperright = MatrixUtils.toPoint3f(
-        RenderUtils.rayIntersect(BehaviorismDriver.renderer.currentWorld, (int) screenBounds.getWidth(), 0, new Point3d()));
+        RenderUtils.rayIntersect(currentWorld, (int) screenBounds.getWidth(), 0, new Point3d()));
 
       screenBoundsInWorldCoords = new Rectangle2D.Float(
         lowerleft.x, lowerleft.y, upperright.x - lowerleft.x, upperright.y - lowerleft.y);
@@ -202,8 +206,8 @@ public class RendererJogl implements GLEventListener
   private void processHandlers()
   {
     //TO DO: have a list of attached handlers...
-    MouseHandler.processMouse();
-    KeyboardHandler.processKeyboard();
+    MouseHandler.getInstance().processMouse();
+    KeyboardHandler.getInstance().processKeyboard();
   }
 
   private void clear()
@@ -222,6 +226,44 @@ public class RendererJogl implements GLEventListener
     System.err.println("in RendererJogl : we have disposed of all resources... ");
     BehaviorismDriver.doneShutdown.set(true);
   }
+
+  @Override
+  public void display(GLAutoDrawable drawable)
+  {
+    if (!isReady(drawable))
+    {
+      return;
+    }
+
+    gl = drawable.getGL();
+
+    clear();
+
+    //i don't like this being here...
+    if (fontHandler.changeFonts.get() == true)
+    {
+      fontHandler.nextFont(fontHandler.fontIndex);
+    }
+
+    BehaviorismDriver.viz.draw(gl);
+
+    //fontHandler.fontsReady.set(false);
+
+    processHandlers();
+    processDebugs();
+    //gl.glFlush(); //is this necessary?
+
+    //set this false here so that geoms that need to recalc if bounds have changed will know
+    //that screen has been reshaped.
+    boundsHaveChanged = false;
+
+
+    if (BehaviorismDriver.isShutdown.get() == true)
+    {
+      shutdown();
+    }
+  }
+
 
   @Override
   public void init(GLAutoDrawable drawable)
@@ -294,7 +336,7 @@ public class RendererJogl implements GLEventListener
     //gl.glDepthMask(false); //may have to futz with for overlays!
     gl.glDepthMask(true); //may have to futz with for overlays!
 
-    //set up tesselation callbacks/objects - used by VizGeom.drawGeomPoly(...)
+    //set up tesselation callbacks/objects - used by SceneGraph.drawGeomPoly(...)
     tessellationCallback = new TessellationCallBack(gl, glu);
     tessellationObject = glu.gluNewTess();
     glu.gluTessCallback(tessellationObject, GLU.GLU_TESS_VERTEX, tessellationCallback);// vertexCallback);
@@ -317,43 +359,6 @@ public class RendererJogl implements GLEventListener
     //animator.setRunAsFastAsPossible(false);
 
     animator.start();
-  }
-
-  @Override
-  public void display(GLAutoDrawable drawable)
-  {
-    if (!isReady(drawable))
-    {
-      return;
-    }
-
-    gl = drawable.getGL();
-
-    clear();
-
-    //i don't like this being here...
-    if (fontHandler.changeFonts.get() == true)
-    {
-      fontHandler.nextFont(fontHandler.fontIndex);
-    }
-
-    BehaviorismDriver.viz.draw(gl);
-
-    //fontHandler.fontsReady.set(false);
-
-    processHandlers();
-    processDebugs();
-    //gl.glFlush(); //is this necessary?
-
-    //set this false here so that geoms that need to recalc if bounds have changed will know
-    //that screen has been reshaped.
-    boundsHaveChanged = false;
-
-
-    if (BehaviorismDriver.isShutdown.get() == true)
-    {
-      shutdown();
-    }
   }
 
   @Override

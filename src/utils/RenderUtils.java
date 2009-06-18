@@ -17,7 +17,7 @@ import javax.media.opengl.GL;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import renderers.RendererJogl;
-import renderers.VizGeom;
+import renderers.SceneGraph;
 
 /**
  *

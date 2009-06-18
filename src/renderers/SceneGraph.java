@@ -16,13 +16,9 @@ import java.util.Map;
 import sequences.Sequence;
 import utils.Utils;
 
-public class VizGeom
+public class SceneGraph
 {
 
-  /**
-   * Sets whether or not we calculate the modelview matricies ourselves as we
-   * traverse the scenegraph. Seems to work, but experimental...
-   */
   public static boolean drawDebugFrameRate = true;
   public static boolean drawDebugGeom = false;
   public static boolean drawDebugGrid = false;
@@ -458,17 +454,17 @@ public class VizGeom
     BehaviorismDriver.renderer.setPerspective2D();
 
     //draw selected debugging info
-    if (VizGeom.drawDebugFrameRate == true)
+    if (SceneGraph.drawDebugFrameRate == true)
     {
       BehaviorismDriver.viz.drawFrameRate(gl);
     }
 
-    if (VizGeom.drawDebugMouseDraggedPoint == true)
+    if (SceneGraph.drawDebugMouseDraggedPoint == true)
     {
       BehaviorismDriver.viz.drawDebugSelectPoint(gl);
     }
 
-    if (VizGeom.drawDebugMouseMovedPoint == true)
+    if (SceneGraph.drawDebugMouseMovedPoint == true)
     {
       BehaviorismDriver.viz.drawDebugMousePoint(gl);
     }

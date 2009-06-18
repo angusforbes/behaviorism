@@ -58,12 +58,30 @@ public class MouseHandler extends MouseAdapter
   public static Geom selectedGeom = null;
   public static Geom mouseOverGeom = null;
 
+  private static MouseHandler instance = null;
+
+  /**
+   * Gets (or creates then gets) the singleton MouseHandler object.
+   * @return the singleton MouseHandler
+   */
+  public static MouseHandler getInstance()
+  {
+    if (instance != null)
+    {
+      return instance;
+    }
+
+    instance = new MouseHandler();
+
+    return instance;
+  }
+
   /**
    * processMouse is called from withing the openGL display loop.
    * It handles the selection, movement, and other interactions
    * of the mouse to objects in the current world including the camera.
    */
-  public static void processMouse()
+  public /*static*/ void processMouse()
   {
     //System.out.println( "isPressing: " + isPressing + " isProcessing: " + isProcessing );
     if (isPressing == true && isProcessing == false)
@@ -93,7 +111,7 @@ public class MouseHandler extends MouseAdapter
     }
   }
 
-  private static void processMouseMoving()
+  private /*static*/ void processMouseMoving()
   {
     double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 
@@ -111,14 +129,14 @@ public class MouseHandler extends MouseAdapter
     }
   }
 
-  private static Point3f worldPtToSelctedGeomPt(Point3f mouseWorld, Geom selectedGeom)
+  private /*static*/ Point3f worldPtToSelctedGeomPt(Point3f mouseWorld, Geom selectedGeom)
   {
     return MatrixUtils.toPoint3f(
       MatrixUtils.getWorldPointInGeomCoordinates(
       MatrixUtils.toPoint3d(mouseWorld), BehaviorismDriver.renderer.modelviewMatrix, selectedGeom.modelview));
   }
 
-  private static void processMousePressing()
+  private /*static*/ void processMousePressing()
   {
     double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 
@@ -158,7 +176,7 @@ public class MouseHandler extends MouseAdapter
     }
   }
 
-  public static void processMouseDragging()
+  public /*static*/ void processMouseDragging()
   {
     if (selectedGeom == null) //drag the camera
     {
@@ -187,11 +205,11 @@ public class MouseHandler extends MouseAdapter
     }
   }
 
-  public static void processMouseReleasing()
+  public /*static*/ void processMouseReleasing()
   {
   }
 
-  private static void dragCamera()
+  private /*static*/ void dragCamera()
   {
     Cam cam = BehaviorismDriver.renderer.getCamera();
     int xDif = mx - pre_mx;
@@ -216,7 +234,7 @@ public class MouseHandler extends MouseAdapter
     }
   }
 
-  public static void dragGeom()
+  public /*static*/ void dragGeom()
   {
     if (button == 1)
     {
@@ -240,7 +258,7 @@ public class MouseHandler extends MouseAdapter
     }
   }
 
-  private static void determineOffsetPointForDragging(Point3d ptWorld)
+  private /*static*/ void determineOffsetPointForDragging(Point3d ptWorld)
   {
     if (selectedGeom.draggableObject != null)
     {
@@ -271,7 +289,7 @@ public class MouseHandler extends MouseAdapter
    * @param geoms
    * @param ptPixel
    */
-  private static void pickGeom(List<Geom> geoms, Point2D.Float ptPixel)
+  private /*static*/ void pickGeom(List<Geom> geoms, Point2D.Float ptPixel)
   {
     selectedGeom = selectPossibleGeom(geoms, ptPixel);
     if (selectedGeom == null)
@@ -327,7 +345,7 @@ public class MouseHandler extends MouseAdapter
    * @param pt
    * @return 
    */
-  private static Geom selectPossibleGeom(List<Geom> geoms, Point2D pt)
+  private /*static*/ Geom selectPossibleGeom(List<Geom> geoms, Point2D pt)
   {
     Geom returnGeom = null;
     //synchronized (geoms)
@@ -360,7 +378,7 @@ public class MouseHandler extends MouseAdapter
     return returnGeom;
   }
 
-  private static void selectPossibleGeoms(
+  private /*static*/ void selectPossibleGeoms(
     List<Geom> geoms, List<Geom> possibleGeoms, Point2D pt)
   {
     for (Geom g : geoms)

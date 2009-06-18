@@ -5,7 +5,7 @@
 package handlers;
 
 import behaviorism.BehaviorismDriver;
-import renderers.VizGeom;
+import renderers.SceneGraph;
 import geometry.media.GeomRectVideoFobs;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -32,12 +32,27 @@ public class KeyboardHandler implements KeyListener
 	}
 	public static ModeEnum g_keyMode = ModeEnum.MODE_ZOOM;
 
-	public KeyboardHandler()
-	{
-	}
+  private static KeyboardHandler instance = null;
+
+  /**
+   * Gets (or creates then gets) the singleton MouseHandler object.
+   * @return the singleton MouseHandler
+   */
+  public static KeyboardHandler getInstance()
+  {
+    if (instance != null)
+    {
+      return instance;
+    }
+
+    instance = new KeyboardHandler();
+
+    return instance;
+  }
+
 
 	/* This method is called from the openGL Renderer display loop */
-	public static void processKeyboard()
+	public /*static*/ void processKeyboard()
 	{
 		checkKeys();
 	}
@@ -70,7 +85,7 @@ public class KeyboardHandler implements KeyListener
 		keysPressing[evt.getKeyCode()] = false;
 	}
 
-	public static void setMode()
+	public /*static*/ void setMode()
 	{
 		if (keys[KeyEvent.VK_F1])
 		{
@@ -121,7 +136,7 @@ public class KeyboardHandler implements KeyListener
 	 * 3) Mode-specific keys, which are keys that are only checked if we are in a particular mode 
 	 * (usually by pressing the F# function keys).
 	 */
-	public static void checkKeys()
+	public /*static*/ void checkKeys()
 	{
 		
 		//check global keys. if any global keys were pressed, return so that we don't try to 
@@ -211,11 +226,11 @@ public class KeyboardHandler implements KeyListener
 		}
 	}
 	
-  //public static boolean prev_keys[] = new boolean[1024];
-	//public static boolean clicking;
-	//public static boolean dragging;
+  //public /*static*/ boolean prev_keys[] = new boolean[1024];
+	//public /*static*/ boolean clicking;
+	//public /*static*/ boolean dragging;
 
-	public static void check_keyPressedFont()
+	public /*static*/ void check_keyPressedFont()
 	{
 		//switch fonts...
 		if (keys[KeyEvent.VK_F])
@@ -273,7 +288,7 @@ public class KeyboardHandler implements KeyListener
 		}
 	}
 
-	public static void check_keyPressedCam()
+	public /*static*/ void check_keyPressedCam()
 	{
 		//MouseHandler.handleCam = true;
     Cam cam = BehaviorismDriver.renderer.getCamera();
@@ -337,18 +352,18 @@ public class KeyboardHandler implements KeyListener
 		}
 	}
 
-	public static void check_keyPressedDebug()
+	public /*static*/ void check_keyPressedDebug()
 	{
 		//toggle ALL debugs
 		if (keys[KeyEvent.VK_0])
 		{
 			if (keysPressing[KeyEvent.VK_0] == false) //all off
 			{
-				VizGeom.drawDebugGrid = false;
-				VizGeom.drawDebugGeom = false;
-				VizGeom.drawDebugMouseMovedPoint = false;
-				VizGeom.drawDebugMouseDraggedPoint = false;
-				VizGeom.drawDebugFrameRate = false;
+				SceneGraph.drawDebugGrid = false;
+				SceneGraph.drawDebugGeom = false;
+				SceneGraph.drawDebugMouseMovedPoint = false;
+				SceneGraph.drawDebugMouseDraggedPoint = false;
+				SceneGraph.drawDebugFrameRate = false;
 				keysPressing[KeyEvent.VK_0] = true;
 			}
 		}
@@ -357,11 +372,11 @@ public class KeyboardHandler implements KeyListener
 		{
 			if (keysPressing[KeyEvent.VK_9] == false) //all on
 			{
-				VizGeom.drawDebugGrid = true;
-				VizGeom.drawDebugGeom = true;
-				VizGeom.drawDebugMouseMovedPoint = true;
-				VizGeom.drawDebugMouseDraggedPoint = true;
-				VizGeom.drawDebugFrameRate = true;
+				SceneGraph.drawDebugGrid = true;
+				SceneGraph.drawDebugGeom = true;
+				SceneGraph.drawDebugMouseMovedPoint = true;
+				SceneGraph.drawDebugMouseDraggedPoint = true;
+				SceneGraph.drawDebugFrameRate = true;
 				keysPressing[KeyEvent.VK_9] = true;
 			}
 		}
@@ -371,7 +386,7 @@ public class KeyboardHandler implements KeyListener
 		{
 			if (keysPressing[KeyEvent.VK_1] == false)
 			{
-				VizGeom.drawDebugGrid = !VizGeom.drawDebugGrid;
+				SceneGraph.drawDebugGrid = !SceneGraph.drawDebugGrid;
 				keysPressing[KeyEvent.VK_1] = true;
 			}
 		}
@@ -380,7 +395,7 @@ public class KeyboardHandler implements KeyListener
 		{
 			if (keysPressing[KeyEvent.VK_2] == false)
 			{
-				VizGeom.drawDebugGeom = !VizGeom.drawDebugGeom;
+				SceneGraph.drawDebugGeom = !SceneGraph.drawDebugGeom;
 				keysPressing[KeyEvent.VK_2] = true;
 			}
 		}
@@ -389,7 +404,7 @@ public class KeyboardHandler implements KeyListener
 		{
 			if (keysPressing[KeyEvent.VK_3] == false)
 			{
-				VizGeom.drawDebugMouseDraggedPoint = !VizGeom.drawDebugMouseDraggedPoint;
+				SceneGraph.drawDebugMouseDraggedPoint = !SceneGraph.drawDebugMouseDraggedPoint;
 				keysPressing[KeyEvent.VK_3] = true;
 			}
 		}
@@ -398,13 +413,13 @@ public class KeyboardHandler implements KeyListener
 		{
 			if (keysPressing[KeyEvent.VK_4] == false)
 			{
-				VizGeom.drawDebugFrameRate = !VizGeom.drawDebugFrameRate;
+				SceneGraph.drawDebugFrameRate = !SceneGraph.drawDebugFrameRate;
 				keysPressing[KeyEvent.VK_4] = true;
 			}
 		}
 	}
 
-	public static void check_keyPressedZoom()
+	public /*static*/ void check_keyPressedZoom()
 	{
 		//float inc = .00125f;
 		float inc = .025f;
@@ -540,9 +555,9 @@ public class KeyboardHandler implements KeyListener
 
 		}
 	}
-	static float rotSpeed = 1f;
+	/*static*/ float rotSpeed = 1f;
 
-	public static void check_keyPressedRotate()
+	public /*static*/ void check_keyPressedRotate()
 	{
 		if (MouseHandler.selectedGeom == null)
 		{
@@ -594,7 +609,7 @@ public class KeyboardHandler implements KeyListener
 
 	}
 
-	public static void check_keyPressedStep()
+	public /*static*/ void check_keyPressedStep()
 	{
 		if (keys[KeyEvent.VK_ENTER])
 		{
@@ -650,9 +665,9 @@ public class KeyboardHandler implements KeyListener
 			}
 		}
 	}
-	static float scaleInc = .05f;
+	/*static*/ float scaleInc = .05f;
 
-	public static void check_keyPressedScale()
+	public /*static*/ void check_keyPressedScale()
 	{
 		if (MouseHandler.selectedGeom != null)
 		{
@@ -688,9 +703,9 @@ public class KeyboardHandler implements KeyListener
 
 		}
 	}
-	static float scaleAnchorInc = .0125f;
+	/*static*/ float scaleAnchorInc = .0125f;
 
-	public static void check_keyPressedScaleAnchor()
+	public /*static*/ void check_keyPressedScaleAnchor()
 	{
 		if (MouseHandler.selectedGeom != null)
 		{
@@ -720,9 +735,9 @@ public class KeyboardHandler implements KeyListener
 			}
 		}
 	}
-	static float rotateAnchorInc = .0125f;
+	/*static*/ float rotateAnchorInc = .0125f;
 
-	public static void check_keyPressedRotateAnchor()
+	public /*static*/ void check_keyPressedRotateAnchor()
 	{
 		if (MouseHandler.selectedGeom != null &&
 						MouseHandler.selectedGeom.rotateAnchor != null)

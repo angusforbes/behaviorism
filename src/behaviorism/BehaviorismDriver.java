@@ -5,7 +5,7 @@ package behaviorism;
 
 import behaviors.Behavior;
 import com.bric.geom.BasicShape;
-import renderers.VizGeom;
+import renderers.SceneGraph;
 import renderers.RendererJogl;
 import handlers.MouseHandler;
 import handlers.KeyboardHandler;
@@ -43,7 +43,7 @@ public class BehaviorismDriver
 {
 
   public static RendererJogl renderer;
-  public static VizGeom viz = null; //should be a singleton!
+  public static SceneGraph viz = null; //should be a singleton!
   //public static WorldGeom world; //should probably synchronize...
   public static int screenWidth;
   public static int screenHeight;
@@ -107,7 +107,7 @@ public class BehaviorismDriver
     System.out.println("osName = " + osName + " version = " + osVersion);
     //initialize renderer & scene graph 
     BehaviorismDriver.renderer = new RendererJogl();
-    BehaviorismDriver.viz = new VizGeom();
+    BehaviorismDriver.viz = new SceneGraph();
 
 
     //load properties from attribute.properties
@@ -297,13 +297,13 @@ public class BehaviorismDriver
   private void setVizParams(Properties properties)
   {
     //how large an offset?
-    VizGeom.vizOffset = Float.parseFloat(properties.getProperty("viz.offset"));
+    SceneGraph.vizOffset = Float.parseFloat(properties.getProperty("viz.offset"));
 
     //various debug flags
-    VizGeom.drawDebugFrameRate = Boolean.parseBoolean(properties.getProperty("viz.drawDebugFrameRate"));
-    VizGeom.drawDebugGrid = Boolean.parseBoolean(properties.getProperty("viz.drawDebugGrid"));
-    VizGeom.drawDebugMouseDraggedPoint = Boolean.parseBoolean(properties.getProperty("viz.drawDebugMouseDraggedPoint"));
-    VizGeom.drawDebugMouseMovedPoint = Boolean.parseBoolean(properties.getProperty("viz.drawDebugMouseMovedPoint"));
+    SceneGraph.drawDebugFrameRate = Boolean.parseBoolean(properties.getProperty("viz.drawDebugFrameRate"));
+    SceneGraph.drawDebugGrid = Boolean.parseBoolean(properties.getProperty("viz.drawDebugGrid"));
+    SceneGraph.drawDebugMouseDraggedPoint = Boolean.parseBoolean(properties.getProperty("viz.drawDebugMouseDraggedPoint"));
+    SceneGraph.drawDebugMouseMovedPoint = Boolean.parseBoolean(properties.getProperty("viz.drawDebugMouseMovedPoint"));
 
 
   }
