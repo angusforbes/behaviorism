@@ -20,6 +20,7 @@ import javax.vecmath.Point3d;
 import renderers.Cam;
 import utils.GeomUtils;
 import utils.MatrixUtils;
+import utils.RenderUtils;
 
 /** 
  * MouseHandler is a wrapper for the various MouseListeners.
@@ -94,7 +95,7 @@ public class MouseHandler extends MouseAdapter
 
   private static void processMouseMoving()
   {
-    double coords[] = BehaviorismDriver.renderer.getWorldCoordsForScreenCoord(mx, my);
+    double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 
     Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
     debugWorldPoint = MatrixUtils.toPoint3f(ptWorld);
@@ -119,7 +120,7 @@ public class MouseHandler extends MouseAdapter
 
   private static void processMousePressing()
   {
-    double coords[] = BehaviorismDriver.renderer.getWorldCoordsForScreenCoord(mx, my);
+    double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 
     Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
     System.out.println("ptWorld = " + ptWorld);
@@ -170,7 +171,7 @@ public class MouseHandler extends MouseAdapter
 
       //but also can be customized...
       /** temp **/
-      double coords[] = BehaviorismDriver.renderer.getWorldCoordsForScreenCoord(mx, my);
+      double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 
       Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
       System.out.println("ptWorld = " + ptWorld);
@@ -220,7 +221,7 @@ public class MouseHandler extends MouseAdapter
     if (button == 1)
     {
       System.out.println("HERE - button 1 drag...");
-      selectedGeom.draggableObject.setPos(new Point3f(BehaviorismDriver.renderer.rayIntersect(selectedGeom.draggableObject, mx, my, offsetPt)));
+      selectedGeom.draggableObject.setPos(new Point3f(RenderUtils.rayIntersect(selectedGeom.draggableObject, mx, my, offsetPt)));
     }
     else if (button == 2)
     {
@@ -338,7 +339,7 @@ public class MouseHandler extends MouseAdapter
         //then can't be selected-- but still need to check its children...
         {
           //g.setColor(1f, 0f, 0f, 1f);
-          Path2D s = BehaviorismDriver.renderer.getScreenShapeForWorldCoords(g);
+          Path2D s = RenderUtils.getScreenShapeForWorldCoords(g);
           if (s == null)
           {
             continue;
@@ -368,7 +369,7 @@ public class MouseHandler extends MouseAdapter
       {
         //g.setColor(1f, 0f, 0f, 1f);
 
-        Path2D.Float s = BehaviorismDriver.renderer.getScreenShapeForWorldCoords(g);
+        Path2D.Float s = RenderUtils.getScreenShapeForWorldCoords(g);
         if (s == null)
         {
           continue;

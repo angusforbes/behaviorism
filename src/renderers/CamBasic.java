@@ -100,62 +100,11 @@ public class CamBasic extends Cam
   @Override
   public void setPerspective(GL gl, GLU glu)
   {
-    //System.out.println("I should never be here...");
-    if (VizGeom.EXPLICITLY_CALCULATE_MODELVIEW == true)
-    {
       gl.glRotatef((float) rotate.x, 1.0f, 0.0f, 0.0f);
       gl.glRotatef((float) rotate.y, 0.0f, 1.0f, 0.0f);
       gl.glRotatef((float) rotate.z, 0.0f, 0.0f, 1.0f);
 
       gl.glTranslatef(anchor.x, anchor.y, anchor.z);
-    }
-    else
-    {
-    //set perspective
-//    gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
-//    gl.glMatrixMode(gl.GL_PROJECTION);
-//    gl.glLoadIdentity();
-//    glu.gluPerspective(this.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
-//
-//    gl.glMatrixMode(gl.GL_MODELVIEW);
-//    gl.glLoadIdentity();
-
-    //set rotation
-    gl.glRotatef((float) rotate.x, 1.0f, 0.0f, 0.0f);
-    gl.glRotatef((float) rotate.y, 0.0f, 1.0f, 0.0f);
-    gl.glRotatef((float) rotate.z, 0.0f, 0.0f, 1.0f);
-    
-    //set location
-    //real one
-    //gl.glTranslatef(-anchor.x, -anchor.y, -anchor.z);
-    
-    gl.glTranslatef(anchor.x, anchor.y, -anchor.z);
-    }
-
-  /* not using anymore, but good to know...
-  double[] da = MatrixUtils.getIdentity();
-  
-  da[8] = m_DirectionVector.x;
-  da[9] = m_DirectionVector.y; 
-  da[10] = m_DirectionVector.z; 
-  da[11] = 0;
-  
-  da[4] = m_UpVector.x; 
-  da[5] = m_UpVector.y; 
-  da[6] = m_UpVector.z; 
-  da[7] = 0;
-  
-  da[0] = m_RightVector.x; 
-  da[1] = m_RightVector.y; 
-  da[2] = m_RightVector.z; 
-  da[3] = 0;
-  
-  da[12] = m_StrafeX; da[13] = m_StrafeY; da[14] = m_Zoom; da[15] = 1;
-  
-  //MatrixUtils.printMatrix(da);
-  //gl.glMultMatrixd(da, 0);
-  //glu.gluLookAt(m_Position.x, m_Position.y, m_Position.z, center.x, center.y, center.z, m_UpVector.x, m_UpVector.y, m_UpVector.z);
-   */
   }
 
   @Override

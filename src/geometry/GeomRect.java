@@ -12,14 +12,13 @@ import algorithms.Corner;
 import renderers.State;
 import java.awt.geom.Rectangle2D;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
-import behaviorism.BehaviorismDriver;
 import java.util.Vector;
 import javax.vecmath.Point3d;
 import renderers.RendererJogl;
 import utils.GeomUtils;
 import utils.MatrixUtils;
+import utils.RenderUtils;
 import utils.Utils;
 
 public class GeomRect extends Geom
@@ -230,7 +229,7 @@ public class GeomRect extends Geom
   @Override
   public void draw(GL gl)
   {
-    boolean depthTest = RendererJogl.getBoolean(gl, GL.GL_DEPTH_TEST);
+    boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
 
     
     if (depthTest == false && isSelectable == true)
@@ -974,10 +973,14 @@ public class GeomRect extends Geom
   @Override
   public boolean checkIsCompletelyVisible()
   {
-    Point3f c1 = BehaviorismDriver.renderer.projectPoint(new Point3f(0f, 0f, 0f), modelview);
-    Point3f c2 = BehaviorismDriver.renderer.projectPoint(new Point3f(w, 0f, 0f), modelview);
-    Point3f c3 = BehaviorismDriver.renderer.projectPoint(new Point3f(w, h, 0f), modelview);
-    Point3f c4 = BehaviorismDriver.renderer.projectPoint(new Point3f(0f, h, 0f), modelview);
+    //Point3f c1 = BehaviorismDriver.renderer.projectPoint(new Point3f(0f, 0f, 0f), modelview);
+    //Point3f c2 = BehaviorismDriver.renderer.projectPoint(new Point3f(w, 0f, 0f), modelview);
+    //Point3f c3 = BehaviorismDriver.renderer.projectPoint(new Point3f(w, h, 0f), modelview);
+    //Point3f c4 = BehaviorismDriver.renderer.projectPoint(new Point3f(0f, h, 0f), modelview);
+    Point3f c1 = MatrixUtils.project(new Point3f(0f, 0f, 0f), modelview);
+    Point3f c2 = MatrixUtils.project(new Point3f(w, 0f, 0f), modelview);
+    Point3f c3 = MatrixUtils.project(new Point3f(w, h, 0f), modelview);
+    Point3f c4 = MatrixUtils.project(new Point3f(0f, h, 0f), modelview);
 
 
     //System.out.println("lower left: " + MatrixUtils.toString(c1));
@@ -992,10 +995,15 @@ public class GeomRect extends Geom
   public boolean checkIsVisible()
   {
     System.out.println("\n\nin checkIsVisible");
-    Point3f c1 = BehaviorismDriver.renderer.projectPoint(new Point3f(0f, 0f, 0f), modelview);
-    Point3f c2 = BehaviorismDriver.renderer.projectPoint(new Point3f(w, 0f, 0f), modelview);
-    Point3f c3 = BehaviorismDriver.renderer.projectPoint(new Point3f(w, h, 0f), modelview);
-    Point3f c4 = BehaviorismDriver.renderer.projectPoint(new Point3f(0f, h, 0f), modelview);
+//    Point3f c1 = BehaviorismDriver.renderer.projectPoint(new Point3f(0f, 0f, 0f), modelview);
+//    Point3f c2 = BehaviorismDriver.renderer.projectPoint(new Point3f(w, 0f, 0f), modelview);
+//    Point3f c3 = BehaviorismDriver.renderer.projectPoint(new Point3f(w, h, 0f), modelview);
+//    Point3f c4 = BehaviorismDriver.renderer.projectPoint(new Point3f(0f, h, 0f), modelview);
+    Point3f c1 = MatrixUtils.project(new Point3f(0f, 0f, 0f), modelview);
+    Point3f c2 = MatrixUtils.project(new Point3f(w, 0f, 0f), modelview);
+    Point3f c3 = MatrixUtils.project(new Point3f(w, h, 0f), modelview);
+    Point3f c4 = MatrixUtils.project(new Point3f(0f, h, 0f), modelview);
+
 
     //System.out.println("lower left: " + MatrixUtils.toString(c1));
     //System.out.println("lower right: " + MatrixUtils.toString(c2));

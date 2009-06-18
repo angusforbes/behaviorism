@@ -22,6 +22,7 @@ import javax.vecmath.Point3f;
 import renderers.RendererJogl;
 import utils.GeomUtils;
 import utils.MatrixUtils;
+import utils.RenderUtils;
 
 /**
  * GeomTextPath arranges the text along a specified base path... class is still being built
@@ -248,7 +249,7 @@ public class GeomTextPath extends GeomPoly
 
 	public void renderInvisiblePickingBackground(GL gl, GLU glu, float offset)
 	{
-		boolean depthTest = RendererJogl.getBoolean(gl, GL.GL_DEPTH_TEST);
+		boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
 		//if (depthTest == false && isSelectable == true)
 		if (isSelectable == true)
 		{
@@ -334,10 +335,10 @@ public class GeomTextPath extends GeomPoly
 		gl.glGetDoublev(gl.GL_PROJECTION_MATRIX, temp_pj, 0);
 		gl.glGetIntegerv(gl.GL_VIEWPORT, temp_vp, 0);
 
-		//this.pxWidth = (int) (BehaviorismDriver.renderer.getWidthOfObjectInPixels(this, this.insetX, temp_mv, temp_pj, temp_vp));
-		//this.pxHeight = (int) (BehaviorismDriver.renderer.getHeightOfObjectInPixels(this, this.insetY, temp_mv, temp_pj, temp_vp));
-		this.pxWidth = (int) (BehaviorismDriver.renderer.getWidthOfObjectInPixels(this, 0, temp_mv, temp_pj, temp_vp));
-		this.pxHeight = (int) (BehaviorismDriver.renderer.getHeightOfObjectInPixels(this, 0, temp_mv, temp_pj, temp_vp));
+		//this.pxWidth = (int) (RenderUtils.getWidthOfObjectInPixels(this, this.insetX, temp_mv, temp_pj, temp_vp));
+		//this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(this, this.insetY, temp_mv, temp_pj, temp_vp));
+		this.pxWidth = (int) (RenderUtils.getWidthOfObjectInPixels(this, 0, temp_mv, temp_pj, temp_vp));
+		this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(this, 0, temp_mv, temp_pj, temp_vp));
 
 		/*
 		

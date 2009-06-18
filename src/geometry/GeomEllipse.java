@@ -8,7 +8,7 @@ import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3f;
 import handlers.MouseHandler;
-import renderers.RendererJogl;
+import utils.RenderUtils;
 
 public class GeomEllipse extends GeomPoly
 {
@@ -203,7 +203,7 @@ public class GeomEllipse extends GeomPoly
     }
     
     //get state variables
-    boolean depthTest = RendererJogl.getBoolean(gl, GL.GL_DEPTH_TEST);
+    boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
     
     if (depthTest == false && isSelectable == true)
     {

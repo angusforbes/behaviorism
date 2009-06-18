@@ -23,7 +23,6 @@ public class VizGeom
    * Sets whether or not we calculate the modelview matricies ourselves as we
    * traverse the scenegraph. Seems to work, but experimental...
    */
-  public static boolean EXPLICITLY_CALCULATE_MODELVIEW = true; //false; //true;
   public static boolean drawDebugFrameRate = true;
   public static boolean drawDebugGeom = false;
   public static boolean drawDebugGrid = false;

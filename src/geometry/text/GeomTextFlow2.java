@@ -2,7 +2,6 @@
 
 package geometry.text;
 
-import geometry.*;
 import behaviorism.BehaviorismDriver;
 import behaviors.geom.continuous.BehaviorScale;
 import com.sun.opengl.util.j2d.TextRenderer;
@@ -24,8 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
+import utils.RenderUtils;
 import utils.Utils;
 
 /**
@@ -232,10 +231,10 @@ public class GeomTextFlow2 extends GeomText2
 
     insetX = 0f;
     insetY = 0f;
-    this.pxWidth = (int) (BehaviorismDriver.renderer.getWidthOfObjectInPixels(this, this.insetX));
-    this.pxHeight = (int) (BehaviorismDriver.renderer.getHeightOfObjectInPixels(this, this.insetY));
+    this.pxWidth = (int) (RenderUtils.getWidthOfObjectInPixels(this, this.insetX));
+    this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(this, this.insetY));
 
-    Rectangle2D rect = BehaviorismDriver.renderer.getScreenRectangleForWorldCoords(this);
+    Rectangle2D rect = RenderUtils.getScreenRectangleForWorldCoords(this);
     this.pxWidth = (int) rect.getWidth();
     this.pxHeight = (int) rect.getHeight();
     int pxX = (int) rect.getX();

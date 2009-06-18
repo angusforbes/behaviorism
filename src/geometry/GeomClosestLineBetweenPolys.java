@@ -1,7 +1,6 @@
 /* GeomClosestLineBetweenPolys.java ~ Aug 25, 2008 */
 package geometry;
 
-import behaviorism.BehaviorismDriver;
 import com.bric.geom.BasicShape;
 import geometry.GeomLine;
 import geometry.GeomRect;
@@ -9,9 +8,9 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import utils.GeomUtils;
 import utils.MatrixUtils;
+import utils.RenderUtils;
 
 /**
  *
@@ -48,8 +47,8 @@ public class GeomClosestLineBetweenPolys extends GeomLine
     //c. transform intersection pts to absolute points
     //d. then we are ready to draw them
 
-    Path2D.Float p1 = BehaviorismDriver.renderer.getScreenShapeForWorldCoords(firstGeom);
-    Path2D.Float p2 = BehaviorismDriver.renderer.getScreenShapeForWorldCoords(secondGeom);
+    Path2D.Float p1 = RenderUtils.getScreenShapeForWorldCoords(firstGeom);
+    Path2D.Float p2 = RenderUtils.getScreenShapeForWorldCoords(secondGeom);
 
     //using BasicShape library for fast checking polygon intersection...
     BasicShape bs1 = new BasicShape(p1);
@@ -114,12 +113,12 @@ public class GeomClosestLineBetweenPolys extends GeomLine
     }
    
     firstOffsetPt.setPos(MatrixUtils.toPoint3f(
-      BehaviorismDriver.renderer.rayIntersect(
+      RenderUtils.rayIntersect(
         (firstOffsetPt), (int) r1_ip.getX(), (int) r1_ip.getY())
       ) 
     );
     secondOffsetPt.setPos(MatrixUtils.toPoint3f(
-      BehaviorismDriver.renderer.rayIntersect(
+      RenderUtils.rayIntersect(
         (secondOffsetPt), (int) r2_ip.getX(), (int) r2_ip.getY()
       ))
     );

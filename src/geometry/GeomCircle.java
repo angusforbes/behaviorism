@@ -8,9 +8,8 @@ import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3f;
 import handlers.MouseHandler;
-import renderers.RendererJogl;
 import textures.TextureImage;
-import utils.Utils;
+import utils.RenderUtils;
 
 public class GeomCircle extends GeomPoly
 {
@@ -177,7 +176,7 @@ public class GeomCircle extends GeomPoly
     }
 
     //get state variables
-    boolean depthTest = RendererJogl.getBoolean(gl, GL.GL_DEPTH_TEST);
+    boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
     if (depthTest == false && isSelectable == true)
     {
       //then we need to render it invisibly with DEPTH_TEST on so that we can pick it

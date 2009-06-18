@@ -432,6 +432,17 @@ public class MatrixUtils
     return new Point3f((float) windowVec[0], (float) windowVec[1], (float) windowVec[2]);
   }
 
+  public static Point3f project(Point3f p3f, double[] modelview)
+  {
+    double[] windowVec = project(
+      pointToHomogenousCoords(p3f),
+      modelview,
+      RendererJogl.projectionMatrix,
+      RendererJogl.viewportBounds);
+
+    return new Point3f((float) windowVec[0], (float) windowVec[1], (float) windowVec[2]);
+  }
+
   /**
    * Project the specified homogenous point into window coordinates given a specified modelview matrix, 
    * projection matrix, and viewport. 

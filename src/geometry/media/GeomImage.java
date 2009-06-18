@@ -6,12 +6,10 @@ package geometry.media;
 
 import geometry.*;
 import com.sun.opengl.util.texture.TextureCoords;
-import com.sun.opengl.util.texture.TextureData;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
-import renderers.RendererJogl;
 import textures.TextureImage;
+import utils.RenderUtils;
 
 public class GeomImage extends GeomRect
 {
@@ -185,7 +183,7 @@ public class GeomImage extends GeomRect
     }
 
     //System.out.println("drawing... " + System.currentTimeMillis());
-    boolean depthTest = RendererJogl.getBoolean(gl, GL.GL_DEPTH_TEST);
+    boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
 
     if (depthTest == false && isSelectable == true)
     {

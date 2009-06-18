@@ -3,7 +3,7 @@
 package renderers;
 
 import javax.media.opengl.GL;
-import renderers.RendererJogl;
+import utils.RenderUtils;
 
 public class State
 {
@@ -45,8 +45,8 @@ public class State
 
   public static void printCurrentState(GL gl)
   {
-    boolean blend = RendererJogl.getBoolean(gl, GL.GL_BLEND);
-    boolean depthTest = RendererJogl.getBoolean(gl, GL.GL_DEPTH_TEST);
+    boolean blend = RenderUtils.getBoolean(gl, GL.GL_BLEND);
+    boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
     
     System.out.println("BLEND : " + blend);
     System.out.println("DEPTH TEST : " + depthTest);

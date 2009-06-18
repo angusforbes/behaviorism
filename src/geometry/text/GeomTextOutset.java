@@ -8,8 +8,6 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
-import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import behaviorism.BehaviorismDriver;
 import geometry.Colorf;
@@ -22,6 +20,7 @@ import java.util.List;
 import javax.vecmath.Vector3f;
 import renderers.Cam;
 import utils.MatrixUtils;
+import utils.RenderUtils;
 
 public class GeomTextOutset extends GeomRect
 {
@@ -500,11 +499,11 @@ public class GeomTextOutset extends GeomRect
     gl.glPopMatrix();
 
 
-    this.pxWidth = (int) (BehaviorismDriver.renderer.getWidthOfObjectInPixels(this, this.paddingX * 2f, temp_mv, temp_pj, temp_vp));
-    //this.pxHeight = (int) (BehaviorismDriver.renderer.getHeightOfObjectInPixels(this, this.insetY, temp_mv, temp_pj, temp_vp));
-    this.pxHeight = (int) (BehaviorismDriver.renderer.getHeightOfObjectInPixels(this, this.paddingY * 2f, temp_mv, temp_pj, temp_vp));
-    this.pxX = (int) (BehaviorismDriver.renderer.getXOfObjectInPixels(this, temp_mv, temp_pj, temp_vp));
-    this.pxY = (int) (BehaviorismDriver.renderer.getYOfObjectInPixels(this, temp_mv, temp_pj, temp_vp));
+    this.pxWidth = (int) (RenderUtils.getWidthOfObjectInPixels(this, this.paddingX * 2f, temp_mv, temp_pj, temp_vp));
+    //this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(this, this.insetY, temp_mv, temp_pj, temp_vp));
+    this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(this, this.paddingY * 2f, temp_mv, temp_pj, temp_vp));
+    this.pxX = (int) (RenderUtils.getXOfObjectInPixels(this, temp_mv, temp_pj, temp_vp));
+    this.pxY = (int) (RenderUtils.getYOfObjectInPixels(this, temp_mv, temp_pj, temp_vp));
 
     System.out.println("pxX / pxY = " + pxX + "/" + pxY);
 
@@ -527,8 +526,8 @@ public class GeomTextOutset extends GeomRect
     temp_mv = MatrixUtils.scale(temp_mv, scale.x, scale.y, scale.z);
     temp_mv = MatrixUtils.translate(temp_mv, -w / 2f, -h / 2f, (float) (-dist));
 
-    this.pxWidth = (int) (BehaviorismDriver.renderer.getWidthOfObjectInPixels(this, this.paddingX * 2f, temp_mv, temp_pj, temp_vp));
-    this.pxHeight = (int) (BehaviorismDriver.renderer.getHeightOfObjectInPixels(this, this.paddingY * 2f, temp_mv, temp_pj, temp_vp));
+    this.pxWidth = (int) (RenderUtils.getWidthOfObjectInPixels(this, this.paddingX * 2f, temp_mv, temp_pj, temp_vp));
+    this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(this, this.paddingY * 2f, temp_mv, temp_pj, temp_vp));
 
   //for debugging...
 //
