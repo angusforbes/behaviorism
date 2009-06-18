@@ -312,7 +312,7 @@ public class GeomText2 extends GeomRect
 		gl.glPopMatrix();
 	}
 
-	@Override public void draw(GL gl, GLU glu, float offset)
+	@Override public void draw(GL gl)
 	{
 
   

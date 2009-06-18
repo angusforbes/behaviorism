@@ -23,7 +23,7 @@ public class GeomGlutCube extends Geom
     this.isSolid = isSolid;
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     gl.glColor4f(r, g, b, a);
     if (isSolid == true)

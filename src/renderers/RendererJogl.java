@@ -50,7 +50,7 @@ public class RendererJogl implements GLEventListener
   public Cam cam = null;
   private FontHandler fontHandler = FontHandler.getInstance();
   /**
-   * modelviewMatrix is the modelview numKnotns*after* the camera has been positioned.
+   * modelviewMatrix is the modelview *after* the camera has been positioned.
    * We are also calling this the "World" modelview (eg, in MatrixUtils).
    */
   public static double[] modelviewMatrix = new double[16];
@@ -389,50 +389,78 @@ public class RendererJogl implements GLEventListener
     gl.glLoadIdentity();
   }
 
-  @Override
-  public void display(GLAutoDrawable drawable)
+  private boolean isReady(GLAutoDrawable drawable)
   {
     if (BehaviorismDriver.doneShutdown.get() == true) //then we are in the process of closing the openGL context
     {
-      return;
+      return false;
     }
 
     if (currentWorld == null) //check if its been setup...
     {
-      return;
+      return false;
     }
 
     gl = drawable.getGL();
-    gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a);                    // Black Background
+    gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a); //background color of world
     gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
     if (cam == null)
     {
+      return false;
+    }
+
+    return true;
+  }
+
+  private void processDebugs()
+  {
+    BehaviorismDriver.viz.drawDebuggingInfo(gl);
+  }
+
+  private void processHandlers()
+  {
+    //TO DO: have a list of attached handlers...
+    MouseHandler.processMouse();
+    KeyboardHandler.processKeyboard();
+  }
+
+  @Override
+  public void display(GLAutoDrawable drawable)
+  {
+    if (!isReady(drawable))
+    {
       return;
     }
 
+    //i don't like this being here...
     if (fontHandler.changeFonts.get() == true)
     {
       fontHandler.nextFont(fontHandler.fontIndex);
     }
 
-    BehaviorismDriver.viz.draw(gl, glu);
+    BehaviorismDriver.viz.draw(gl);
 
     //fontHandler.fontsReady.set(false);
 
-    MouseHandler.processMouse();
-    KeyboardHandler.processKeyboard();
-
-    BehaviorismDriver.viz.drawDebuggingInfo(gl);
+    processHandlers();
+    processDebugs();
     //gl.glFlush(); //is this necessary?
 
     //set this false here so that geoms that need to recalc if bounds have changed will know
     //that screen has been reshaped.
     boundsHaveChanged = false;
 
+
     if (BehaviorismDriver.isShutdown.get() == true)
     {
-      System.err.println("in RendererJogl : cleaning up resources... ");
+      shutdown();
+    }
+  }
+
+  private void shutdown()
+  {
+   System.err.println("in RendererJogl : cleaning up resources... ");
       Set<WorldGeom> worlds = BehaviorismDriver.renderer.worlds.keySet();
       for (WorldGeom w : worlds)
       {
@@ -440,7 +468,6 @@ public class RendererJogl implements GLEventListener
       }
       System.err.println("in RendererJogl : we have disposed of all resources... ");
       BehaviorismDriver.doneShutdown.set(true);
-    }
   }
 
   @Override

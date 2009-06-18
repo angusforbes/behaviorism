@@ -5,6 +5,7 @@
 
 package geometry.text;
 
+import behaviorism.BehaviorismDriver;
 import geometry.*;
 import com.sun.opengl.util.j2d.TextRenderer;
 import java.awt.Font;
@@ -14,6 +15,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import handlers.FontHandler;
 
+/** this is OLD too!!! */
 @Deprecated
 public class GeomText extends Geom
 {
@@ -54,8 +56,10 @@ public class GeomText extends Geom
     this.numChars = text.length();
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
+    GLU glu = BehaviorismDriver.renderer.glu;
+
     TextRenderer textRenderer = getAppropriateFontInfo(gl, glu, this, numChars);
     
     if (textRenderer == null)

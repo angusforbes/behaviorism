@@ -105,7 +105,7 @@ public class GeomDisplayList extends Geom
 	}
 
 	@Override
-	public void draw(GL gl, GLU glu, float offset)
+	public void draw(GL gl)
 	{
 		gl.glColor4f(1f, 0f, 0f, .01f);
 	gl.glPointSize(20f);

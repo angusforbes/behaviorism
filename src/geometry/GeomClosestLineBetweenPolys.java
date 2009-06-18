@@ -135,7 +135,7 @@ public class GeomClosestLineBetweenPolys extends GeomLine
 //  }
 //  
   @Override
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     //firstOffsetPt.transform(gl, glu);
     //secondOffsetPt.transform(gl, glu);
@@ -151,7 +151,8 @@ public class GeomClosestLineBetweenPolys extends GeomLine
       isFirstTime = false;
       return;
     }
-    super.draw(gl, glu, offset);
+    //super.draw(gl, glu, offset);
+    super.draw(gl);
 
 
     /*

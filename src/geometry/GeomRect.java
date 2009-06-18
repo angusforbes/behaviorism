@@ -228,7 +228,7 @@ public class GeomRect extends Geom
   }
 
   @Override
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     boolean depthTest = RendererJogl.getBoolean(gl, GL.GL_DEPTH_TEST);
 

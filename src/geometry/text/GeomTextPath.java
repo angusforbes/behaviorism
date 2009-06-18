@@ -156,8 +156,10 @@ public class GeomTextPath extends GeomPoly
 	}
 
 	@Override
-	public void draw(GL gl, GLU glu, float offset)
+	public void draw(GL gl)
 	{
+    GLU glu = BehaviorismDriver.renderer.glu;
+    
 		//gl.glColor4f(1f, 0f, 0f, .5f);
 		//drawConvex(gl, glu, offset);
 		this.r = 1f;

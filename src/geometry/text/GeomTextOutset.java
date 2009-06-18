@@ -548,7 +548,7 @@ public class GeomTextOutset extends GeomRect
 
   //DebugTimer timer = new DebugTimer();
   @Override
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     //timer.resetTime();
     calculateUnrotatedPixelWidthAndHeight(gl);

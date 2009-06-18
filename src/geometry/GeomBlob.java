@@ -296,7 +296,8 @@ public class GeomBlob extends Geom
     
     return bes;
   }
-  public void draw(GL gl, GLU glu, float offset)
+
+  public void draw(GL gl)
   {
     //maybe only do this when necessary?
     List<BlobElement> elements = makeBlobFromPoints();

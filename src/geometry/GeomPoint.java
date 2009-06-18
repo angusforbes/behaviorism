@@ -49,7 +49,7 @@ public class GeomPoint extends Geom
     this.pointSize = pointSize;
   }
   
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     gl.glColor4f(r, g, b, a);
     gl.glPointSize(this.pointSize);

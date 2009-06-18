@@ -554,7 +554,7 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
   //System.out.println("scaleVal = " + scaleVal);
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     //temp - draw background
     if (debugDrawBackground == true || backgroundColor != null || 1 == 1)

@@ -98,6 +98,8 @@ public abstract class Geom //extends Point3f //Object
   @Deprecated
   public float area = 0f; //i think i was using this for an picking alogrithm. it was a dumb idea. this shouldn't be stored.
 
+  //used if need for polygon offset in 2D
+  public float offset = 0f;
 
   //various flags for rendering, texturing, picking, timing, etc.
 
@@ -163,9 +165,19 @@ public abstract class Geom //extends Point3f //Object
    * @param glu
    * @param offset
    */
-  public abstract void draw(GL gl, GLU glu, float offset);
+  //public abstract void draw(GL gl, GLU glu, float offset);
+  public abstract void draw(GL gl);
 
 
+  public float getOffset()
+  {
+    return this.offset;
+  }
+
+  public void setOffset(float offset)
+  {
+    this.offset = offset;
+  }
 
 
   /**

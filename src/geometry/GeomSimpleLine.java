@@ -67,7 +67,7 @@ public class GeomSimpleLine extends Geom
     ends[1] = new GeomPoint(p2.x, p2.y, p2.z);
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     //System.out.println("in simpleline, anchor = " + anchor);
     //float hx = anchor.x;

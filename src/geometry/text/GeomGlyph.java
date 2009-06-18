@@ -38,7 +38,7 @@ public class GeomGlyph extends Geom
     this.scaleVal = scaleVal;
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     /*
     if (textRenderer == null) return;

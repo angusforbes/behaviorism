@@ -158,7 +158,7 @@ public class GeomSimpleText extends GeomRect
   }
 
   @Override
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     //calculateBounds();
 

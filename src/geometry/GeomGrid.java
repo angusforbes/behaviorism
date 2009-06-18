@@ -70,7 +70,7 @@ public class GeomGrid extends GeomRect
   }
 
   @Override
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     //super.draw(gl, glu, offset - (offset * .5f));
 

@@ -155,7 +155,7 @@ public class GeomVertexBufferObject extends Geom
 	
 	float posx = -2f;
 	float posy = 2f;
-	public void draw(GL gl, GLU glu, float offset)
+	public void draw(GL gl)
 	{
 
 		//immediate mode

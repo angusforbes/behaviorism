@@ -38,8 +38,10 @@ public class GeomGluSphere extends Geom
  
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
+      GLU glu = BehaviorismDriver.renderer.glu;
+
     gl.glColor4f(r, g, b, a);
 //    glu.gluSphere(BehaviorismDriver.renderer.quadricRenderer,
 //      this.innerRadius, this.outerRadius,

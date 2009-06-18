@@ -176,7 +176,7 @@ public class GeomImage extends GeomRect
 //    }
 
   @Override
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     if (!updateTextures())
     {

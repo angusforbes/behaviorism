@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import handlers.FontHandler;
 
+/** get rid of me! */
 @Deprecated
 public class GeomTag extends GeomText2
 {

@@ -60,7 +60,7 @@ public class GeomVideo extends GeomRect
     attachTexture(ti);
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     if (!updateTextures())
     {

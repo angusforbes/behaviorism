@@ -77,7 +77,7 @@ public class GeomTrace extends GeomPoint
   }
 
   @Override
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     //System.out.println("in GeomTrace() : trace size = " + trace.size());
     gl.glColor4f(r, g, b, a);

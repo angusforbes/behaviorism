@@ -43,6 +43,8 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.media.util.BufferToImage;
 
+/** This is OLD!!! Probably should get rid of it!!!! */
+
 /* MUST hava jmf.properties, jmf.jar, fobs4jmf.dll, fobs4jmf.jar in classpath/library path!!! */
 public class GeomRectVideo extends GeomRect implements Renderer, ControllerListener
 {

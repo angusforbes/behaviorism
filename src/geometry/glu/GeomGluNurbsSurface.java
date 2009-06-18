@@ -149,8 +149,10 @@ public class GeomGluNurbsSurface extends Geom
   //System.out.println("controlArray = " + Arrays.toString(controlArray));
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
+      GLU glu = BehaviorismDriver.renderer.glu;
+
     if (dynamicControlPoints != null) //and there has been a change
     {
       updateControlArray();

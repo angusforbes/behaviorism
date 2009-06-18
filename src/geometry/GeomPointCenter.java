@@ -14,7 +14,7 @@ public class GeomPointCenter extends GeomPoint
 	{
 	}
 	
-	public void draw(GL gl, GLU glu, float offset)
+	public void draw(GL gl)
   {
 		//Point3f c1n = BehaviorismDriver.renderer.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth / 2,
 		//				RendererJogl.canvasHeight / 2, .99, RendererJogl.modelviewMatrix);

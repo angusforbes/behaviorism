@@ -55,6 +55,10 @@ import javax.media.util.BufferToImage;
 import javax.vecmath.Point3f;
 import utils.Utils;
 
+/***
+ * THIS IS OLD-- probably need to get rid of it!!!
+ * @author angus
+ */
 public class GeomRectVideoFobs extends GeomRect implements Renderer, ControllerListener
 {
    Texture texture;

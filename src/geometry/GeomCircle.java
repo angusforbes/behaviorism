@@ -153,7 +153,7 @@ public class GeomCircle extends GeomPoly
     }
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     if (this == MouseHandler.selectedGeom)
     {
@@ -165,6 +165,7 @@ public class GeomCircle extends GeomPoly
       return;
     }
 
+    GLU glu = BehaviorismDriver.renderer.glu;
 
     //get Tesselator object
     GLUtessellator tobj = BehaviorismDriver.renderer.tessellationObject;

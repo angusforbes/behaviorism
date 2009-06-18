@@ -183,8 +183,10 @@ public class GeomEllipse extends GeomPoly
     }
   }
   
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
+    GLU glu = BehaviorismDriver.renderer.glu;
+    
     if (this == MouseHandler.selectedGeom)
     {
       //System.out.println("offset = " + offset);

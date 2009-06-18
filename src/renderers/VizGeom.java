@@ -112,7 +112,7 @@ public class VizGeom
    * @param gl
    * @param glu
    */
-  public void draw(GL gl, GLU glu)
+  public void draw(GL gl)
   {
     this.currentNano = System.nanoTime();
     this.offset = 0f; //reset offset
@@ -131,14 +131,14 @@ public class VizGeom
     }
 
     //traverse scene graph to determine each element's transformation matrix
-    traverseGeoms(gl, glu, BehaviorismDriver.renderer.currentWorld.geoms,
+    traverseGeoms(gl, BehaviorismDriver.renderer.currentWorld.geoms,
       BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed,
       offset);
     BehaviorismDriver.renderer.currentWorld.isTransformed = false;
     BehaviorismDriver.renderer.cam.isTransformed = false;
 
     //iterate through layers and render each element to screen.
-    drawGeoms(gl, glu);
+    drawGeoms(gl);
   }
 
   private void updateCameraBehavior()
@@ -174,7 +174,7 @@ public class VizGeom
     BehaviorismDriver.renderer.setPerspective3D();
   }
 
-  private void traverseGeoms(GL gl, GLU glu, List<Geom> geoms, boolean parentTransformed, float prevOffset) //, long currentNano, int level, float prevOffset)
+  private void traverseGeoms(GL gl, List<Geom> geoms, boolean parentTransformed, float prevOffset) //, long currentNano, int level, float prevOffset)
   {
     List<Geom> scheduledForRemovalGeoms = new ArrayList<Geom>();
 
@@ -191,7 +191,7 @@ public class VizGeom
 
       g.transform2(); //EXPERIMENTAL ONE
       BehaviorismDriver.renderer.currentWorld.layers.get(g.layerNum).attachedGeoms.add(g);
-      traverseGeoms(gl, glu, g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
+      traverseGeoms(gl, g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
 
       g.isTransformed = false;
 
@@ -211,7 +211,7 @@ public class VizGeom
   }
 
   //need to clean this up a bit...
-  public void drawGeoms(GL gl, GLU glu)
+  public void drawGeoms(GL gl)
   {
     gl.glMatrixMode(gl.GL_PROJECTION);
     gl.glLoadMatrixd(RendererJogl.projectionMatrix, 0);
@@ -303,7 +303,8 @@ public class VizGeom
         {
           invisiblePickingGeoms.add(g);
         }
-        g.draw(gl, glu, 0f);
+        //g.draw(gl, glu, 0f);
+        g.draw(gl);
 
         if (g.state != null) //individual geoms can still override layer... should this be allowed??? this is slow
         {
@@ -356,7 +357,9 @@ public class VizGeom
     }
      */
 
-    g.draw(gl, glu, offset);
+    //g.draw(gl, glu, offset);
+    g.setOffset(offset); //that is, only if specified-- TO DO
+    g.draw(gl);
 
     if (drawDebugGeom == true)
     {
@@ -535,5 +538,41 @@ public class VizGeom
         tr.endRendering();
       }
     }
+  }
+
+  public void drawJava2DCoord(GL gl /*, CoordJava2D c*/)
+  {
+    /*
+    if (c.img != null)
+    {
+    int inset = 2;
+    int w = c.img.getWidth(null);
+    int h = c.img.getHeight(null);
+
+    if (w < 0 || h < 0)
+    {
+    return; //not loaded yet
+    }
+
+    TextureRenderer tr = new TextureRenderer(w, h, false);
+    Graphics2D g = tr.createGraphics();
+
+    //g.setColor(Color.GRAY);
+    //g.fillRect(0,0,w,h);
+    //g.drawImage(ImageFilterHandler.filterScale(img, scale, scale), 20, 20, dsw.bufferedImage.getWidth(null) - 40, dsw.bufferedImage.getHeight(null) - 40, null);
+    //g.drawImage(c.img, inset, inset, w - inset*2, h - inset*2, null);
+    g.drawImage(c.img, 0, 0, w, h, null);
+    g.dispose();
+    //tr.sync(0, 0, w, h);
+
+    //tr.beginOrthoRendering(w, h );
+    //tr.drawOrthoRect(0,0, 0,0, w,h);
+    //tr.endOrthoRendering();
+
+    tr.begin3DRendering();
+    tr.draw3DRect(c.x, c.y, c.z, 0, 0, w, h, .05f);
+    tr.end3DRendering();
+    }
+     */
   }
 }

@@ -353,9 +353,10 @@ public class GeomPoly extends Geom
       //glu.gluDeleteTess(tobj); //what does this do?
 	}
 	
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
-		
+    GLU glu = BehaviorismDriver.renderer.glu;
+
 		gl.glColor4f(r, g, b, a);
      
     if (isConvex == true)

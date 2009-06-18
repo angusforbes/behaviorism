@@ -91,7 +91,7 @@ public class GeomLine extends Geom
   }
   
   @Override
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     Point3d h1 = MatrixUtils.getGeomPointInGeomCoordinates(
       new Point3d(), firstOffsetPt.modelview, this.modelview);

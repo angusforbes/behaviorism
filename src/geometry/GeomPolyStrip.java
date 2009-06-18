@@ -11,6 +11,7 @@ package geometry;
  */
 
 
+import behaviorism.BehaviorismDriver;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,8 +135,10 @@ public class GeomPolyStrip extends Geom{
     
 	
 	
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
+    GLU glu = BehaviorismDriver.renderer.glu;
+
         gl.glColor4f(r, g, b, a);
      
         if (isConvex == true)

@@ -92,8 +92,10 @@ public class GeomGluNurbsCurve extends Geom
     }
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
+      GLU glu = BehaviorismDriver.renderer.glu;
+
     if (dynamicControlPoints != null) //and there has been a change
     {
       updateControlArray();

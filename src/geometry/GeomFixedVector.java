@@ -52,10 +52,11 @@ public class GeomFixedVector extends GeomSimpleLine
   }
 
   @Override
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     calculateUnfixedPoint();
-    super.draw(gl, glu, offset);
+    //super.draw(gl, glu, offset);
+    super.draw(gl);
   }
 
   @Override

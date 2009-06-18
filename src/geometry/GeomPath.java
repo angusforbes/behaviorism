@@ -16,7 +16,7 @@ public class GeomPath extends Geom
     this.vertices = vertices;
   }
 
-  public void draw(GL gl, GLU glu, float offset)
+  public void draw(GL gl)
   {
     gl.glColor4f(r, g, b, a);
 
