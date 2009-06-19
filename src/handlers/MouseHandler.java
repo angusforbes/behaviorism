@@ -133,7 +133,7 @@ public class MouseHandler extends MouseAdapter
   {
     return MatrixUtils.toPoint3f(
       MatrixUtils.getWorldPointInGeomCoordinates(
-      MatrixUtils.toPoint3d(mouseWorld), BehaviorismDriver.renderer.modelviewMatrix, selectedGeom.modelview));
+      MatrixUtils.toPoint3d(mouseWorld), RenderUtils.getCamera().modelview, selectedGeom.modelview));
   }
 
   private /*static*/ void processMousePressing()
@@ -239,7 +239,7 @@ public class MouseHandler extends MouseAdapter
     if (button == 1)
     {
       System.out.println("HERE - button 1 drag...");
-      selectedGeom.draggableObject.setPos(new Point3f(RenderUtils.rayIntersect(selectedGeom.draggableObject, mx, my, offsetPt)));
+      selectedGeom.draggableObject.anchor(new Point3f(RenderUtils.rayIntersect(selectedGeom.draggableObject, mx, my, offsetPt)));
     }
     else if (button == 2)
     {
@@ -270,7 +270,7 @@ public class MouseHandler extends MouseAdapter
       {
         //should use getWorldPointInGeomCoord???
         //offsetPt = MatrixUtils.getAbsolutePointInGeomCoordinates(ptWorld, selectedGeom.draggableObject.parent.modelview);
-        offsetPt = MatrixUtils.getWorldPointInGeomCoordinates(ptWorld, RendererJogl.modelviewMatrix, selectedGeom.draggableObject.parent.modelview);
+        offsetPt = MatrixUtils.getWorldPointInGeomCoordinates(ptWorld, RenderUtils.getCamera().modelview, selectedGeom.draggableObject.parent.modelview);
       }
 
       offsetPt = new Point3d(offsetPt.x - selectedGeom.draggableObject.anchor.x,

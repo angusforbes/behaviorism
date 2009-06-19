@@ -46,11 +46,11 @@ public class RendererJogl implements GLEventListener
    * modelviewMatrix is the modelview *after* the camera has been positioned.
    * We are also calling this the "World" modelview (eg, in MatrixUtils).
    */
-  public static double[] modelviewMatrix = new double[16];
+  //public static double[] modelviewMatrix = new double[16];
   /**
    * projectionMatrix holds is the current project
    */
-  public static double[] projectionMatrix = new double[16];
+  //public static double[] projectionMatrix = new double[16];
   /**
    * viewportBounds holds the current viewport bounds (x, y, w, h)
    */
@@ -127,6 +127,11 @@ public class RendererJogl implements GLEventListener
       return;
     }
 
+    cam.projection();
+
+    cam.perspective();
+    
+    /*
     projectionMatrix = MatrixUtils.perspective(
       cam.fovy,
       ((float) BehaviorismDriver.canvasWidth) / BehaviorismDriver.canvasHeight,
@@ -134,6 +139,7 @@ public class RendererJogl implements GLEventListener
       RendererJogl.farPlane);
 
     modelviewMatrix = cam.perspective();
+    */
 
     if(boundsHaveChanged == true)
     {
@@ -147,10 +153,10 @@ public class RendererJogl implements GLEventListener
         lowerleft.x, lowerleft.y, upperright.x - lowerleft.x, upperright.y - lowerleft.y);
 
 
-      worldBoundaryPoints.get(0).setPos(lowerleft.x, lowerleft.y, 0f);
-      worldBoundaryPoints.get(1).setPos(upperright.x, lowerleft.y, 0f);
-      worldBoundaryPoints.get(2).setPos(upperright.x, upperright.y, 0f);
-      worldBoundaryPoints.get(3).setPos(lowerleft.x, upperright.y, 0f);
+      worldBoundaryPoints.get(0).anchor(lowerleft.x, lowerleft.y, 0f);
+      worldBoundaryPoints.get(1).anchor(upperright.x, lowerleft.y, 0f);
+      worldBoundaryPoints.get(2).anchor(upperright.x, upperright.y, 0f);
+      worldBoundaryPoints.get(3).anchor(lowerleft.x, upperright.y, 0f);
     }
 
   //extractFrustum();
@@ -161,8 +167,8 @@ public class RendererJogl implements GLEventListener
   @Deprecated //delete me soon! (being used by GeomText2 and GeomTextPath
   public void resetPerspective3D()
   {
-    projectionMatrix = MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
-    modelviewMatrix = cam.resetPerspective();
+    //projectionMatrix = MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
+    //modelviewMatrix = cam.resetPerspective();
   }
 
   /**

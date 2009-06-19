@@ -53,6 +53,11 @@ public class CamOrbit extends Cam
 		this.rotateAnchor = rotateAnchor;
 	}
 
+  public void perspective()
+  {
+    System.out.println("ERROR -- we haven't set up the perspective for CamOrbit!!! TO DO!!!");
+    System.exit(0);
+  }
   @Override
 	public void setPerspective(GL gl, GLU glu)
 	{

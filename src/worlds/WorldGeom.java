@@ -58,7 +58,10 @@ public abstract class WorldGeom extends GeomPoint //does this make sense?
     //initialize a default RendererLayer for this world
     layers.put(0, new BackToFrontLayer());
     //layers.put(0, new UnsortedLayer());
-    System.out.println("added default layer 0");
+    //System.out.println("added default layer 0");
+    this.name = "world";
+    this.id = "0";
+    this.parent = this.cam;
   }
 
  
@@ -145,13 +148,14 @@ public abstract class WorldGeom extends GeomPoint //does this make sense?
 
   //this may not be necessary since now WorldGeom extends from an empty GeomPoint... check it out sometime...,
   //the only difference is that the parent is null here (should now be the the root geom point?)
+  /*
   @Override
   public void addGeomToLayer(Geom g, boolean isActive, int layerNum)
   {
     WorldGeom.addGeomToSceneGraph(g, this.geoms, isActive, null);
     WorldGeom.addGeomToRendererLayer(g, layerNum);
   }
-
+  */
   
   public static void addGeomToSceneGraph(Geom g, List<Geom> geomList, boolean isActive, Geom parentGeom)
   {
@@ -203,6 +207,7 @@ public abstract class WorldGeom extends GeomPoint //does this make sense?
    * @param g
    * @param isActive
    */
+  /*
   public void addGeomAndWaitUntilAdded(Geom g, boolean isActive)
   {
     addGeom(g);
@@ -214,6 +219,7 @@ public abstract class WorldGeom extends GeomPoint //does this make sense?
 
     g.isActive = isActive;
   }
+  */
 
   public void addSequence(Sequence s)
   {

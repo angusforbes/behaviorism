@@ -743,7 +743,7 @@ public class GeomRectVideoFobs extends GeomRect implements Renderer, ControllerL
         gc2.state.BLEND = false;
       
         
-        v1.setPos(insetw, inseth, 0f);
+        v1.anchor(insetw, inseth, 0f);
       
         gc2.addGeom(v1, true);
      
@@ -788,7 +788,7 @@ public class GeomRectVideoFobs extends GeomRect implements Renderer, ControllerL
         //gc2.state.BLEND = false;
       
         gc2.setColor(0f, 0f, 0f,0f);
-        v1.setPos(-v1.w * .5f, -v1.h * .5f, 0f);
+        v1.anchor(-v1.w * .5f, -v1.h * .5f, 0f);
         gc2.addGeom(v1, true);
         
 
@@ -832,7 +832,7 @@ public class GeomRectVideoFobs extends GeomRect implements Renderer, ControllerL
         inseth = (v1.h * .0f) ;
         gc2 = new GeomRect(-v1.w * .5f - insetw, -v1.h * .5f - inseth, 0f,
                 v1.w + (insetw * 2f), v1.h + (inseth * 2f));
-        v1.setPos(insetw, inseth, 0f);
+        v1.anchor(insetw, inseth, 0f);
         gc2.addGeom(v1, true);
         gc2.isSelectable = true; //true;
         

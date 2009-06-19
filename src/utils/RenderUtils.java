@@ -17,7 +17,7 @@ import javax.media.opengl.GL;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import renderers.RendererJogl;
-import renderers.SceneGraph;
+import renderers.cameras.Cam;
 
 /**
  *
@@ -48,8 +48,10 @@ public class RenderUtils
     int viewport[] = new int[4];
     double worldCoords[] = new double[3];
 
-    projection = MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
-    modelview = rj.cam.perspective();
+    //projection = MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
+    projection = rj.cam.projection; MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
+    //modelview = rj.cam.perspective();
+    modelview = rj.cam.modelview;
     viewport = rj.viewportBounds;
 
     //invert y value properly
@@ -110,7 +112,7 @@ public class RenderUtils
     double projection[] = new double[16];
     int viewport[] = new int[4];
 
-    projection = rj.projectionMatrix;
+    projection = RenderUtils.getCamera().projection;
     viewport = rj.viewportBounds;
 
     if (g instanceof GeomRect)
@@ -130,6 +132,12 @@ public class RenderUtils
   {
     return BehaviorismDriver.renderer;
   }
+
+  public static Cam getCamera()
+  {
+    return BehaviorismDriver.renderer.currentWorld.cam;
+  }
+
 
   public static List<Float> getScreenRectInGeomCoordnates(Geom g, Rectangle2D.Float r2f)
   {
@@ -189,20 +197,20 @@ public class RenderUtils
     double wcsF[] = new double[3];
     //double offsets[] = new double[3];
 
-    projection = rj.projectionMatrix;
+    projection = RenderUtils.getCamera().projection;
     viewport = rj.viewportBounds;
 
     //invert y value properly
     y = (int) ((float) viewport[3] - (float) y);
 
     rj.glu.gluUnProject((double) x, (double) y, 0.0, //-1?
-      rj.modelviewMatrix, 0,
+      RenderUtils.getCamera().modelview, 0,
       projection, 0,
       viewport, 0,
       wcsN, 0);
 
     rj.glu.gluUnProject((double) x, (double) y, 1.0,
-      rj.modelviewMatrix, 0,
+      RenderUtils.getCamera().modelview, 0,
       projection, 0,
       viewport, 0,
       wcsF, 0);
@@ -216,7 +224,7 @@ public class RenderUtils
     Point3d geomPt = new Point3d(g.anchor.x + offsetPt.x, g.anchor.y + offsetPt.y, g.anchor.z + offsetPt.z);
     if (g.parent != null)
     {
-      geomPt_wc = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, g.parent.modelview, rj.modelviewMatrix);
+      geomPt_wc = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, g.parent.modelview, RenderUtils.getCamera().modelview);
     }
     else
     {
@@ -256,7 +264,7 @@ public class RenderUtils
 
     if (g.parent != null)
     {
-      returnPt = MatrixUtils.getWorldPointInGeomCoordinates(returnPt, rj.modelviewMatrix, g.parent.modelview);
+      returnPt = MatrixUtils.getWorldPointInGeomCoordinates(returnPt, RenderUtils.getCamera().modelview, g.parent.modelview);
     }
 
     return new Point3d(returnPt.x - offsetPt.x, returnPt.y - offsetPt.y, returnPt.z - offsetPt.z);
@@ -308,7 +316,7 @@ public class RenderUtils
 
     rj.glu.gluProject(0f, 0f, 0f,
       g.modelview, 0,
-      rj.projectionMatrix, 0,
+      RenderUtils.getCamera().projection, 0,
       rj.viewportBounds, 0,
       screenCoords, 0);
 
@@ -317,7 +325,7 @@ public class RenderUtils
 
     rj.glu.gluProject(g.w, 0f, 0f,
       g.modelview, 0,
-      rj.projectionMatrix, 0,
+      RenderUtils.getCamera().projection, 0,
       rj.viewportBounds, 0,
       screenCoords, 0);
 
@@ -435,7 +443,7 @@ public class RenderUtils
 
     rj.glu.gluProject(0f, 0f, 0f,
       g.modelview, 0,
-      rj.projectionMatrix, 0,
+      RenderUtils.getCamera().projection, 0,
       rj.viewportBounds, 0,
       windowCoords, 0);
 
@@ -444,7 +452,7 @@ public class RenderUtils
 
     rj.glu.gluProject(0f, g.h, 0f,
       g.modelview, 0,
-      rj.projectionMatrix, 0,
+      RenderUtils.getCamera().projection, 0,
       rj.viewportBounds, 0,
       windowCoords, 0);
     double x2 = windowCoords[0];
@@ -617,8 +625,8 @@ public class RenderUtils
 
     double[][] frustum = new double[6][4];
 
-    double[] modl = rj.modelviewMatrix;
-    double[] proj = rj.projectionMatrix;
+    double[] modl = RenderUtils.getCamera().modelview;
+    double[] proj = RenderUtils.getCamera().projection;
     double[] clip = new double[16];
     double t;
 

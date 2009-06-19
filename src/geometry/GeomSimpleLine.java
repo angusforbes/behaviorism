@@ -41,7 +41,7 @@ public class GeomSimpleLine extends Geom
     GeomSimpleLine line = new GeomSimpleLine(new Point3f(),
       new Point3f(w, h, 0f));
 
-    line.setPos(0f, 0f, 0f);
+    line.anchor(0f, 0f, 0f);
     return line;
   }
 

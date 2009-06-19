@@ -112,12 +112,12 @@ public class GeomClosestLineBetweenPolys extends GeomLine
       return;
     }
    
-    firstOffsetPt.setPos(MatrixUtils.toPoint3f(
+    firstOffsetPt.anchor(MatrixUtils.toPoint3f(
       RenderUtils.rayIntersect(
         (firstOffsetPt), (int) r1_ip.getX(), (int) r1_ip.getY())
       ) 
     );
-    secondOffsetPt.setPos(MatrixUtils.toPoint3f(
+    secondOffsetPt.anchor(MatrixUtils.toPoint3f(
       RenderUtils.rayIntersect(
         (secondOffsetPt), (int) r2_ip.getX(), (int) r2_ip.getY()
       ))

@@ -17,9 +17,9 @@ public class GeomPointCenter extends GeomPoint
 	public void draw(GL gl)
   {
 		//Point3f c1n = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth / 2,
-		//				RendererJogl.canvasHeight / 2, .99, RendererJogl.modelviewMatrix);
+		//				RendererJogl.canvasHeight / 2, .99, RenderUtils.getCamera().modelview);
 		Point3f c1n = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth / 2,
-						BehaviorismDriver.canvasHeight / 2, .99, RendererJogl.modelviewMatrix);
+						BehaviorismDriver.canvasHeight / 2, .99, RenderUtils.getCamera().modelview);
 
     gl.glColor4f(r, g, b, a);
     gl.glPointSize(this.pointSize);

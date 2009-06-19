@@ -243,7 +243,7 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
             //theChar = "" + line.charAt(i);
             //addGeom(
             //  new GeomGlyph(theCharPos.character, new Point3f(theCharPos.xpos * scaleVal, (theCharPos.ypos + pxH) * scaleVal, 0f), textRenderer, scaleVal));
-            theCharPos.geomGlyph.setPos(new Point3f(theCharPos.xpos * scaleVal, (theCharPos.ypos + pxH) * scaleVal, 0f));
+            theCharPos.geomGlyph.anchor(new Point3f(theCharPos.xpos * scaleVal, (theCharPos.ypos + pxH) * scaleVal, 0f));
             theCharPos.geomGlyph.textRenderer = textRenderer;
             theCharPos.geomGlyph.scaleVal = scaleVal;
             theCharPos.geomGlyph.setColor(theCharPos.charState.color);

@@ -187,7 +187,8 @@ public class GeomRect extends Geom
         {
           //Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.z);
           Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.anchor.z);
-          Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(test, RendererJogl.modelviewMatrix, modelview);
+          //Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(test, RenderUtils.getCamera().modelview, modelview);
+          Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(test, RenderUtils.getCamera().modelview, modelview);
           gl.glColor4f(1f, 0f, 0f, 1f);
           //gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
         }
@@ -208,13 +209,13 @@ public class GeomRect extends Geom
             float cz = this.anchor.z;
 
 
-            Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX(), r2f.getY(), cz), RendererJogl.modelviewMatrix, modelview);
+            Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX(), r2f.getY(), cz), RenderUtils.getCamera().modelview, modelview);
             gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
-            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX() + r2f.getWidth(), r2f.getY(), cz), RendererJogl.modelviewMatrix, modelview);
+            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX() + r2f.getWidth(), r2f.getY(), cz), RenderUtils.getCamera().modelview, modelview);
             gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
-            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX() + r2f.getWidth(), r2f.getY() + r2f.getHeight(), cz), RendererJogl.modelviewMatrix, modelview);
+            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX() + r2f.getWidth(), r2f.getY() + r2f.getHeight(), cz), RenderUtils.getCamera().modelview, modelview);
             gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
-            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX(), r2f.getY() + r2f.getHeight(), cz), RendererJogl.modelviewMatrix, modelview);
+            p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX(), r2f.getY() + r2f.getHeight(), cz), RenderUtils.getCamera().modelview, modelview);
             gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
 
           }
@@ -367,7 +368,7 @@ public class GeomRect extends Geom
 
   public void setRect(Point3f p3f, float w, float h)
   {
-    setPos(p3f);
+    anchor(p3f);
     this.w = w;
     this.h = h;
   }
@@ -392,7 +393,7 @@ public class GeomRect extends Geom
         returnGeom.state.BLEND = false;
         returnGeom.setColor(color);
 
-        geom.setPos(exactInset, exactInset, 0f);
+        geom.anchor(exactInset, exactInset, 0f);
 
         returnGeom.addGeom(geom, true);
         returnGeom.isSelectable = true; //true;
@@ -453,7 +454,7 @@ public class GeomRect extends Geom
         returnGeom.state.BLEND = false;
         returnGeom.setColor(color);
 
-        geom.setPos(insetw, inseth, 0f);
+        geom.anchor(insetw, inseth, 0f);
 
         returnGeom.addGeom(geom, true);
         returnGeom.isSelectable = true; //true;
@@ -498,7 +499,7 @@ public class GeomRect extends Geom
 
         //returnGeom.setColor(1f, 0f, 0f, 0f);
         returnGeom.setColor(color);
-        geom.setPos(-geom.w * .5f, -geom.h * .5f, 0f);
+        geom.anchor(-geom.w * .5f, -geom.h * .5f, 0f);
         returnGeom.addGeom(geom, true);
 
 
@@ -535,7 +536,7 @@ public class GeomRect extends Geom
         returnGeom.state.BLEND = false;
 
         returnGeom.setColor(0f, 0f, 0f, 0f);
-        geom.setPos(-geom.w * .5f, -geom.h * .5f, 0f);
+        geom.anchor(-geom.w * .5f, -geom.h * .5f, 0f);
         returnGeom.addGeom(geom, true);
 
 
@@ -568,7 +569,7 @@ public class GeomRect extends Geom
       inseth = (v1.h * .0f) ;
       gc2 = new GeomRect(-v1.w * .5f - insetw, -v1.h * .5f - inseth, 0f,
       v1.w + (insetw * 2f), v1.h + (inseth * 2f));
-      v1.setPos(insetw, inseth, 0f);
+      v1.anchor(insetw, inseth, 0f);
       gc2.addGeom(v1, true);
       gc2.isSelectable = true; //true;
       
@@ -644,7 +645,7 @@ public class GeomRect extends Geom
         returnGeom.addGeom(borderRect2, true);
         borderRect2.setColor(innerInsetColor);
 
-        origGeom.setPos(outerExactInset, outerExactInset, 0f);
+        origGeom.anchor(outerExactInset, outerExactInset, 0f);
 
         returnGeom.addGeom(origGeom, true);
         returnGeom.isSelectable = true;
@@ -658,9 +659,9 @@ public class GeomRect extends Geom
         borderRect2.registerDraggableObject(returnGeom);
 
       
-        //returnGeom.setPos(ox, oy, origGeom.z);
-        returnGeom.setPos(ox, oy, origGeom.anchor.z);
-        //returnGeom.setPos(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z); 
+        //returnGeom.anchor(ox, oy, origGeom.z);
+        returnGeom.anchor(ox, oy, origGeom.anchor.z);
+        //returnGeom.anchor(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z);
       
         return returnGeom;
 
@@ -693,7 +694,7 @@ public class GeomRect extends Geom
         returnGeom.addGeom(borderRect2, true);
         borderRect2.setColor(innerInsetColor);
 
-        origGeom.setPos(outerExactInsetW, outerExactInsetH, 0f);
+        origGeom.anchor(outerExactInsetW, outerExactInsetH, 0f);
 
         returnGeom.addGeom(origGeom, true);
         returnGeom.isSelectable = true;
@@ -707,9 +708,9 @@ public class GeomRect extends Geom
         borderRect2.registerDraggableObject(returnGeom);
 
 
-        //returnGeom.setPos(ox, oy, origGeom.z);
-        returnGeom.setPos(ox, oy, origGeom.anchor.z);
-        //returnGeom.setPos(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z);
+        //returnGeom.anchor(ox, oy, origGeom.z);
+        returnGeom.anchor(ox, oy, origGeom.anchor.z);
+        //returnGeom.anchor(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z);
 
         return returnGeom;
 
@@ -767,7 +768,7 @@ public class GeomRect extends Geom
         returnGeom.addGeom(borderRect2, false);
         borderRect2.setColor(color2);
 
-        geom.setPos(insetw, inseth, 0f);
+        geom.anchor(insetw, inseth, 0f);
 
         returnGeom.addGeom(geom, false);
         returnGeom.isSelectable = true; //true;
@@ -780,8 +781,8 @@ public class GeomRect extends Geom
         borderRect2.registerClickableObject(returnGeom);
         borderRect2.registerDraggableObject(returnGeom);
       
-        //returnGeom.setPos(ox, oy, geom.z);
-        returnGeom.setPos(ox, oy, geom.anchor.z);
+        //returnGeom.anchor(ox, oy, geom.z);
+        returnGeom.anchor(ox, oy, geom.anchor.z);
       
         return returnGeom;
     }
@@ -844,7 +845,7 @@ public class GeomRect extends Geom
         returnGeom.addGeom(borderRect2, true);
         borderRect2.setColor(color2);
 
-        geom.setPos(insetw, inseth, 0f);
+        geom.anchor(insetw, inseth, 0f);
 
         returnGeom.addGeom(geom, true);
         returnGeom.isSelectable = true; //true;
@@ -858,9 +859,9 @@ public class GeomRect extends Geom
         borderRect2.registerDraggableObject(returnGeom);
 
       
-        //returnGeom.setPos(ox, oy, geom.z);
-        returnGeom.setPos(ox, oy, geom.anchor.z);
-        //returnGeom.setPos(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z); 
+        //returnGeom.anchor(ox, oy, geom.z);
+        returnGeom.anchor(ox, oy, geom.anchor.z);
+        //returnGeom.anchor(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z);
       
         return returnGeom;
 
@@ -890,7 +891,7 @@ public class GeomRect extends Geom
 
         //returnGeom.setColor(1f, 0f, 0f, 0f);
         returnGeom.setColor(color);
-        geom.setPos(-geom.w * .5f, -geom.h * .5f, 0f);
+        geom.anchor(-geom.w * .5f, -geom.h * .5f, 0f);
         returnGeom.addGeom(geom, true);
 
 
@@ -932,7 +933,7 @@ public class GeomRect extends Geom
         returnGeom.state.BLEND = false;
 
         returnGeom.setColor(0f, 0f, 0f, 0f);
-        geom.setPos(-geom.w * .5f, -geom.h * .5f, 0f);
+        geom.anchor(-geom.w * .5f, -geom.h * .5f, 0f);
         returnGeom.addGeom(geom, true);
 
 
@@ -1047,7 +1048,8 @@ public class GeomRect extends Geom
 
   public String toString()
   {
-    return "x/y/z/w/h = " + anchor.x + "/" + anchor.y + "/" + anchor.z + "/" + w + "/" + h;
+
+    return super.toString() + ", w/h = " + w + "/" + h;
   }
   /** this version puts the Geom points in world Coords and checks against the frustum.
    * This version is flawed, although it is the usual method of doing things.
@@ -1055,13 +1057,13 @@ public class GeomRect extends Geom
   public boolean checkIsVisible()
   {
   Point3d ppp1 = MatrixUtils.getGeomPointInWorldCoordinates(
-  new Point3d(0,0,0), modelview, RendererJogl.modelviewMatrix);
+  new Point3d(0,0,0), modelview, RenderUtils.getCamera().modelview);
   Point3d ppp2 = MatrixUtils.getGeomPointInWorldCoordinates(
-  new Point3d(w,0,0), modelview, RendererJogl.modelviewMatrix);
+  new Point3d(w,0,0), modelview, RenderUtils.getCamera().modelview);
   Point3d ppp3 = MatrixUtils.getGeomPointInWorldCoordinates(
-  new Point3d(w,h,0), modelview, RendererJogl.modelviewMatrix);
+  new Point3d(w,h,0), modelview, RenderUtils.getCamera().modelview);
   Point3d ppp4 = MatrixUtils.getGeomPointInWorldCoordinates(
-  new Point3d(0,h,0), modelview, RendererJogl.modelviewMatrix);
+  new Point3d(0,h,0), modelview, RenderUtils.getCamera().modelview);
   
   //first check points. If any points are in frustrum, then the origGeom is visible
   if (RendererJogl.arePointsInFrustum(ppp1, ppp2, ppp3, ppp4))

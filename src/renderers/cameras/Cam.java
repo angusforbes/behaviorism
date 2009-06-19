@@ -1,22 +1,18 @@
-/*
- * Cam.java
- *
- * Created on November 18, 2007, 1:25 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 package renderers.cameras;
 
+import behaviorism.BehaviorismDriver;
 import geometry.GeomPoint;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
 import javax.media.opengl.GL;
+import renderers.RendererJogl;
 import utils.MatrixUtils;
 
 /**
- *
- * @author basakalper
+ * openGL uses a RHS, meaning that the Z axis looks down the *negative* z axis.
+ * That is, camera is at, say 10z, and things are place in front of it,
+ * from 9.9z (close to camera) to -100z (far away from it).
+ * To move something away from the camera you *decrease* its z value.
  */
 public abstract class Cam extends GeomPoint
 {
@@ -31,6 +27,7 @@ public abstract class Cam extends GeomPoint
   public double zFar; //the	distance from the viewer to the	far clipping plane (always positive).
 
   //public double[] modelview = MatrixUtils.getIdentity();
+  public double[] projection;
 
   public void changeHeading(double degrees)
   {
@@ -55,9 +52,23 @@ public abstract class Cam extends GeomPoint
 
 
   //should be abstract
-  public double[] perspective()
+  //public double[] perspective()
+  abstract public void perspective();
+//  {
+//    return MatrixUtils.getIdentity();
+//  }
+
+  public void projection()
   {
-    return MatrixUtils.getIdentity();
+    if (projection == null) //or has changed... TO DO
+    {
+
+    projection = MatrixUtils.perspective(
+      fovy,
+      ((float) BehaviorismDriver.canvasWidth) / BehaviorismDriver.canvasHeight,
+      RendererJogl.nearPlane,
+      RendererJogl.farPlane);
+    }
   }
 
   //should be abstract

@@ -111,9 +111,4 @@ public class GeomPoint extends Geom
     }
     return gps;
   }
-
-  public String toString()
-  {
-    return anchor.toString();
-  }
 }

@@ -4,12 +4,14 @@
  */
 package renderers.cameras;
 
+import behaviorism.BehaviorismDriver;
 import behaviors.Behavior;
 import behaviors.geom.continuous.BehaviorTranslate;
 import geometry.GeomPoint;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
+import renderers.RendererJogl;
 import utils.MatrixUtils;
 
 /**
@@ -63,14 +65,16 @@ public class CamBasic extends Cam
   }
   
   @Override
-  public double[] perspective()
+  //public double[] perspective()
+  public void perspective()
   {
+    
     modelview = MatrixUtils.getIdentity();
     modelview = MatrixUtils.rotate(modelview, rotate.x, 1.0f, 0.0f, 0.0f);
     modelview = MatrixUtils.rotate(modelview, rotate.y, 0.0f, 1.0f, 0.0f);
     modelview = MatrixUtils.rotate(modelview, rotate.z, 0.0f, 0.0f, 1.0f);
     modelview = MatrixUtils.translate(modelview, anchor.x, anchor.y, -anchor.z);
-    return modelview;
+    //return modelview;
   }
 
   @Override

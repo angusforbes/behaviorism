@@ -166,7 +166,7 @@ public class MatrixUtils
 
   public static void debugPointRelativeToGeom(Point3d absPt, Geom g)
   {
-    Point3d worldPt = getAbsolutePointInWorldCoordinates(absPt, BehaviorismDriver.renderer.modelviewMatrix);
+    Point3d worldPt = getAbsolutePointInWorldCoordinates(absPt, RenderUtils.getCamera().modelview);
     Point3d geomPt = getAbsolutePointInGeomCoordinates(absPt, g.modelview);
 
     System.out.println("absPt   = " + absPt);
@@ -184,7 +184,7 @@ public class MatrixUtils
   {
     Point3d zeroPt = new Point3d(g.anchor); //new Point3f(0f, 0f, 0f);
     Point3d absPt = getGeomPointInAbsoluteCoordinates(zeroPt, g.modelview);
-    Point3d worldPt = getGeomPointInWorldCoordinates(zeroPt, g.modelview, BehaviorismDriver.renderer.modelviewMatrix);
+    Point3d worldPt = getGeomPointInWorldCoordinates(zeroPt, g.modelview, RenderUtils.getCamera().modelview);
     Point3d geomPt = getGeomPointInGeomCoordinates(zeroPt, g.modelview, g.modelview);
 
 
@@ -425,8 +425,8 @@ public class MatrixUtils
   {
     double[] windowVec = project(
       pointToHomogenousCoords(p3f),
-      RendererJogl.modelviewMatrix,
-      RendererJogl.projectionMatrix,
+      RenderUtils.getCamera().modelview,
+      RenderUtils.getCamera().projection,
       RendererJogl.viewportBounds);
 
     return new Point3f((float) windowVec[0], (float) windowVec[1], (float) windowVec[2]);
@@ -437,7 +437,7 @@ public class MatrixUtils
     double[] windowVec = project(
       pointToHomogenousCoords(p3f),
       modelview,
-      RendererJogl.projectionMatrix,
+      RenderUtils.getCamera().projection,
       RendererJogl.viewportBounds);
 
     return new Point3f((float) windowVec[0], (float) windowVec[1], (float) windowVec[2]);

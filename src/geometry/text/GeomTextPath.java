@@ -304,14 +304,14 @@ public class GeomTextPath extends GeomPoly
 		{
 			//newp = new Point3d(rotateAnchor.anchor.x, rotateAnchor.anchor.y, 0f);
 			newp = new Point3d(w * .5f, h * .5f, 0f);
-			world_z = (float) (MatrixUtils.getGeomPointInWorldCoordinates(newp, modelview, RendererJogl.modelviewMatrix)).z;
+			world_z = (float) (MatrixUtils.getGeomPointInWorldCoordinates(newp, modelview, RenderUtils.getCamera().modelview)).z;
 
 		}
 		else
 		{
 			newp = new Point3d(parent.w * .5f, parent.h * .5f, 0f);
 			//newp = new Point3d();
-			world_z = (float) (MatrixUtils.getGeomPointInWorldCoordinates(newp, parent.modelview, RendererJogl.modelviewMatrix)).z;
+			world_z = (float) (MatrixUtils.getGeomPointInWorldCoordinates(newp, parent.modelview, RenderUtils.getCamera().modelview)).z;
 		//world_z = (float) (MatrixUtils.getGeomPointInGeomCoordinates(newp, modelview, parent.modelview)).z;
 		//System.out.println("world_z for child = " + world_z);
 		}

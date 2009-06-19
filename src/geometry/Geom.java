@@ -1,7 +1,6 @@
 /* Geom.java - Created on July 12, 2007, 7:52 PM */
 package geometry;
 
-import behaviorism.BehaviorismDriver;
 import renderers.State;
 import behaviors.Behavior;
 //import behaviors.BehaviorIsActive;
@@ -15,10 +14,9 @@ import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import behaviors.geom.discrete.BehaviorIsActive;
-import java.util.Arrays;
-import renderers.RendererJogl;
 import textures.TextureImage;
 import utils.MatrixUtils;
+import utils.RenderUtils;
 import utils.Utils;
 import worlds.WorldGeom;
 
@@ -28,12 +26,12 @@ public abstract class Geom //extends Point3f //Object
   /**
    * A name for this Geom. Does not need to be unique.
    */
-  public String name = "untitled";
+  public String name = null;
 
   /**
    * A unique id for this Geom.
    */
-  public String id = ""; //not currently used...
+  public String id = null; //not currently used...
 
   /**
    * A List of all child Geoms attached to this Geom.
@@ -149,12 +147,12 @@ public abstract class Geom //extends Point3f //Object
 
   public Geom(float x, float y, float z)
   {
-    setPos(x, y, z);
+    anchor(x, y, z);
   }
 
   public Geom(Point3f p3f)
   {
-    setPos(p3f);
+    anchor(p3f);
   }
 
   /**
@@ -242,7 +240,9 @@ public abstract class Geom //extends Point3f //Object
   public Point3f geomPointToWorldPoint(Point3f geomPt)
   {
     return MatrixUtils.toPoint3f(
-      MatrixUtils.getGeomPointInWorldCoordinates(MatrixUtils.toPoint3d(geomPt), modelview, RendererJogl.modelviewMatrix));
+      //MatrixUtils.getGeomPointInWorldCoordinates(MatrixUtils.toPoint3d(geomPt), modelview, RendererJogl.modelviewMatrix));
+      MatrixUtils.getGeomPointInWorldCoordinates(MatrixUtils.toPoint3d(geomPt), modelview, RenderUtils.getCamera().modelview)
+      );
 
   }
 
@@ -261,34 +261,11 @@ public abstract class Geom //extends Point3f //Object
     if (!isTransformed)
     {
       return;
-//
-//      if (parent == null && (BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed))
-//      {
-//        isTransformed = true;
-//      }
-//      else if(parent != null && parent.isTransformed)
-//      {
-//        isTransformed = true;
-//      }
-//      else
-//      {
-//        return;
-//      }
-       // return; //because nothing has changed
     }
 
-    System.out.println("Geom (" + this.name + ") is transformed!");
-    
-    //System.out.println(this + " class=" + getClass());
-    if (parent != null) // && parent.isTransformed == true)
-    {
-      modelview = Arrays.copyOf(parent.modelview, 16);
-    }
-    else //if (camera.isTransformed) check first if camera has changed!
-    {
-      modelview = Arrays.copyOf(RendererJogl.modelviewMatrix, 16);
-    }
-
+    /* System.arrayCopy is slightly faster that Arrays.copyOf, allegedly. */
+    System.arraycopy(parent.modelview, 0, modelview, 0, 16);
+    //modelview = Arrays.copyOf(parent.modelview, 16);
 
     modelview = MatrixUtils.translate(modelview, anchor.x, anchor.y, anchor.z);
 
@@ -304,8 +281,6 @@ public abstract class Geom //extends Point3f //Object
     modelview = MatrixUtils.translate(modelview, scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
     modelview = MatrixUtils.scale(modelview, scale.x, scale.y, scale.z);
     modelview = MatrixUtils.translate(modelview, -scaleAnchor.x, -scaleAnchor.y, -scaleAnchor.z);
-
-    //isTransformed = false;
   }
 
   /**
@@ -642,6 +617,13 @@ public abstract class Geom //extends Point3f //Object
     }
   }
 
+  public void move(float x, float y, float z)
+  {
+    moveX(x);
+    moveY(y);
+    moveZ(z);
+  }
+
   public void moveX(float x)
   {
     if (x != 0f)
@@ -724,7 +706,7 @@ public abstract class Geom //extends Point3f //Object
     }
   }
   
-  public void setPos(Point3f p3f)
+  public void anchor(Point3f p3f)
   {
     if (!this.anchor.equals(p3f))
     {
@@ -733,7 +715,7 @@ public abstract class Geom //extends Point3f //Object
     }
   }
 
-  public void setPos(float x, float y, float z)
+  public void anchor(float x, float y, float z)
   {
     if (x != anchor.x && y != anchor.y && z != anchor.z)
     {
@@ -1085,7 +1067,18 @@ public abstract class Geom //extends Point3f //Object
   @Override
   public String toString()
   {
-    String str = "Geom : anchorPoint = " + anchor;
+
+    String str = "" + getClass() + " : ";
+    if (name != null)
+    {
+      str += "name=" + name + " : ";
+    }
+    if (id != null)
+    {
+      str += "id=" + id + " : ";
+    }
+    
+    str += "anchor = " + anchor;
     return str;
   }
 

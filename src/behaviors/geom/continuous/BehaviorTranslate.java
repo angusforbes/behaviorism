@@ -104,9 +104,7 @@ public class BehaviorTranslate extends BehaviorGeomContinuous
   {
     if (isActive == true)
     {
-      g.anchor.x += offsets[0];
-      g.anchor.y += offsets[1];
-      g.anchor.z += offsets[2];
+      g.move(offsets[0], offsets[1], offsets[2]);
     }
   }
 }

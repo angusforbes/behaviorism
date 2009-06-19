@@ -162,20 +162,20 @@ public class GeomText2 extends GeomRect
 
 	public void printFrustum()
 	{
-		Point3f c1n = RenderUtils.getWorldCoordsForScreenCoord(0, 0, 0, RendererJogl.modelviewMatrix);
-		Point3f c1f = RenderUtils.getWorldCoordsForScreenCoord(0, 0, 1, RendererJogl.modelviewMatrix);
-		//Point3f c2n = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, 0, 0, RendererJogl.modelviewMatrix);
-		//Point3f c2f = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, 0, 1, RendererJogl.modelviewMatrix);
-		//Point3f c3n = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, RendererJogl.canvasHeight, 1, RendererJogl.modelviewMatrix);
-		//Point3f c3f = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, RendererJogl.canvasHeight, 100, RendererJogl.modelviewMatrix);
-		Point3f c2n = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, 0, 0, RendererJogl.modelviewMatrix);
-		Point3f c2f = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, 0, 1, RendererJogl.modelviewMatrix);
-		Point3f c3n = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight, 1, RendererJogl.modelviewMatrix);
-		Point3f c3f = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight, 100, RendererJogl.modelviewMatrix);
-		//Point3f c4n = RenderUtils.getWorldCoordsForScreenCoord(0, RendererJogl.canvasHeight, 1, RendererJogl.modelviewMatrix);
-		//Point3f c4f = RenderUtils.getWorldCoordsForScreenCoord(0, RendererJogl.canvasHeight, 100, RendererJogl.modelviewMatrix);
-		Point3f c4n = RenderUtils.getWorldCoordsForScreenCoord(0, BehaviorismDriver.canvasHeight, 1, RendererJogl.modelviewMatrix);
-		Point3f c4f = RenderUtils.getWorldCoordsForScreenCoord(0, BehaviorismDriver.canvasHeight, 100, RendererJogl.modelviewMatrix);
+		Point3f c1n = RenderUtils.getWorldCoordsForScreenCoord(0, 0, 0, RenderUtils.getCamera().modelview);
+		Point3f c1f = RenderUtils.getWorldCoordsForScreenCoord(0, 0, 1, RenderUtils.getCamera().modelview);
+		//Point3f c2n = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, 0, 0, RenderUtils.getCamera().modelview);
+		//Point3f c2f = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, 0, 1, RenderUtils.getCamera().modelview);
+		//Point3f c3n = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, RendererJogl.canvasHeight, 1, RenderUtils.getCamera().modelview);
+		//Point3f c3f = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, RendererJogl.canvasHeight, 100, RenderUtils.getCamera().modelview);
+		Point3f c2n = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, 0, 0, RenderUtils.getCamera().modelview);
+		Point3f c2f = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, 0, 1, RenderUtils.getCamera().modelview);
+		Point3f c3n = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight, 1, RenderUtils.getCamera().modelview);
+		Point3f c3f = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight, 100, RenderUtils.getCamera().modelview);
+		//Point3f c4n = RenderUtils.getWorldCoordsForScreenCoord(0, RendererJogl.canvasHeight, 1, RenderUtils.getCamera().modelview);
+		//Point3f c4f = RenderUtils.getWorldCoordsForScreenCoord(0, RendererJogl.canvasHeight, 100, RenderUtils.getCamera().modelview);
+		Point3f c4n = RenderUtils.getWorldCoordsForScreenCoord(0, BehaviorismDriver.canvasHeight, 1, RenderUtils.getCamera().modelview);
+		Point3f c4f = RenderUtils.getWorldCoordsForScreenCoord(0, BehaviorismDriver.canvasHeight, 100, RenderUtils.getCamera().modelview);
 
 		System.out.println("screen in world c1n: " + c1n);
 		System.out.println("screen in world c2n: " + c2n);
@@ -245,14 +245,14 @@ public class GeomText2 extends GeomRect
 		{
 			//newp = new Point3d(rotateAnchor.anchor.x, rotateAnchor.anchor.y, 0f);
 			newp = new Point3d(w * .5f, h * .5f, 0f);
-			world_z = (float) (MatrixUtils.getGeomPointInWorldCoordinates(newp, modelview, RendererJogl.modelviewMatrix)).z;
+			world_z = (float) (MatrixUtils.getGeomPointInWorldCoordinates(newp, modelview, RenderUtils.getCamera().modelview)).z;
 
 		}
 		else
 		{
 			newp = new Point3d(parent.w * .5f, parent.h * .5f, 0f);
 			//newp = new Point3d();
-			world_z = (float) (MatrixUtils.getGeomPointInWorldCoordinates(newp, parent.modelview, RendererJogl.modelviewMatrix)).z;
+			world_z = (float) (MatrixUtils.getGeomPointInWorldCoordinates(newp, parent.modelview, RenderUtils.getCamera().modelview)).z;
 		//world_z = (float) (MatrixUtils.getGeomPointInGeomCoordinates(newp, modelview, parent.modelview)).z;
 		//System.out.println("world_z for child = " + world_z);
 		}

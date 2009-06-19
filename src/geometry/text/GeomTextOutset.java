@@ -411,8 +411,8 @@ public class GeomTextOutset extends GeomRect
     float angleCosine;
 
     Cam cam = BehaviorismDriver.renderer.cam;
-    double[] temp_mv = Arrays.copyOf(RendererJogl.modelviewMatrix, 16);
-    double[] temp_pj = RendererJogl.projectionMatrix;
+    double[] temp_mv = Arrays.copyOf(RenderUtils.getCamera().modelview, 16);
+    double[] temp_pj = RenderUtils.getCamera().projection;
     int[] temp_vp = RendererJogl.viewportBounds;
 
 
@@ -511,7 +511,7 @@ public class GeomTextOutset extends GeomRect
 
   protected void calculateUnrotatedPixelWidthAndHeight(GL gl)
   {
-    double[] temp_pj = RendererJogl.projectionMatrix;
+    double[] temp_pj = RenderUtils.getCamera().projection;
     int[] temp_vp = RendererJogl.viewportBounds;
 
     Cam cam = BehaviorismDriver.renderer.cam;

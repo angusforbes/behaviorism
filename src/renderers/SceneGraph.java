@@ -14,6 +14,7 @@ import javax.media.opengl.glu.GLU;
 import handlers.FontHandler;
 import java.util.Map;
 import sequences.Sequence;
+import utils.RenderUtils;
 import utils.Utils;
 
 public class SceneGraph
@@ -126,7 +127,12 @@ public class SceneGraph
     }
 
     //traverse scene graph to determine each element's transformation matrix
-    traverseGeoms(gl, BehaviorismDriver.renderer.currentWorld.geoms,
+//    traverseGeoms(gl, BehaviorismDriver.renderer.currentWorld.geoms,
+//      BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed,
+//      offset);
+    List worldGeom = new ArrayList();
+    worldGeom.add(BehaviorismDriver.renderer.currentWorld);
+    traverseGeoms(gl, worldGeom,
       BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed,
       offset);
     BehaviorismDriver.renderer.currentWorld.isTransformed = false;
@@ -209,7 +215,7 @@ public class SceneGraph
   public void drawGeoms(GL gl)
   {
     gl.glMatrixMode(gl.GL_PROJECTION);
-    gl.glLoadMatrixd(RendererJogl.projectionMatrix, 0);
+    gl.glLoadMatrixd(RenderUtils.getCamera().projection, 0);
     gl.glMatrixMode(gl.GL_MODELVIEW);
 
     //gl.glPushMatrix();
