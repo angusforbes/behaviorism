@@ -7,6 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import javax.vecmath.Vector3d;
 
+//this shouldn't be part of the library!!! we should just import it as needed directly from the traer jar
+//for specific projects. Or make an add-on lib to include other numerical methods/integrators if needed...
+//
 public class ParticleSystem
 {
     public List<Particle> particles = new ArrayList<Particle>();

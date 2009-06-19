@@ -1,5 +1,5 @@
 /*
- * WorldGeom.java - Created on July 12, 2007, 6:59 PM
+ * World.java - Created on July 12, 2007, 6:59 PM
  */
 package worlds;
 
@@ -27,8 +27,8 @@ import renderers.cameras.CamBasic;
 import renderers.layers.BackToFrontLayer;
 import renderers.layers.RendererLayer;
 
-//public abstract class WorldGeom
-public abstract class WorldGeom extends GeomPoint //does this make sense?
+//public abstract class World
+public abstract class World extends GeomPoint //does this make sense?
 //we'll have to make a lot of chnages
 //to RendererJogl modelview, etc?
 {
@@ -52,7 +52,7 @@ public abstract class WorldGeom extends GeomPoint //does this make sense?
   }
   public boolean isPaused = false;
 
-  public WorldGeom()
+  public World()
   {
     //initialize a default RendererLayer for this world
     layers.put(0, new BackToFrontLayer());
@@ -145,14 +145,14 @@ public abstract class WorldGeom extends GeomPoint //does this make sense?
   }
    */
 
-  //this may not be necessary since now WorldGeom extends from an empty GeomPoint... check it out sometime...,
+  //this may not be necessary since now World extends from an empty GeomPoint... check it out sometime...,
   //the only difference is that the parent is null here (should now be the the root geom point?)
   /*
   @Override
   public void addGeomToLayer(Geom g, boolean isActive, int layerNum)
   {
-    WorldGeom.addGeomToSceneGraph(g, this.geoms, isActive, null);
-    WorldGeom.addGeomToRendererLayer(g, layerNum);
+    World.addGeomToSceneGraph(g, this.geoms, isActive, null);
+    World.addGeomToRendererLayer(g, layerNum);
   }
   */
   

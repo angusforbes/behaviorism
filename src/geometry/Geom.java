@@ -18,7 +18,7 @@ import textures.TextureImage;
 import utils.MatrixUtils;
 import utils.RenderUtils;
 import utils.Utils;
-import worlds.WorldGeom;
+import worlds.World;
 
 public abstract class Geom //extends Point3f //Object
 {
@@ -423,7 +423,7 @@ public abstract class Geom //extends Point3f //Object
   }
 
   /**
-   * Adds a Geom to this WorldGeom. By default the Geom is immediately activated.
+   * Adds a Geom to this World. By default the Geom is immediately activated.
    * @param g The Geom being added.
    */
   public void addGeom(Geom g)
@@ -496,8 +496,8 @@ public abstract class Geom //extends Point3f //Object
 //  
   public void addGeomToLayer(Geom g, boolean isActive, int layerNum)
   {
-    WorldGeom.addGeomToSceneGraph(g, this.geoms, isActive, this);
-    WorldGeom.addGeomToRendererLayer(g, layerNum);
+    World.addGeomToSceneGraph(g, this.geoms, isActive, this);
+    World.addGeomToRendererLayer(g, layerNum);
   }
 
   /**

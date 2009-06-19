@@ -2,7 +2,7 @@ package sequences;
 
 import behaviorism.BehaviorismDriver;
 import java.util.List;
-import worlds.WorldGeom;
+import worlds.World;
 
 /**
  *
@@ -11,11 +11,11 @@ import worlds.WorldGeom;
 abstract public class Sequence
 {
 
-	public WorldGeom world = null;
+	public World world = null;
 	public long baseNano = -1;
 	public long pauseNano = -1;
 
-	public Sequence(WorldGeom world, long baseNano)
+	public Sequence(World world, long baseNano)
 	{
 		this.world = world;
 		this.baseNano = baseNano;

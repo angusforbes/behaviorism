@@ -29,7 +29,7 @@ import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import utils.Utils;
-import worlds.WorldGeom;
+import worlds.World;
 
 /**
  * This is the main driver for the application. (blah blah)
@@ -44,7 +44,7 @@ public class BehaviorismDriver
 
   public static Renderer renderer = null;
   public static SceneGraph viz = null; //should be a singleton!
-  //public static WorldGeom world; //should probably synchronize...
+  //public static World world; //should probably synchronize...
   public static int screenWidth;
   public static int screenHeight;
   public static int canvasHeight = 400;
@@ -64,7 +64,7 @@ public class BehaviorismDriver
     new BehaviorismDriver();
   }
 
-  public BehaviorismDriver(WorldGeom world)
+  public BehaviorismDriver(World world)
   {
     initialize(null);
     //BehaviorismDriver.renderer.currentWorld = world;
@@ -73,7 +73,7 @@ public class BehaviorismDriver
     world.setUpWorld();
   }
 
-  public BehaviorismDriver(WorldGeom world, Properties properties)
+  public BehaviorismDriver(World world, Properties properties)
   {
     initialize(properties);
     //BehaviorismDriver.renderer.currentWorld = world;
@@ -89,7 +89,7 @@ public class BehaviorismDriver
     BehaviorismDriver.renderer.currentWorld.setUpWorld();
   }
 
-  public void installWorld(WorldGeom world, Properties properties)
+  public void installWorld(World world, Properties properties)
   {
     if (properties != null)
     {
@@ -334,7 +334,7 @@ public class BehaviorismDriver
       // Load in the class; [worldClass].class must be located in
       // the directory build/classes/worlds/
       cls = cl.loadClass("worlds." + worldClass.trim());
-      BehaviorismDriver.renderer.currentWorld = (WorldGeom) cls.newInstance();
+      BehaviorismDriver.renderer.currentWorld = (World) cls.newInstance();
       System.out.println("cls name = " + BehaviorismDriver.renderer.currentWorld.getClass());
 
     }

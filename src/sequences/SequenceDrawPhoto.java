@@ -7,7 +7,7 @@ import geometry.GeomRect;
 import java.util.ArrayList;
 import java.util.List;
 import utils.Utils;
-import worlds.WorldGeom;
+import worlds.World;
 
 /**
  *
@@ -20,7 +20,7 @@ public class SequenceDrawPhoto extends Sequence
 	FlickrData prevPhoto = null;
 	Geom prevGeomImage = null;
 	
-	public SequenceDrawPhoto(WorldGeom world, long baseNano,
+	public SequenceDrawPhoto(World world, long baseNano,
 					FlickrData currentPhoto, FlickrData prevPhoto, 
 					Geom prevGeomImage)
 	{

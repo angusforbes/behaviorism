@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import utils.Utils;
 
-public class WorldYouTube extends WorldGeom
+public class WorldYouTube extends World
 {
 
 	public WorldYouTube()

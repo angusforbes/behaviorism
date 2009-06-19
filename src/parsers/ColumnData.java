@@ -1,5 +1,6 @@
 package parsers;
 
+//move this to a class inside SqlHandler...
 public class ColumnData {
 
    String column;

@@ -29,7 +29,7 @@ import utils.FileUtils;
 import utils.Utils;
 
 //TODO: delete this line as well!
-public class WorldDemo1 extends WorldGeom {
+public class WorldDemo1 extends World {
 
    private YouTubeHandler youTubeHandler = null;
 

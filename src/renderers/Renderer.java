@@ -23,13 +23,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import utils.MatrixUtils;
 import utils.RenderUtils;
 import utils.Utils;
-import worlds.WorldGeom;
+import worlds.World;
 
 public class Renderer implements GLEventListener
 {
 
-  public Map<WorldGeom, Boolean> worlds = new ConcurrentHashMap<WorldGeom, Boolean>();
-  public WorldGeom currentWorld = null;
+  public Map<World, Boolean> worlds = new ConcurrentHashMap<World, Boolean>();
+  public World currentWorld = null;
   public SceneGraph sceneGraph = null;
   public static GLUT glut;
   public static GLU glu;
@@ -43,10 +43,6 @@ public class Renderer implements GLEventListener
   public Cam cam = null;
   private FontHandler fontHandler = FontHandler.getInstance();
 
-  /**
-   * viewportBounds holds the current viewport bounds (x, y, w, h)
-   */
-  //public static int viewportBounds[] = new int[4];
   
   public static double frustum[][] = null;
   public static Rectangle2D.Float screenBounds = null;
@@ -74,12 +70,12 @@ public class Renderer implements GLEventListener
     return instance;
   }
 
-  public void installWorld(WorldGeom world)
+  public void installWorld(World world)
   {
     installWorld(world, true, true);
   }
 
-  public void installWorld(WorldGeom world, boolean isActive, boolean isCurrent)
+  public void installWorld(World world, boolean isActive, boolean isCurrent)
   {
     if (!worlds.keySet().contains(world))
     {
@@ -102,7 +98,7 @@ public class Renderer implements GLEventListener
     boundsHaveChanged = true;
   }
 
-  public void activateWorld(WorldGeom world, boolean isCurrent)
+  public void activateWorld(World world, boolean isCurrent)
   {
     worlds.put(world, true);
 
@@ -224,7 +220,7 @@ public class Renderer implements GLEventListener
   private void shutdown()
   {
     System.err.println("in RendererJogl : cleaning up resources... ");
-    for (WorldGeom w : worlds.keySet())
+    for (World w : worlds.keySet())
     {
       w.cleanUp();
     }
