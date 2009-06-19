@@ -22,12 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
 import handlers.FontHandler;
 import utils.Utils;
 
-public class GeomTextFlow extends GeomText2
+public class GeomTextFlow extends GeomTextOutset
 {
   //actually only used in GeomTextFlowForcedFontSize...
   public List<CharLine> charLines = new ArrayList<CharLine>();
@@ -80,12 +79,12 @@ public class GeomTextFlow extends GeomText2
 
   public GeomTextFlow(Point3f p3f, float w, float h, String text)
   {
-    super(p3f, w, h, text);
+    //super(p3f, w, h, text);
   }
 
   public GeomTextFlow(float x, float y, float z, float w, float h, String text)
   {
-    super(x, y, z, w, h, text);
+    //super(x, y, z, w, h, text);
   }
 
   @Override
@@ -178,6 +177,8 @@ public class GeomTextFlow extends GeomText2
 
   public void setupTextRenderer()
   {
+    //figure this out later-- commented out while switching to GTextOutset...
+    /*
     this.scaleValX = (this.w * (1f)) / ((float) pxMaxWidth);
     this.scaleValY = ((this.h / lines.size()) * 1f) / ((float) pxMaxHeight);
 
@@ -189,7 +190,7 @@ public class GeomTextFlow extends GeomText2
     {
       this.scaleVal = scaleValY;
     }
-
+    */
   /*
   System.out.println("fontSize = " + font_layout.getSize() +
   " ; w/h = " + w + "/" + h +
@@ -206,6 +207,7 @@ public class GeomTextFlow extends GeomText2
 
   public void draw(GL gl)
   {
+    /*
     //temp - draw background
     if (debugDrawBackground == true || backgroundColor != null)
     {
@@ -266,13 +268,13 @@ public class GeomTextFlow extends GeomText2
         float carea = (cw * ch);
         float xval = (float) Math.sqrt(carea / (w * h));
 
-        /*
-        System.out.println("characters = " + text.length());
-        System.out.printf("max area w/h = %f/%f\n", cw, ch);
-        System.out.println("carea = " + carea);
-        System.out.println("xval = " + xval);
-        System.out.println("is " + carea + " < " + (pxHeight * pxWidth) + "?");
-         */
+        
+//        System.out.println("characters = " + text.length());
+//        System.out.printf("max area w/h = %f/%f\n", cw, ch);
+//        System.out.println("carea = " + carea);
+//        System.out.println("xval = " + xval);
+//        System.out.println("is " + carea + " < " + (pxHeight * pxWidth) + "?");
+        
         if (carea < (pxWidth * pxHeight) * 2f || i == 0) //ie if it fits OR it is the last one
         {
           float currentFontSize = tr1.getFont().getSize();
@@ -362,7 +364,7 @@ public class GeomTextFlow extends GeomText2
     }
 
     textRenderer.end3DRendering();
-
+    */
   }
 
   public static GeomTextFlow createGeomTextFlowWithQuotes(String text)

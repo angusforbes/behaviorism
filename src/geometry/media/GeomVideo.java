@@ -2,26 +2,10 @@
 package geometry.media;
 
 import textures.TextureVideo;
-import behaviors.Behavior;
-import behaviors.geom.continuous.BehaviorRotate;
-import behaviors.geom.continuous.BehaviorScale;
-import com.sun.media.jmc.MediaProvider;
-import com.sun.media.jmc.control.AudioControl;
-import com.sun.media.jmc.control.TrackControl;
-import com.sun.media.jmc.control.VideoRenderControl;
 import com.sun.opengl.util.texture.TextureCoords;
-import com.sun.opengl.util.texture.TextureData;
-import com.sun.opengl.util.texture.TextureIO;
-import geometry.Colorf;
 import geometry.GeomRect;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
-import utils.Utils;
 
 /**
  *
@@ -60,6 +44,7 @@ public class GeomVideo extends GeomRect
     attachTexture(ti);
   }
 
+  @Override
   public void draw(GL gl)
   {
     if (!updateTextures())

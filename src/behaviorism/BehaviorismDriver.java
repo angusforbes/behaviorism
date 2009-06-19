@@ -109,7 +109,6 @@ public class BehaviorismDriver
     viz = SceneGraph.getInstance();
     renderer = Renderer.getInstance();
 
-
     //load properties from attribute.properties
     //Properties properties = loadPropertiesFile();
     if (properties != null)
@@ -125,7 +124,7 @@ public class BehaviorismDriver
     BasicShape.register("297210770");
 
     //determine available fonts
-    FontHandler.getInstance().determineFonts();
+    //FontHandler.getInstance().determineFonts();
 
     //set up openGL canvas        
     GLCapabilities caps = new GLCapabilities();
@@ -186,8 +185,8 @@ public class BehaviorismDriver
 
 
     //add listeners
-    keyListener = new KeyboardHandler();
-    mouseListener = new MouseHandler();
+    keyListener = KeyboardHandler.getInstance();
+    mouseListener = MouseHandler.getInstance();
 
     canvas.addMouseListener(mouseListener);
     canvas.addMouseMotionListener(mouseListener);
@@ -235,11 +234,25 @@ public class BehaviorismDriver
    */
   private void setFontParams(Properties properties)
   {
-    String df = properties.getProperty("font.defaultFont");
+    boolean updateDefaultFont = false;
+    String fontName = "Default";
+    int fontStyle = 0;
 
-    if (df != null)
+    if (properties.getProperty("font.defaultFont") != null)
     {
-      FontHandler.getInstance().defaultFont = df;
+      fontName = properties.getProperty("font.defaultFont");
+      updateDefaultFont = true;
+    }
+
+    if (properties.getProperty("font.defaultFontStyle") != null)
+    {
+      fontStyle = Integer.parseInt(properties.getProperty("font.defaultFontStyle"));
+      updateDefaultFont = true;
+    }
+
+    if (updateDefaultFont == true)
+    {
+      FontHandler.getInstance().setDefaultFont(fontName, fontStyle);
     }
   }
 

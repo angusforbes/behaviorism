@@ -1,7 +1,6 @@
 /* GeomTextOutset.java ~ Oct 6, 2008 */
 package geometry.text;
 
-import renderers.Renderer;
 import com.sun.opengl.util.j2d.TextRenderer;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
@@ -260,10 +259,11 @@ public class GeomTextOutset extends GeomRect
 
   public void setFont(String fontString, int fontStyle)
   {
-    this.textRenderers = FontHandler.getInstance().findFontFamily(fontString, fontStyle);
+    this.textRenderers = FontHandler.getInstance().getFontFamily(fontString, fontStyle);
   //FontHandler.getInstance().fontsReady.set(true);
   }
 
+  public GeomTextOutset() {} //temp while we are cleaning stuff up... remove this soon! TODO
   public GeomTextOutset(GeomTextBuilder builder)
   {
     super(builder.anchorPt, builder.width, builder.height);
@@ -767,6 +767,7 @@ public class GeomTextOutset extends GeomRect
 
   }
 
+  /*
   public static GeomText2 createGeomTextWithQuotes(String text)
   {
     return createGeomTextWithQuotes(0f, 0f, 0f, 2f, 1f, text);
@@ -797,7 +798,7 @@ public class GeomTextOutset extends GeomRect
     gtf3.registerSelectableObject(gtf);
     return gtf;
   }
-
+  */
   @Override
   public void dispose()
   {

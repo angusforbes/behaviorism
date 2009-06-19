@@ -12,10 +12,12 @@ import geometry.GeomPoint;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.*;
 import com.sun.opengl.util.*;
+import com.sun.opengl.util.j2d.TextRenderer;
 import java.awt.geom.Rectangle2D;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import handlers.FontHandler;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +29,6 @@ import worlds.World;
 
 public class Renderer implements GLEventListener
 {
-
   public Map<World, Boolean> worlds = new ConcurrentHashMap<World, Boolean>();
   public World currentWorld = null;
   public SceneGraph sceneGraph = null;
@@ -41,15 +42,12 @@ public class Renderer implements GLEventListener
   public GLUnurbs nurbsRenderer = null;
   public GLUquadric quadricRenderer = null;
   public Cam cam = null;
-  private FontHandler fontHandler = FontHandler.getInstance();
-
   
   public static double frustum[][] = null;
   public static Rectangle2D.Float screenBounds = null;
   public static Rectangle2D.Float screenBoundsInWorldCoords = null;
   public static List<GeomPoint> worldBoundaryPoints = null;
   public static boolean boundsHaveChanged = true;
-
 
   private static Renderer instance = null;
 
@@ -66,8 +64,12 @@ public class Renderer implements GLEventListener
 
     instance = new Renderer();
 
-    instance.sceneGraph = SceneGraph.getInstance();
     return instance;
+  }
+
+  private Renderer()
+  {
+    sceneGraph = SceneGraph.getInstance();
   }
 
   public void installWorld(World world)
@@ -204,7 +206,7 @@ public class Renderer implements GLEventListener
     sceneGraph.drawDebuggingInfo(gl);
   }
 
-  private void processHandlers()
+  private void processInputs()
   {
     //TO DO: have a list of attached handlers...
     MouseHandler.getInstance().processMouse();
@@ -238,31 +240,23 @@ public class Renderer implements GLEventListener
 
     clearScreen();
 
-    //i don't like this being here...
-    if (fontHandler.changeFonts.get() == true)
-    {
-      fontHandler.nextFont(fontHandler.fontIndex);
-    }
-
     sceneGraph.draw(gl);
 
-    //fontHandler.fontsReady.set(false);
+    processInputs();
 
-    processHandlers();
     processDebugs();
     //gl.glFlush(); //is this necessary?
+
 
     //set this false here so that geoms that need to recalc if bounds have changed will know
     //that screen has been reshaped.
     boundsHaveChanged = false;
-
 
     if (BehaviorismDriver.isShutdown.get() == true)
     {
       shutdown();
     }
   }
-
 
   @Override
   public void init(GLAutoDrawable drawable)
@@ -280,6 +274,9 @@ public class Renderer implements GLEventListener
     glu = new GLU();
     glut = new GLUT();
 
+
+    //debugTextRenderer = FontHandler.getInstance().getFont("Arial", Font.PLAIN, 18);
+    
     //print out version info..
     System.out.println("GLSL version = " + gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION));
 

@@ -6,7 +6,7 @@
 package algorithms;
 
 import geometry.GeomRect;
-import geometry.text.GeomText2;
+import geometry.text.GeomTextOutset;
 import java.util.List;
 import java.awt.geom.*;
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class PackingAlgorithm
     initialize(boundingPath);
   }
 
-  public PackingAlgorithm(List<GeomText2> geomTexts, Path2D.Float boundingPath) //make a poly later...
+  public PackingAlgorithm(List<GeomTextOutset> geomTexts, Path2D.Float boundingPath) //make a poly later...
   {
     initialize(geomTexts, boundingPath);
   }
@@ -91,11 +91,11 @@ public class PackingAlgorithm
     this.boundingLines = GeomUtils.getLinesFromPath2D(boundingPath);
   }
   
-  public void initialize(List<GeomText2> geomTexts, Rectangle2D boundingRect)
+  public void initialize(List<GeomTextOutset> geomTexts, Rectangle2D boundingRect)
   {
     initialize(geomTexts, new Path2D.Float(boundingRect));
   }
-  public void initialize(List<GeomText2> geomTexts, Path2D.Float boundingPath)
+  public void initialize(List<GeomTextOutset> geomTexts, Path2D.Float boundingPath)
   {
     placedGeomTexts = new ArrayList<GeomRect>();
     
@@ -105,7 +105,7 @@ public class PackingAlgorithm
     this.boundingLines = GeomUtils.getLinesFromPath2D(boundingPath);
     
       boolean firstTime = true;
-    for(GeomText2 gt : geomTexts)
+    for(GeomTextOutset gt : geomTexts)
     {
       placeGeom(gt, firstTime);
       firstTime = false;

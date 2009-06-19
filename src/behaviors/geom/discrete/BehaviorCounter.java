@@ -3,7 +3,7 @@
 package behaviors.geom.discrete;
 
 import geometry.Geom;
-import geometry.text.GeomText2;
+import geometry.text.GeomTextOutset;
 import java.util.Collections;
 import java.util.List;
 
@@ -106,9 +106,9 @@ public class BehaviorCounter extends BehaviorGeomDiscrete
   public void updateGeom(Geom geom)
   {
     System.out.println("count index = " + countIndex);
-    if (geom instanceof GeomText2)
+    if (geom instanceof GeomTextOutset)
     {
-      ((GeomText2)geom).text = "" + counts.get(  countIndex % (counts.size() ) );
+      ((GeomTextOutset)geom).text = "" + counts.get(  countIndex % (counts.size() ) );
 
       countIndex++;
      

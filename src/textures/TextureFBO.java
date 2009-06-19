@@ -3,10 +3,6 @@ package textures;
 
 import behaviorism.BehaviorismDriver;
 import com.sun.opengl.util.texture.TextureIO;
-import geometry.Colorf;
-import geometry.Geom;
-import java.util.ArrayList;
-import java.util.List;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import static javax.media.opengl.GL.*;

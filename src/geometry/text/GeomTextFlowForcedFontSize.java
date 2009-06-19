@@ -508,6 +508,8 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
 
   public void setupTextRenderer(float cw, float ch)
   {
+
+    /*
     //this.scaleValX = (this.w * (1f)) / ((float) pxMaxWidth);
     this.scaleValX = (this.w * (1f)) / cw;
     //this.scaleValY = ((this.h / lines.size()) * 1f) / ((float) pxMaxHeight);
@@ -528,10 +530,13 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
     this.scaleVal = 1f; //scaleValY;
 
   //System.out.println("scaleVal = " + scaleVal);
+     */
   }
 
   public void setupTextRenderer()
   {
+
+    /*
     //this.scaleValX = (this.w * (1f)) / ((float) pxMaxWidth);
     this.scaleValX = (this.w * (1f)) / ((float) pxWidth);
     //this.scaleValY = ((this.h / lines.size()) * 1f) / ((float) pxMaxHeight);
@@ -552,10 +557,13 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
     this.scaleVal = scaleValY;
 
   //System.out.println("scaleVal = " + scaleVal);
+     */
   }
 
   public void draw(GL gl)
   {
+
+    /*
     //temp - draw background
     if (debugDrawBackground == true || backgroundColor != null || 1 == 1)
     {
@@ -697,7 +705,9 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
     //now render it!	
     int visiblesIdx = 0;
     //System.out.println("scaleVal = " + scaleVal);
-    /*
+
+     */
+     /*
     for (CharPosition cpos : charPositions)
     {
     textRenderer.setColor(cpos.color.r, cpos.color.g, cpos.color.b, cpos.color.a);
@@ -715,7 +725,7 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
 
 
 
-    textRenderer.begin3DRendering();
+   ////  textRenderer.begin3DRendering();
 
     /*
     for (CharLine charLine : charLines)
@@ -743,6 +753,7 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
     }
     */
 
+    /*******
     for (Geom g : geoms)
     {
       if (!(g instanceof GeomGlyph))
@@ -759,7 +770,7 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
     }
     
     textRenderer.end3DRendering();
-
+    *******/
 
 
     /*
@@ -799,7 +810,7 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
      */
 
 
-
+     /*******
     gl.glLineWidth(1f);
     gl.glColor4f(1f, 1f, 1f, 1f);
 
@@ -815,7 +826,7 @@ public class GeomTextFlowForcedFontSize extends GeomTextFlow
       }
     }
     gl.glEnd();
-
+      *******/
   }
 }
 

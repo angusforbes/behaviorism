@@ -50,7 +50,14 @@ public class GeomSimpleText extends GeomRect
   {
     super(p3f, 0f, 0f);
     this.text = text;
-    this.textRenderer = FontHandler.getInstance().getFont(fontName, fontStyle, fontSize);
+    setFont(fontName, fontStyle, fontSize);
+  }
+
+   public GeomSimpleText(Point3f p3f, String text, TextRenderer textRenderer)
+  {
+    super(p3f, 0f, 0f);
+    this.text = text;
+    this.textRenderer = textRenderer;
     calculateBounds();
   }
 

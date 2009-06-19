@@ -31,8 +31,9 @@ public class FontHandler
   boolean USE_MIPMAPS = false;
   boolean USE_FRACTIONAL_METRICS = false;
   public Map<String, List<TextRenderer>> fontFamilyMap = new ConcurrentHashMap<String, List<TextRenderer>>();
-  public List<String> fontNames = new ArrayList<String>();
-  public int fontIndex = 0;
+  public List<TextRenderer> defaultFontFamily = null;
+  //public List<String> fontNames = new ArrayList<String>();
+  //public int fontIndex = 0;
   /** 
   textRenderers is a List of currently active TextRenderers, each one assigned
   to a particular size within a specific family. That is,
@@ -48,14 +49,16 @@ public class FontHandler
    * The name of the default font to use during when the application first starts up. This is set
    * programmatically in Main if the parameter "font.defaultFont" exists in attributes.properties.
    */
-  public String defaultFont = "default";
+  public String defaultFont = "Arial";
+  public int defaultStyle = Font.PLAIN;
+
   /**
    * Singleton instance of FontHandler. The only way to use this class is via the static getInstance() method.
    */
   private static FontHandler instance = null;
 
   /**
-   * method to get or create the singleton FontHandler object.
+   * Gets the singleton FontHandler object.
    * @return the singleton FontHandler
    */
   public static FontHandler getInstance()
@@ -70,9 +73,14 @@ public class FontHandler
     return instance;
   }
 
+
+  private FontHandler()
+  {}
+
   /**
    * Determine which fonts are available and place them in an unmodifiable list.
    */
+  /*
   public void determineFonts()
   {
     List<String> names = new ArrayList<String>();
@@ -125,20 +133,26 @@ public class FontHandler
       fontIndex = 0;
     }
   }
+  */
 
   public synchronized TextRenderer getLargestTextRenderer()
   {
     return textRenderers.get(textRenderers.size() - 1);
   }
 
-  public synchronized void nextFont()
-  {
-    nextFont((fontIndex + 1) % fontNames.size());
-  }
-
+  /**
+   * Gets or creates the specified font. First looks to see if the font family is loaded. If not,
+   * the font family is loaded. Then looks to see if our specified size is available. If not,
+   * create it and add it to the fontFamily. If for some reason we can't load the font family, then
+   * use the default font family.
+   * @param fontName
+   * @param fontStyle
+   * @param fontSize
+   * @return A TextRenderer representing the specfied font.
+   */
   public synchronized TextRenderer getFont(String fontName, int fontStyle, float fontSize)
   {
-    List<TextRenderer> renderers = findFontFamily(fontName, fontStyle);
+    List<TextRenderer> renderers = getFontFamily(fontName, fontStyle);
 
     if (renderers == null)
     {
@@ -163,10 +177,49 @@ public class FontHandler
     return renderer;
   }
 
-  public synchronized TextRenderer createTextRenderer(Font font, int fontStyle, float fontSize)
+  public void setDefaultFont(String font, int fontStyle)
   {
-    //System.out.println("in createTextRenderer : AAA : fontStyle = " + fontStyle + ", fontSize = " + fontSize);
+    this.defaultFont = font;
+    this.defaultStyle = fontStyle;
+
+    defaultFontFamily = getFontFamily(this.defaultFont, this.defaultStyle);
+  }
+
+  public TextRenderer getDefaultFont(float fontSize)
+  {
+    if (defaultFontFamily == null)
+    {
+      defaultFontFamily = getFontFamily(this.defaultFont, this.defaultStyle);
+    }
+
+    for (TextRenderer renderer : defaultFontFamily)
+    {
+      if (renderer.getFont().getSize() == fontSize)
+      {
+        return renderer;
+      }
+    }
+
+    System.out.println("couldn't find size <" + fontSize + ">, creating it...");
+    Font derive = new Font(defaultFont, defaultStyle, 800);
+
+    TextRenderer renderer = createTextRenderer(derive, defaultStyle, fontSize);
+    defaultFontFamily.add(renderer);
+
+    return renderer;
+  }
+
+  /**
+   * Creates a single TextRenderer for a specified font and style with a particular size.
+   * @param font
+   * @param fontStyle
+   * @param fontSize
+   * @return A new TextRenderer for the specified font with a specified style at a specified size.
+   */
+  private synchronized TextRenderer createTextRenderer(Font font, int fontStyle, float fontSize)
+  {
     boolean useAntialias = true;
+
     if (fontSize < 18f) //then don't anti-alias!
     {
       useAntialias = false;
@@ -182,9 +235,18 @@ public class FontHandler
   }
 
   /**
-   * load up the specified font family 
+   * Gets the specified font family. This method tries to find 
+   * the font family in the following manner. First, by searching the fontFamilyMap
+   * to see if this font has already been loaded. If not, it looks to see if this font family
+   * is available natively on the system and loads it. If not, it looks in the
+   * resources folder within behaviorism.jar and loads it (TO DO!). If not, it looks in the data/fonts
+   * directory and loads it. If all of these fail, then we are unable to create the
+   * font family and instead return the default font family (TO DO!).
+   * @param fontName
+   * @param fontStyle
+   * @return A List of TextRenderers representing the specified font family at various sizes.
    */
-  public synchronized List<TextRenderer> findFontFamily(String fontName, int fontStyle)
+  public synchronized List<TextRenderer> getFontFamily(String fontName, int fontStyle)
   {
     String familyId = fontName + "," + fontStyle;
 
@@ -192,11 +254,12 @@ public class FontHandler
 
     if (familyTextRenderers != null) //we found it in out hash...
     {
-      System.out.println("in findFontFamily : we found the font family :" + familyId);
+      //System.out.println("in findFontFamily : we found the font family :" + familyId);
       return familyTextRenderers;
     }
     else // we haven't seen this family yet...
     {
+      System.out.println("in getFontFamily : we have not yet loaded this font family...");
       //try to load in native font from the system...
 
       Font derive = new Font(fontName, fontStyle, 800);
@@ -260,6 +323,13 @@ public class FontHandler
     return familyTextRenderers;
   }
 
+  /** We have removed teh notion of a global font. If we need to recreate this behavior, it should be
+   * within a Sequence, or a behavior if for a particular set of Geoms...
+   * @param fontIndex
+   * @deprecated
+   */
+  /*
+  @Deprecated
   public synchronized void nextFont(int fontIndex)
   {
     //fontIndex = 0;
@@ -314,6 +384,7 @@ public class FontHandler
 
     //System.out.println("out nextFont()");
   }
+   */
   /*
   for (FontInfo finfo : Main.fonts)
   {

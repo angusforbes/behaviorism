@@ -6,7 +6,6 @@ package handlers;
 
 import behaviorism.BehaviorismDriver;
 import renderers.SceneGraph;
-import geometry.media.GeomRectVideoFobs;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import renderers.cameras.Cam;
@@ -50,6 +49,9 @@ public class KeyboardHandler implements KeyListener
     return instance;
   }
 
+  private KeyboardHandler()
+  {
+  }
 
 	/* This method is called from the openGL Renderer display loop */
 	public /*static*/ void processKeyboard()
@@ -232,6 +234,8 @@ public class KeyboardHandler implements KeyListener
 
 	public /*static*/ void check_keyPressedFont()
 	{
+    //Need to think of best way to do this...
+    /*
 		//switch fonts...
 		if (keys[KeyEvent.VK_F])
 		{
@@ -286,6 +290,7 @@ public class KeyboardHandler implements KeyListener
 			keys[KeyEvent.VK_9] = false;
 			FontHandler.getInstance().nextFont(9);
 		}
+     */
 	}
 
 	public /*static*/ void check_keyPressedCam()
@@ -471,86 +476,6 @@ public class KeyboardHandler implements KeyListener
 			if (keys[KeyEvent.VK_PAGE_UP])
 			{
 				MouseHandler.selectedGeom.moveZ(+inc);
-			}
-			if (keys[KeyEvent.VK_A])
-			{
-				if (keysPressing[KeyEvent.VK_A] == false)
-				{
-
-					if (MouseHandler.selectedGeom.selectableObject instanceof GeomRectVideoFobs)
-					{
-						GeomRectVideoFobs vd = (GeomRectVideoFobs) MouseHandler.selectedGeom.selectableObject;
-						if (vd.isPlaying == true)
-						{
-							System.out.println("about to call this.stop!");
-							vd.stop();
-							vd.stopBehavior();
-						}
-					}
-					keysPressing[KeyEvent.VK_A] = true;
-				}
-			}
-
-
-			if (keys[KeyEvent.VK_S])
-			{
-				if (keysPressing[KeyEvent.VK_S] == false)
-				{
-					if (MouseHandler.selectedGeom.selectableObject instanceof GeomRectVideoFobs)
-					{
-
-						GeomRectVideoFobs vd = (GeomRectVideoFobs) MouseHandler.selectedGeom.selectableObject;
-
-						if (vd.isPlaying == false)
-						{
-							System.out.println("about to call this.start!");
-							vd.startBehavior();
-							vd.start();
-
-						}
-					}
-					keysPressing[KeyEvent.VK_S] = true;
-				}
-
-			}
-
-			if (keys[KeyEvent.VK_D])
-			{
-				if (keysPressing[KeyEvent.VK_D] == false)
-				{
-
-					if (MouseHandler.selectedGeom.selectableObject instanceof GeomRectVideoFobs)
-					{
-						GeomRectVideoFobs vd = (GeomRectVideoFobs) MouseHandler.selectedGeom.selectableObject;
-						//if (vd.isPlaying == true)
-						{
-							System.out.println("about to call skip!");
-						//vd.skip(3f);
-						}
-					}
-					keysPressing[KeyEvent.VK_D] = true;
-
-				}
-			}
-
-			//skip babckwards test
-			if (keys[KeyEvent.VK_E])
-			{
-				if (keysPressing[KeyEvent.VK_E] == false)
-				{
-
-					if (MouseHandler.selectedGeom.selectableObject instanceof GeomRectVideoFobs)
-					{
-						GeomRectVideoFobs vd = (GeomRectVideoFobs) MouseHandler.selectedGeom.selectableObject;
-						//if (vd.isPlaying == true)
-						{
-							System.out.println("about to call skip!");
-						//vd.skip(-3f);
-						}
-					}
-					keysPressing[KeyEvent.VK_E] = true;
-
-				}
 			}
 
 		}

@@ -76,6 +76,8 @@ public class MouseHandler extends MouseAdapter
     return instance;
   }
 
+  private MouseHandler()
+  {}
   /**
    * processMouse is called from withing the openGL display loop.
    * It handles the selection, movement, and other interactions

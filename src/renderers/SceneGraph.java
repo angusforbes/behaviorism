@@ -12,6 +12,7 @@ import java.util.List;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
 import handlers.FontHandler;
+import java.awt.Font;
 import java.util.Map;
 import sequences.Sequence;
 import utils.RenderUtils;
@@ -19,6 +20,7 @@ import utils.Utils;
 
 public class SceneGraph
 {
+
   public static boolean drawDebugFrameRate = true;
   public static boolean drawDebugGeom = false;
   public static boolean drawDebugGrid = false;
@@ -38,8 +40,6 @@ public class SceneGraph
   public boolean isStepping = false;
   public static float vizOffset = .00001f;
   private List<Geom> invisiblePickingGeoms = new ArrayList<Geom>(); //thinking...
-
-
   private static SceneGraph instance = null;
 
   /**
@@ -549,18 +549,12 @@ public class SceneGraph
       this.frames = 0;
     }
 
-    if (FontHandler.getInstance().textRenderers.size() > 0)
-    {
-      TextRenderer tr = (FontHandler.getInstance().textRenderers.get(0)); //just get smallest font
+    TextRenderer debugTextRenderer = FontHandler.getInstance().getDefaultFont(18);
 
-      if (tr != null)
-      {
-        tr.beginRendering(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
-        tr.setColor(1f, 1f, 1f, 1f);
-        tr.draw("fps: " + this.fps, 5, 5);
-        tr.endRendering();
-      }
-    }
+    debugTextRenderer.beginRendering(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
+    debugTextRenderer.setColor(1f, 1f, 1f, 1f);
+    debugTextRenderer.draw("fps: " + this.fps, 5, 5);
+    debugTextRenderer.endRendering();
   }
 
   public void drawJava2DCoord(GL gl /*, CoordJava2D c*/)
@@ -577,8 +571,8 @@ public class SceneGraph
     return; //not loaded yet
     }
 
-    TextureRenderer tr = new TextureRenderer(w, h, false);
-    Graphics2D g = tr.createGraphics();
+    TextureRenderer debugTextRenderer = new TextureRenderer(w, h, false);
+    Graphics2D g = debugTextRenderer.createGraphics();
 
     //g.setColor(Color.GRAY);
     //g.fillRect(0,0,w,h);
@@ -586,15 +580,15 @@ public class SceneGraph
     //g.drawImage(c.img, inset, inset, w - inset*2, h - inset*2, null);
     g.drawImage(c.img, 0, 0, w, h, null);
     g.dispose();
-    //tr.sync(0, 0, w, h);
+    //debugTextRenderer.sync(0, 0, w, h);
 
-    //tr.beginOrthoRendering(w, h );
-    //tr.drawOrthoRect(0,0, 0,0, w,h);
-    //tr.endOrthoRendering();
+    //debugTextRenderer.beginOrthoRendering(w, h );
+    //debugTextRenderer.drawOrthoRect(0,0, 0,0, w,h);
+    //debugTextRenderer.endOrthoRendering();
 
-    tr.begin3DRendering();
-    tr.draw3DRect(c.x, c.y, c.z, 0, 0, w, h, .05f);
-    tr.end3DRendering();
+    debugTextRenderer.begin3DRendering();
+    debugTextRenderer.draw3DRect(c.x, c.y, c.z, 0, 0, w, h, .05f);
+    debugTextRenderer.end3DRendering();
     }
      */
   }
