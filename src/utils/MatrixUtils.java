@@ -1,15 +1,14 @@
 /* MatrixUtils.java (created on August 30, 2007, 4:49 PM) */
 package utils;
 
-import behaviorism.BehaviorismDriver;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3f;
 import geometry.Geom;
-import renderers.RendererJogl;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import javax.vecmath.Point3d;
 import javax.vecmath.SingularMatrixException;
+import renderers.Renderer;
 
 /** 
  * This class contains static utility methods having to do with matrix manipulations. 
@@ -427,7 +426,7 @@ public class MatrixUtils
       pointToHomogenousCoords(p3f),
       RenderUtils.getCamera().modelview,
       RenderUtils.getCamera().projection,
-      RendererJogl.viewportBounds);
+      RenderUtils.getCamera().viewport);
 
     return new Point3f((float) windowVec[0], (float) windowVec[1], (float) windowVec[2]);
   }
@@ -438,7 +437,7 @@ public class MatrixUtils
       pointToHomogenousCoords(p3f),
       modelview,
       RenderUtils.getCamera().projection,
-      RendererJogl.viewportBounds);
+      RenderUtils.getCamera().viewport);
 
     return new Point3f((float) windowVec[0], (float) windowVec[1], (float) windowVec[2]);
   }

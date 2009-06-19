@@ -21,12 +21,11 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import renderers.cameras.Cam;
 import renderers.cameras.CamBasic;
 import renderers.layers.BackToFrontLayer;
 import renderers.layers.RendererLayer;
-import utils.Utils;
 
 //public abstract class WorldGeom
 public abstract class WorldGeom extends GeomPoint //does this make sense?
@@ -118,12 +117,12 @@ public abstract class WorldGeom extends GeomPoint //does this make sense?
   
   public List<GeomPoint> getWorldBoundaryPoints()
   {
-    return RendererJogl.worldBoundaryPoints;
+    return Renderer.worldBoundaryPoints;
   }
 
   public Rectangle2D.Float getScreenBoundsInWorldCoords()
   {
-    return RendererJogl.screenBoundsInWorldCoords;
+    return Renderer.screenBoundsInWorldCoords;
   }
 
   /**

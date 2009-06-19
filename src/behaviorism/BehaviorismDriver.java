@@ -6,7 +6,7 @@ package behaviorism;
 import behaviors.Behavior;
 import com.bric.geom.BasicShape;
 import renderers.SceneGraph;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import handlers.MouseHandler;
 import handlers.KeyboardHandler;
 import handlers.FontHandler;
@@ -42,7 +42,7 @@ import worlds.WorldGeom;
 public class BehaviorismDriver
 {
 
-  public static RendererJogl renderer;
+  public static Renderer renderer = null;
   public static SceneGraph viz = null; //should be a singleton!
   //public static WorldGeom world; //should probably synchronize...
   public static int screenWidth;
@@ -106,8 +106,8 @@ public class BehaviorismDriver
 
     System.out.println("osName = " + osName + " version = " + osVersion);
     //initialize renderer & scene graph 
-    BehaviorismDriver.renderer = new RendererJogl();
-    BehaviorismDriver.viz = new SceneGraph();
+    viz = SceneGraph.getInstance();
+    renderer = Renderer.getInstance();
 
 
     //load properties from attribute.properties

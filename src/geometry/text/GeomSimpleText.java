@@ -13,7 +13,7 @@ import java.awt.geom.Rectangle2D;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
-import renderers.RendererJogl;
+import renderers.Renderer;
 
 /**
  * GeomSimpleText is a simple wrapper for displaying text in a specified font.
@@ -121,7 +121,7 @@ public class GeomSimpleText extends GeomRect
     //	{
     bounds = font.getStringBounds(this.text, frc);
 
-    float worldHeight = RendererJogl.screenBoundsInWorldCoords.height; //BehaviorismDriver.world.getWorldRect().h;
+    float worldHeight = Renderer.screenBoundsInWorldCoords.height; //BehaviorismDriver.world.getWorldRect().h;
     this.scaleVal = ((worldHeight / (float) BehaviorismDriver.canvasHeight));
 
     metrics = font.getLineMetrics(text, frc);

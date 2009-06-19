@@ -5,7 +5,7 @@ import geometry.GeomPoint;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
 import javax.media.opengl.GL;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import utils.MatrixUtils;
 
 /**
@@ -21,13 +21,45 @@ public abstract class Cam extends GeomPoint
   public Point3f resetRotateAnchor = new Point3f();
 
   //perspective information
-  public double fovy; //field of view angle, in	degrees, in the y	direction.
-  public double apsect; //the	aspect ratio that determines the field of view in the x direction. The aspect ratio is the ratio	of x (width) to	y (height).
-  public double zNear; //the	distance from the viewer to the	near clipping plane (always positive).
-  public double zFar; //the	distance from the viewer to the	far clipping plane (always positive).
+  private double fovy; //field of view angle, in	degrees, in the y	direction.
+  private double aspect; //the	aspect ratio that determines the field of view in the x direction. The aspect ratio is the ratio	of x (width) to	y (height).
+  private double nearPlane = 1f; //the	distance from the viewer to the	near clipping plane (always positive).
+  private double farPlane = 100f; //the	distance from the viewer to the	far clipping plane (always positive).
 
-  //public double[] modelview = MatrixUtils.getIdentity();
   public double[] projection;
+  public boolean projectionHasChanged = true;
+  public int[] viewport;
+
+  public void setViewPlanes(double near, double far)
+  {
+    this.nearPlane = near;
+    this.farPlane = far;
+    this.projectionHasChanged = true;
+  }
+  public void setFovy(double fovy)
+  {
+    this.fovy = fovy;
+    this.projectionHasChanged = true;
+  }
+  public void setAspectRatio(double aspect)
+  {
+    this.aspect = aspect;
+    this.projectionHasChanged = true;
+  }
+  public void setAspectRatio(int w, int h)
+  {
+    this.aspect = (double) w / (double) h;
+    this.projectionHasChanged = true;
+  }
+  public void setViewport(int x, int y, int w, int h)
+  {
+      this.viewport = new int[]
+      {
+        x, y, w, h
+      };
+
+      this.projectionHasChanged = true;
+  }
 
   public void changeHeading(double degrees)
   {
@@ -60,14 +92,17 @@ public abstract class Cam extends GeomPoint
 
   public void projection()
   {
-    if (projection == null) //or has changed... TO DO
+    if (projection == null || projectionHasChanged == true) //or has changed... TO DO
     {
 
     projection = MatrixUtils.perspective(
       fovy,
-      ((float) BehaviorismDriver.canvasWidth) / BehaviorismDriver.canvasHeight,
-      RendererJogl.nearPlane,
-      RendererJogl.farPlane);
+      aspect,
+      //((float) BehaviorismDriver.canvasWidth) / BehaviorismDriver.canvasHeight,
+      nearPlane, farPlane
+      );
+
+     projectionHasChanged = false;
     }
   }
 

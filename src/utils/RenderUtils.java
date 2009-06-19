@@ -16,7 +16,7 @@ import java.util.List;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import renderers.cameras.Cam;
 
 /**
@@ -41,18 +41,18 @@ public class RenderUtils
    */
   public static double[] getWorldCoordsForScreenCoord(int x, int y)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     double modelview[] = new double[16];
     double projection[] = new double[16];
     int viewport[] = new int[4];
     double worldCoords[] = new double[3];
 
-    //projection = MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
-    projection = rj.cam.projection; MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
+    //projection = MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, Renderer.nearPlane, Renderer.farPlane);
+    projection = rj.cam.projection; //MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, Renderer.nearPlane, Renderer.farPlane);
     //modelview = rj.cam.perspective();
     modelview = rj.cam.modelview;
-    viewport = rj.viewportBounds;
+    viewport = RenderUtils.getCamera().viewport;
 
     //invert y value properly
     y = (int) ((float) viewport[3] - (float) y);
@@ -77,7 +77,7 @@ public class RenderUtils
    */
   public static Point3f getWorldCoordsForScreenCoord(int x, int y, double z, double[] modelview)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     double projection[] = new double[16];
     int viewport[] = new int[4];
@@ -106,14 +106,14 @@ public class RenderUtils
   //public Shape getScreenShapeForWorldCoords(GL gl, GLU glu, Geom g)
   public static Path2D.Float getScreenShapeForWorldCoords(Geom g)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     Path2D.Float p2f = null;
     double projection[] = new double[16];
     int viewport[] = new int[4];
 
     projection = RenderUtils.getCamera().projection;
-    viewport = rj.viewportBounds;
+    viewport = RenderUtils.getCamera().viewport;
 
     if (g instanceof GeomRect)
     {
@@ -128,7 +128,7 @@ public class RenderUtils
     return p2f;
   }
 
-  public static RendererJogl getRenderer()
+  public static Renderer getRenderer()
   {
     return BehaviorismDriver.renderer;
   }
@@ -181,7 +181,7 @@ public class RenderUtils
 
   public static Point3d rayIntersect(Geom g, int x, int y, Point3d offsetPt)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     //1. get values of ray (at screen coords) at near and far points (in world coordinates)
     //2. get Geom in world coordinates
@@ -198,7 +198,7 @@ public class RenderUtils
     //double offsets[] = new double[3];
 
     projection = RenderUtils.getCamera().projection;
-    viewport = rj.viewportBounds;
+    viewport = RenderUtils.getCamera().viewport;
 
     //invert y value properly
     y = (int) ((float) viewport[3] - (float) y);
@@ -304,7 +304,7 @@ public class RenderUtils
   //TODO - replace gluProject with MatrixUtils.project
   public static int getWidthOfObjectInPixels(Geom g, float inset)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     //setPerspective3D();
     //double projectionMatrix[] = new double[16];
@@ -317,7 +317,7 @@ public class RenderUtils
     rj.glu.gluProject(0f, 0f, 0f,
       g.modelview, 0,
       RenderUtils.getCamera().projection, 0,
-      rj.viewportBounds, 0,
+      RenderUtils.getCamera().viewport, 0,
       screenCoords, 0);
 
     double x1 = screenCoords[0];
@@ -326,7 +326,7 @@ public class RenderUtils
     rj.glu.gluProject(g.w, 0f, 0f,
       g.modelview, 0,
       RenderUtils.getCamera().projection, 0,
-      rj.viewportBounds, 0,
+      RenderUtils.getCamera().viewport, 0,
       screenCoords, 0);
 
     double x2 = screenCoords[0];
@@ -338,7 +338,7 @@ public class RenderUtils
 
   public static Point geomPointToScreenPoint(Point3f geomPoint, double[] modelview, double[] projection, int[] viewport)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     double screenCoords[] = new double[3];
     rj.glu.gluProject(0f, 0f, 0f,
@@ -355,7 +355,7 @@ public class RenderUtils
 
   public static int getXOfObjectInPixels(Geom g, double[] modelview, double[] projection, int[] viewport)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     double screenCoords[] = new double[3];
     rj.glu.gluProject(0f, 0f, 0f,
@@ -371,7 +371,7 @@ public class RenderUtils
 
   public static int getYOfObjectInPixels(Geom g, double[] modelview, double[] projection, int[] viewport)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     double screenCoords[] = new double[3];
     rj.glu.gluProject(0f, 0f, 0f,
@@ -387,7 +387,7 @@ public class RenderUtils
 
   public static int getWidthOfObjectInPixels(Geom g, float inset, double[] modelview, double[] projection, int[] viewport)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     //setPerspective3D();
     //double projectionMatrix[] = new double[16];
@@ -432,7 +432,7 @@ public class RenderUtils
 
   public static int getHeightOfObjectInPixels(Geom g, float inset)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     //double projectionMatrix[] = new double[16];
     //int viewportBounds[] = new int[4];
@@ -444,7 +444,7 @@ public class RenderUtils
     rj.glu.gluProject(0f, 0f, 0f,
       g.modelview, 0,
       RenderUtils.getCamera().projection, 0,
-      rj.viewportBounds, 0,
+      RenderUtils.getCamera().viewport, 0,
       windowCoords, 0);
 
     double x1 = windowCoords[0];
@@ -453,7 +453,7 @@ public class RenderUtils
     rj.glu.gluProject(0f, g.h, 0f,
       g.modelview, 0,
       RenderUtils.getCamera().projection, 0,
-      rj.viewportBounds, 0,
+      RenderUtils.getCamera().viewport, 0,
       windowCoords, 0);
     double x2 = windowCoords[0];
     double y2 = windowCoords[1];
@@ -463,7 +463,7 @@ public class RenderUtils
 
   public static int getHeightOfObjectInPixels(Geom g, float inset, double[] modelview, double[] projection, int[] viewport)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     //double projectionMatrix[] = new double[16];
     //int viewportBounds[] = new int[4];
@@ -511,7 +511,7 @@ public class RenderUtils
     double[] modelview, double[] projection, int[] viewport)
   {
 
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     Path2D.Float p2f = new Path2D.Float();
 
@@ -566,7 +566,7 @@ public class RenderUtils
   public static Path2D.Float projectGeomPoly(GeomPoly g,
     double[] modelview, double[] projection, int[] viewport)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     Path2D.Float p2f = new Path2D.Float();
 
@@ -621,7 +621,7 @@ public class RenderUtils
 
   public static void extractFrustum()
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
 
     double[][] frustum = new double[6][4];
 
@@ -745,7 +745,7 @@ public class RenderUtils
   public static boolean isLineInFrustum(float x1, float y1, float z1,
     float x2, float y2, float z2)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
     //System.out.printf("in isLineInFrustum... (%f/%f/%f), (%f/%f/%f)\n", x1, y1, z1, x2,y2, z2);
     int crossings = 0;
     double top,
@@ -820,7 +820,7 @@ public class RenderUtils
 
   public static boolean isPointInFrustum(float x, float y, float z)
   {
-    RendererJogl rj = getRenderer();
+    Renderer rj = getRenderer();
     for (int p = 0; p < 6; p++)
     {
       if (rj.frustum[p][0] * x + rj.frustum[p][1] * y + rj.frustum[p][2] * z + rj.frustum[p][3] <= 0)

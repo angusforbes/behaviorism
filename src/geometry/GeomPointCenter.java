@@ -3,7 +3,7 @@ package geometry;
 import behaviorism.BehaviorismDriver;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import utils.RenderUtils;
 //TODO - GeomPointCenter should not exist!
 
@@ -16,8 +16,8 @@ public class GeomPointCenter extends GeomPoint
 	
 	public void draw(GL gl)
   {
-		//Point3f c1n = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth / 2,
-		//				RendererJogl.canvasHeight / 2, .99, RenderUtils.getCamera().modelview);
+		//Point3f c1n = RenderUtils.getWorldCoordsForScreenCoord(Renderer.canvasWidth / 2,
+		//				Renderer.canvasHeight / 2, .99, RenderUtils.getCamera().modelview);
 		Point3f c1n = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth / 2,
 						BehaviorismDriver.canvasHeight / 2, .99, RenderUtils.getCamera().modelview);
 

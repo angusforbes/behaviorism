@@ -5,7 +5,7 @@
 package handlers;
 
 import behaviorism.BehaviorismDriver;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import geometry.Geom;
 import java.awt.Point;
 import java.awt.event.MouseEvent;

@@ -19,7 +19,6 @@ import utils.Utils;
 
 public class SceneGraph
 {
-
   public static boolean drawDebugFrameRate = true;
   public static boolean drawDebugGeom = false;
   public static boolean drawDebugGrid = false;
@@ -39,6 +38,29 @@ public class SceneGraph
   public boolean isStepping = false;
   public static float vizOffset = .00001f;
   private List<Geom> invisiblePickingGeoms = new ArrayList<Geom>(); //thinking...
+
+
+  private static SceneGraph instance = null;
+
+  /**
+   * Gets (or creates then gets) the singleton SceneGraph object.
+   * @return the singleton SceneGraph
+   */
+  public static SceneGraph getInstance()
+  {
+    if (instance != null)
+    {
+      return instance;
+    }
+
+    instance = new SceneGraph();
+
+    return instance;
+  }
+
+  private void SceneGraph()
+  {
+  }
 
   private void processBehaviors(Geom g)
   {

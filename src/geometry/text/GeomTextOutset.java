@@ -1,7 +1,7 @@
 /* GeomTextOutset.java ~ Oct 6, 2008 */
 package geometry.text;
 
-import renderers.RendererJogl;
+import renderers.Renderer;
 import com.sun.opengl.util.j2d.TextRenderer;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
@@ -413,7 +413,7 @@ public class GeomTextOutset extends GeomRect
     Cam cam = BehaviorismDriver.renderer.cam;
     double[] temp_mv = Arrays.copyOf(RenderUtils.getCamera().modelview, 16);
     double[] temp_pj = RenderUtils.getCamera().projection;
-    int[] temp_vp = RendererJogl.viewportBounds;
+    int[] temp_vp = RenderUtils.getCamera().viewport;
 
 
 
@@ -512,7 +512,7 @@ public class GeomTextOutset extends GeomRect
   protected void calculateUnrotatedPixelWidthAndHeight(GL gl)
   {
     double[] temp_pj = RenderUtils.getCamera().projection;
-    int[] temp_vp = RendererJogl.viewportBounds;
+    int[] temp_vp = RenderUtils.getCamera().viewport;
 
     Cam cam = BehaviorismDriver.renderer.cam;
 

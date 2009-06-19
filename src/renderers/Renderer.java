@@ -25,12 +25,12 @@ import utils.RenderUtils;
 import utils.Utils;
 import worlds.WorldGeom;
 
-public class RendererJogl implements GLEventListener
+public class Renderer implements GLEventListener
 {
 
   public Map<WorldGeom, Boolean> worlds = new ConcurrentHashMap<WorldGeom, Boolean>();
   public WorldGeom currentWorld = null;
-  public SceneGraph viz = null;
+  public SceneGraph sceneGraph = null;
   public static GLUT glut;
   public static GLU glu;
   public GL gl;
@@ -42,32 +42,38 @@ public class RendererJogl implements GLEventListener
   public GLUquadric quadricRenderer = null;
   public Cam cam = null;
   private FontHandler fontHandler = FontHandler.getInstance();
-  /**
-   * modelviewMatrix is the modelview *after* the camera has been positioned.
-   * We are also calling this the "World" modelview (eg, in MatrixUtils).
-   */
-  //public static double[] modelviewMatrix = new double[16];
-  /**
-   * projectionMatrix holds is the current project
-   */
-  //public static double[] projectionMatrix = new double[16];
+
   /**
    * viewportBounds holds the current viewport bounds (x, y, w, h)
    */
-  public static int viewportBounds[] = new int[4];
-  //public static float nearPlane = .001f; //1f
-  public static float nearPlane = 1f;
-  public static float farPlane = 100f;
+  //public static int viewportBounds[] = new int[4];
+  
   public static double frustum[][] = null;
   public static Rectangle2D.Float screenBounds = null;
   public static Rectangle2D.Float screenBoundsInWorldCoords = null;
   public static List<GeomPoint> worldBoundaryPoints = null;
   public static boolean boundsHaveChanged = true;
 
-  /** Sets the camera explicitly. By default we use a {@link soi3.CamBasic} with the camera located 
-   * at (0, 0, -10) and pointing toward the origin.
-   * @param cam An instance of a {@link soi3.Cam}.
+
+  private static Renderer instance = null;
+
+  /**
+   * Gets (or creates then gets) the singleton Renderer object.
+   * @return the singleton Renderer
    */
+  public static Renderer getInstance()
+  {
+    if (instance != null)
+    {
+      return instance;
+    }
+
+    instance = new Renderer();
+
+    instance.sceneGraph = SceneGraph.getInstance();
+    return instance;
+  }
+
   public void installWorld(WorldGeom world)
   {
     installWorld(world, true, true);
@@ -128,19 +134,8 @@ public class RendererJogl implements GLEventListener
     }
 
     cam.projection();
-
     cam.perspective();
     
-    /*
-    projectionMatrix = MatrixUtils.perspective(
-      cam.fovy,
-      ((float) BehaviorismDriver.canvasWidth) / BehaviorismDriver.canvasHeight,
-      RendererJogl.nearPlane,
-      RendererJogl.farPlane);
-
-    modelviewMatrix = cam.perspective();
-    */
-
     if(boundsHaveChanged == true)
     {
       //System.out.println("boundsHaveChanged!!!");
@@ -167,7 +162,7 @@ public class RendererJogl implements GLEventListener
   @Deprecated //delete me soon! (being used by GeomText2 and GeomTextPath
   public void resetPerspective3D()
   {
-    //projectionMatrix = MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, RendererJogl.nearPlane, RendererJogl.farPlane);
+    //projectionMatrix = MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, Renderer.nearPlane, Renderer.farPlane);
     //modelviewMatrix = cam.resetPerspective();
   }
 
@@ -201,12 +196,16 @@ public class RendererJogl implements GLEventListener
       return false;
     }
 
+    //make sure we have the right GL context
+    gl = drawable.getGL();
+
     return true;
   }
 
+  //no reason for this to be in scene graph... move it here or to renderutils.
   private void processDebugs()
   {
-    BehaviorismDriver.viz.drawDebuggingInfo(gl);
+    sceneGraph.drawDebuggingInfo(gl);
   }
 
   private void processHandlers()
@@ -216,7 +215,7 @@ public class RendererJogl implements GLEventListener
     KeyboardHandler.getInstance().processKeyboard();
   }
 
-  private void clear()
+  private void clearScreen()
   {
     gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a); //background color of world
     gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
@@ -241,9 +240,7 @@ public class RendererJogl implements GLEventListener
       return;
     }
 
-    gl = drawable.getGL();
-
-    clear();
+    clearScreen();
 
     //i don't like this being here...
     if (fontHandler.changeFonts.get() == true)
@@ -251,7 +248,7 @@ public class RendererJogl implements GLEventListener
       fontHandler.nextFont(fontHandler.fontIndex);
     }
 
-    BehaviorismDriver.viz.draw(gl);
+    sceneGraph.draw(gl);
 
     //fontHandler.fontsReady.set(false);
 
@@ -279,7 +276,10 @@ public class RendererJogl implements GLEventListener
     Utils.addTo(worldBoundaryPoints, new GeomPoint(), new GeomPoint(), new GeomPoint(), new GeomPoint());
 
     glDrawable = drawable;
-    gl = glDrawable.getGL();
+    //gl = glDrawable.getGL();
+
+    this.gl = drawable.getGL();
+
     glDrawable.setGL(new DebugGL(gl));
     glu = new GLU();
     glut = new GLUT();
@@ -372,16 +372,19 @@ public class RendererJogl implements GLEventListener
   {
     height = (height == 0) ? 1 : height;
 
+    //don't really want to bother with this... just update the viewport...
     BehaviorismDriver.canvasWidth = width;
     BehaviorismDriver.canvasHeight = height;
-    viewportBounds = new int[]
-      {
-        0, 0, width, height
-      };
 
-    RendererJogl.screenBounds = new Rectangle2D.Float(0, 0, width, height);
+    this.cam.setViewport(0,0,width, height);
+
+    Renderer.screenBounds = new Rectangle2D.Float(0, 0, width, height);
 
     boundsHaveChanged = true;
+    if (cam != null)
+    {
+      cam.setAspectRatio(width, height);
+    }
 
     setPerspective3D();
   }

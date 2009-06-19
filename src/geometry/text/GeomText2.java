@@ -5,7 +5,7 @@
 package geometry.text;
 
 import geometry.*;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import com.sun.opengl.util.j2d.TextRenderer;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
@@ -164,16 +164,16 @@ public class GeomText2 extends GeomRect
 	{
 		Point3f c1n = RenderUtils.getWorldCoordsForScreenCoord(0, 0, 0, RenderUtils.getCamera().modelview);
 		Point3f c1f = RenderUtils.getWorldCoordsForScreenCoord(0, 0, 1, RenderUtils.getCamera().modelview);
-		//Point3f c2n = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, 0, 0, RenderUtils.getCamera().modelview);
-		//Point3f c2f = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, 0, 1, RenderUtils.getCamera().modelview);
-		//Point3f c3n = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, RendererJogl.canvasHeight, 1, RenderUtils.getCamera().modelview);
-		//Point3f c3f = RenderUtils.getWorldCoordsForScreenCoord(RendererJogl.canvasWidth, RendererJogl.canvasHeight, 100, RenderUtils.getCamera().modelview);
+		//Point3f c2n = RenderUtils.getWorldCoordsForScreenCoord(Renderer.canvasWidth, 0, 0, RenderUtils.getCamera().modelview);
+		//Point3f c2f = RenderUtils.getWorldCoordsForScreenCoord(Renderer.canvasWidth, 0, 1, RenderUtils.getCamera().modelview);
+		//Point3f c3n = RenderUtils.getWorldCoordsForScreenCoord(Renderer.canvasWidth, Renderer.canvasHeight, 1, RenderUtils.getCamera().modelview);
+		//Point3f c3f = RenderUtils.getWorldCoordsForScreenCoord(Renderer.canvasWidth, Renderer.canvasHeight, 100, RenderUtils.getCamera().modelview);
 		Point3f c2n = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, 0, 0, RenderUtils.getCamera().modelview);
 		Point3f c2f = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, 0, 1, RenderUtils.getCamera().modelview);
 		Point3f c3n = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight, 1, RenderUtils.getCamera().modelview);
 		Point3f c3f = RenderUtils.getWorldCoordsForScreenCoord(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight, 100, RenderUtils.getCamera().modelview);
-		//Point3f c4n = RenderUtils.getWorldCoordsForScreenCoord(0, RendererJogl.canvasHeight, 1, RenderUtils.getCamera().modelview);
-		//Point3f c4f = RenderUtils.getWorldCoordsForScreenCoord(0, RendererJogl.canvasHeight, 100, RenderUtils.getCamera().modelview);
+		//Point3f c4n = RenderUtils.getWorldCoordsForScreenCoord(0, Renderer.canvasHeight, 1, RenderUtils.getCamera().modelview);
+		//Point3f c4f = RenderUtils.getWorldCoordsForScreenCoord(0, Renderer.canvasHeight, 100, RenderUtils.getCamera().modelview);
 		Point3f c4n = RenderUtils.getWorldCoordsForScreenCoord(0, BehaviorismDriver.canvasHeight, 1, RenderUtils.getCamera().modelview);
 		Point3f c4f = RenderUtils.getWorldCoordsForScreenCoord(0, BehaviorismDriver.canvasHeight, 100, RenderUtils.getCamera().modelview);
 
@@ -502,7 +502,7 @@ public class GeomText2 extends GeomRect
 	/** render invisibly for mouse picking */
 	public void renderInvisiblePickingBackground(GL gl, float offset)
 	{
-		//boolean depthTest = RendererJogl.getBoolean(gl, GL.GL_DEPTH_TEST);
+		//boolean depthTest = Renderer.getBoolean(gl, GL.GL_DEPTH_TEST);
 		//if (depthTest == false && isSelectable == true)
 		if (isSelectable == true)
 		{

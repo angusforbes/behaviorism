@@ -19,7 +19,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import utils.GeomUtils;
 import utils.MatrixUtils;
 import utils.RenderUtils;

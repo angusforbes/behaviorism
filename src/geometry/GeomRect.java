@@ -15,7 +15,7 @@ import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
 import java.util.Vector;
 import javax.vecmath.Point3d;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import utils.GeomUtils;
 import utils.MatrixUtils;
 import utils.RenderUtils;
@@ -988,7 +988,7 @@ public class GeomRect extends Geom
     //System.out.println("lower right: " + MatrixUtils.toString(c2));
     //System.out.println("upper right: " + MatrixUtils.toString(c3));
     //System.out.println("upper left: " + MatrixUtils.toString(c4));
-    return GeomUtils.checkIfPolygonIsCompletelyContainedInView(RendererJogl.screenBounds, c1, c2, c3, c4);
+    return GeomUtils.checkIfPolygonIsCompletelyContainedInView(Renderer.screenBounds, c1, c2, c3, c4);
   }
 
   /** This version puts the Geom points in screen (pixel) coordinates and checks against the window dimensions (x,y) */
@@ -1011,11 +1011,11 @@ public class GeomRect extends Geom
     //System.out.println("upper right: " + MatrixUtils.toString(c3));
     //System.out.println("upper left: " + MatrixUtils.toString(c4));
 
-    this.isVisible = GeomUtils.checkIfPolygonIsInView(RendererJogl.screenBounds, c1, c2, c3, c4);
+    this.isVisible = GeomUtils.checkIfPolygonIsInView(Renderer.screenBounds, c1, c2, c3, c4);
     return this.isVisible;
 
   /*
-  if (GeomUtils.checkIfPolygonIsInView(RendererJogl.screenBounds, c1, c2, c3, c4) == false)
+  if (GeomUtils.checkIfPolygonIsInView(Renderer.screenBounds, c1, c2, c3, c4) == false)
   {
   isVisible = false;
   //System.out.println("using checkIfRect... [" + this + "] is not in view");
@@ -1066,14 +1066,14 @@ public class GeomRect extends Geom
   new Point3d(0,h,0), modelview, RenderUtils.getCamera().modelview);
   
   //first check points. If any points are in frustrum, then the origGeom is visible
-  if (RendererJogl.arePointsInFrustum(ppp1, ppp2, ppp3, ppp4))
+  if (Renderer.arePointsInFrustum(ppp1, ppp2, ppp3, ppp4))
   {
   this.isVisible = true;
   return true;
   }
   
   //second check to see if lines between points are in frustrum, if yes then origGeom is visible
-  if (RendererJogl.areLinesInFrustum(ppp1, ppp2, ppp3, ppp4) == true)
+  if (Renderer.areLinesInFrustum(ppp1, ppp2, ppp3, ppp4) == true)
   {
   this.isVisible = true;
   return true;

@@ -11,7 +11,7 @@ import geometry.GeomPoint;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
-import renderers.RendererJogl;
+import renderers.Renderer;
 import utils.MatrixUtils;
 
 /**
@@ -47,7 +47,8 @@ public class CamBasic extends Cam
     this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
     this.resetAnchor = new Point3f(anchorPt);
 
-    this.fovy = 45;
+    setViewPlanes(1.0, 100.0);
+    setFovy(45.0);
   }
   
 
