@@ -4,16 +4,15 @@ package behaviors.geom.continuous.function;
 
 import behaviors.geom.*;
 import behaviors.BehaviorContinuous;
-import functions.Function;
 
 /**
  *
  * @author angus
  */
 public abstract class BehaviorGeomContinuousFunction 
-  extends BehaviorContinuous implements GeomUpdater, FunctionUpdater
+  extends BehaviorContinuous implements GeomUpdater //, FunctionUpdater
 {
-  Function function;
+  //Function function;
   
   public BehaviorGeomContinuousFunction()
   {

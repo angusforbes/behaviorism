@@ -5,7 +5,7 @@
 
 package behaviors.geom;
 
-import functions.Function;
+//import functions.Function;
 
 /**
  *
@@ -13,5 +13,5 @@ import functions.Function;
  */
 public interface FunctionUpdater 
 {
-  public void updateFunction(Function f);
+  //public void updateFunction(Function f);
 }
