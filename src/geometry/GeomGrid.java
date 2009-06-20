@@ -91,8 +91,8 @@ public class GeomGrid extends GeomRect
       }
 
       float xpos1 = xsize * i;
-      gl.glVertex3f(xpos1, 0f, anchor.z + offset);
-      gl.glVertex3f(xpos1, h, anchor.z + offset);
+      gl.glVertex3f(xpos1, 0f, translate.z + offset);
+      gl.glVertex3f(xpos1, h, translate.z + offset);
     }
 
 
@@ -108,8 +108,8 @@ public class GeomGrid extends GeomRect
       }
 
       float ypos1 = ysize * i;
-      gl.glVertex3f(0f, ypos1, anchor.z + offset);
-      gl.glVertex3f(w, ypos1, anchor.z + offset);
+      gl.glVertex3f(0f, ypos1, translate.z + offset);
+      gl.glVertex3f(w, ypos1, translate.z + offset);
     }
 
     /*
@@ -117,15 +117,15 @@ public class GeomGrid extends GeomRect
     for (int i = 0; i < numCols + 1; i++)
     {
     float xpos1 = (float) Utils.getSlotPosition(i, numCols, 0, w);
-    gl.glVertex3f(xpos1, 0f, anchor.z);
-    gl.glVertex3f(xpos1, h, anchor.z);
+    gl.glVertex3f(xpos1, 0f, translate.z);
+    gl.glVertex3f(xpos1, h, translate.z);
     }
     
     for (int i = 0; i < numRows + 1; i++)
     {
     float ypos1 = (float) Utils.getSlotPosition(i, numRows, 0, h);
-    gl.glVertex3f(0f, ypos1, anchor.z);
-    gl.glVertex3f(w, ypos1, anchor.z);
+    gl.glVertex3f(0f, ypos1, translate.z);
+    gl.glVertex3f(w, ypos1, translate.z);
     }
      */
     gl.glEnd();
@@ -205,12 +205,12 @@ public class GeomGrid extends GeomRect
 
   public GeomRect getCellRowGeom(int row)
   {
-    return new GeomRect(anchor.x, getGridPoint(0, row).y, 0f, w, ysize);
+    return new GeomRect(translate.x, getGridPoint(0, row).y, 0f, w, ysize);
   }
 
   public GeomRect getCellColGeom(int col)
   {
-    return new GeomRect(getGridPoint(col, 0).x, anchor.y, 0f, xsize, h);
+    return new GeomRect(getGridPoint(col, 0).x, translate.y, 0f, xsize, h);
   }
 
   public int getColContaining(Point3f pt)

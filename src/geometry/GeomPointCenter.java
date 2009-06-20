@@ -25,8 +25,8 @@ public class GeomPointCenter extends GeomPoint
     gl.glPointSize(this.pointSize);
     
     gl.glBegin(gl.GL_POINTS);
-    //gl.glVertex3f(anchor.x, anchor.y , anchor.z);  //draws the point, it should be the point plus anchor
-    gl.glVertex3f(c1n.x, c1n.y, c1n.z);  //draws the point, it should be the point plus anchor
+    //gl.glVertex3f(translate.x, translate.y , translate.z);  //draws the point, it should be the point plus translate
+    gl.glVertex3f(c1n.x, c1n.y, c1n.z);  //draws the point, it should be the point plus translate
     gl.glEnd();
   }
 }

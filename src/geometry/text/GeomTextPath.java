@@ -217,7 +217,7 @@ public class GeomTextPath extends GeomPoly
 			float strh2 = (float) (bounds2.getHeight());
 
 			gl.glPushMatrix();
-			gl.glTranslatef(chunk.p.anchor.x, chunk.p.anchor.y, chunk.p.anchor.z);
+			gl.glTranslatef(chunk.p.translate.x, chunk.p.translate.y, chunk.p.translate.z);
 			//System.out.println("chunk.p = " + chunk.p);
 			gl.glRotatef(chunk.angle, 0f, 0f, 1f);
 
@@ -302,7 +302,7 @@ public class GeomTextPath extends GeomPoly
 
 		if (parent == null)
 		{
-			//newp = new Point3d(rotateAnchor.anchor.x, rotateAnchor.anchor.y, 0f);
+			//newp = new Point3d(rotateAnchor.translate.x, rotateAnchor.translate.y, 0f);
 			newp = new Point3d(w * .5f, h * .5f, 0f);
 			world_z = (float) (MatrixUtils.getGeomPointInWorldCoordinates(newp, modelview, RenderUtils.getCamera().modelview)).z;
 

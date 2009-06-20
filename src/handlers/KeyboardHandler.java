@@ -330,30 +330,30 @@ public class KeyboardHandler implements KeyListener
 
 		if (keys[KeyEvent.VK_PAGE_DOWN])
 		{
-			cam.moveZ(.1f);
+			cam.translateZ(.1f);
 		}
 		if (keys[KeyEvent.VK_PAGE_UP])
 		{
-			cam.moveZ(-.1f);
+			cam.translateZ(-.1f);
 		}
 		if (keys[KeyEvent.VK_1])
 		{
-			cam.moveX(-.1f);
+			cam.translateX(-.1f);
 		}
 		if (keys[KeyEvent.VK_2])
 		{
-			cam.moveX(.1f);
+			cam.translateX(.1f);
 		}
 		if (keys[KeyEvent.VK_3])
 		{
 			//          BehaviorismDriver.renderer.cam.m_StrafeY += 0.1f;
-			cam.moveY(-.1f);
+			cam.translateY(-.1f);
 		}
 
 		if (keys[KeyEvent.VK_4])
 		{
 			//BehaviorismDriver.renderer.cam.m_StrafeY -= 0.1f;
-			cam.moveY(.1f);
+			cam.translateY(.1f);
 		}
 	}
 
@@ -454,28 +454,28 @@ public class KeyboardHandler implements KeyListener
 		{
 			if (keys[KeyEvent.VK_LEFT])
 			{
-				MouseHandler.selectedGeom.moveX(-inc);
+				MouseHandler.selectedGeom.translateX(-inc);
 			}
 			if (keys[KeyEvent.VK_RIGHT])
 			{
-				MouseHandler.selectedGeom.moveX(+inc);
-				//MouseHandler.selectedGeom.anchor.x += inc;
+				MouseHandler.selectedGeom.translateX(+inc);
+				//MouseHandler.selectedGeom.translate.x += inc;
 			}
 			if (keys[KeyEvent.VK_DOWN])
 			{
-				MouseHandler.selectedGeom.moveY(-inc);
+				MouseHandler.selectedGeom.translateY(-inc);
 			}
 			if (keys[KeyEvent.VK_UP])
 			{
-				MouseHandler.selectedGeom.moveY(+inc);
+				MouseHandler.selectedGeom.translateY(+inc);
 			}
 			if (keys[KeyEvent.VK_PAGE_DOWN])
 			{
-				MouseHandler.selectedGeom.moveZ(-inc);
+				MouseHandler.selectedGeom.translateZ(-inc);
 			}
 			if (keys[KeyEvent.VK_PAGE_UP])
 			{
-				MouseHandler.selectedGeom.moveZ(+inc);
+				MouseHandler.selectedGeom.translateZ(+inc);
 			}
 
 		}
@@ -669,29 +669,29 @@ public class KeyboardHandler implements KeyListener
 		{
 			if (keys[KeyEvent.VK_LEFT])
 			{
-				MouseHandler.selectedGeom.rotateAnchor.anchor.x -= rotateAnchorInc;
-			//MouseHandler.selectedGeom.anchor.x-=rotateAnchorInc;
+				MouseHandler.selectedGeom.rotateAnchor.translate.x -= rotateAnchorInc;
+			//MouseHandler.selectedGeom.translate.x-=rotateAnchorInc;
 			}
 			if (keys[KeyEvent.VK_RIGHT])
 			{
-				MouseHandler.selectedGeom.rotateAnchor.anchor.x += rotateAnchorInc;
-			//MouseHandler.selectedGeom.anchor.x+=rotateAnchorInc;
+				MouseHandler.selectedGeom.rotateAnchor.translate.x += rotateAnchorInc;
+			//MouseHandler.selectedGeom.translate.x+=rotateAnchorInc;
 			}
 			if (keys[KeyEvent.VK_DOWN])
 			{
-				MouseHandler.selectedGeom.rotateAnchor.anchor.y -= rotateAnchorInc;
+				MouseHandler.selectedGeom.rotateAnchor.translate.y -= rotateAnchorInc;
 			}
 			if (keys[KeyEvent.VK_UP])
 			{
-				MouseHandler.selectedGeom.rotateAnchor.anchor.y += rotateAnchorInc;
+				MouseHandler.selectedGeom.rotateAnchor.translate.y += rotateAnchorInc;
 			}
 			if (keys[KeyEvent.VK_PAGE_DOWN])
 			{
-				MouseHandler.selectedGeom.rotateAnchor.anchor.z -= rotateAnchorInc;
+				MouseHandler.selectedGeom.rotateAnchor.translate.z -= rotateAnchorInc;
 			}
 			if (keys[KeyEvent.VK_PAGE_UP])
 			{
-				MouseHandler.selectedGeom.rotateAnchor.anchor.z += rotateAnchorInc;
+				MouseHandler.selectedGeom.rotateAnchor.translate.z += rotateAnchorInc;
 			}
 		}
 	}

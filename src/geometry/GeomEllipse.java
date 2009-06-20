@@ -117,7 +117,7 @@ public class GeomEllipse extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (outerW * Math.cos(Math.toRadians(angle)))),
                 (float)(0 + (outerH * Math.sin(Math.toRadians(angle)))),
-                anchor.z //z
+                translate.z //z
                 ));
         angle+=inc;
         
@@ -131,7 +131,7 @@ public class GeomEllipse extends GeomPoly
 				if (borderSize <= 0f)
 				{
 					//this.vertices.add(new GeomPoint(0f, 0f, z));
-					this.vertices.add(new GeomPoint(0f, 0f, anchor.z));
+					this.vertices.add(new GeomPoint(0f, 0f, translate.z));
 				}
 				else
 				{
@@ -139,7 +139,7 @@ public class GeomEllipse extends GeomPoly
 				//					(float)(0f + ((outerH-(outerH * borderSize)) * Math.sin(Math.toRadians(angle)))), z));
 						this.vertices.add(new GeomPoint((float) (0f + ((outerW-borderSize) * Math.cos(Math.toRadians(angle)))),
                 (float)(0f + ((outerH-borderSize) * Math.sin(Math.toRadians(angle)))), 
-                anchor.z //z
+                translate.z //z
                 ));
 				
 				}
@@ -154,7 +154,7 @@ public class GeomEllipse extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (outerW * Math.cos(Math.toRadians(angle)))),
                 (float)(0 + (outerH * Math.sin(Math.toRadians(angle)))),
-                anchor.z //z
+                translate.z //z
                 ));
         angle+=inc;
         
@@ -167,7 +167,7 @@ public class GeomEllipse extends GeomPoly
         {
 					this.vertices.add(new GeomPoint((float) (0f + ((outerW-borderSize) * Math.cos(Math.toRadians(angle)))),
                 (float)(0f + ((outerH-borderSize) * Math.sin(Math.toRadians(angle)))),
-                anchor.z //z
+                translate.z //z
                 ));
 				
           //this.verts.add(new GeomPoint((float) (0 + (innerW * Math.cos(Math.toRadians(angle)))),
@@ -248,9 +248,9 @@ public class GeomEllipse extends GeomPoly
     for (int i = 0; i < vertsSize(); i++)
     {
       GeomPoint p3f = getVert(i);
-      double[] dubArr = new double[]{(p3f.anchor.x ),
-      (p3f.anchor.y),
-      (p3f.anchor.z + offset)};
+      double[] dubArr = new double[]{(p3f.translate.x ),
+      (p3f.translate.y),
+      (p3f.translate.z + offset)};
       
       glu.gluTessVertex(tobj, dubArr, 0, dubArr);
     }
@@ -272,9 +272,9 @@ public class GeomEllipse extends GeomPoly
     for (int i = 0; i < vertsSize() / 2; i++)
     {
       GeomPoint p3f = getVert(i);
-      double[] dubArr = new double[]{(p3f.anchor.x ),
-      (p3f.anchor.y),
-      (p3f.anchor.z + offset)};
+      double[] dubArr = new double[]{(p3f.translate.x ),
+      (p3f.translate.y),
+      (p3f.translate.z + offset)};
       
       glu.gluTessVertex(tobj, dubArr, 0, dubArr);
     }
@@ -293,9 +293,9 @@ public class GeomEllipse extends GeomPoly
       {
         GeomPoint p3f = getVert(i);
         
-        double[] dubArr = new double[]{(p3f.anchor.x ),
-        (p3f.anchor.y ),
-        ( (p3f.anchor.z ) + offset)};
+        double[] dubArr = new double[]{(p3f.translate.x ),
+        (p3f.translate.y ),
+        ( (p3f.translate.z ) + offset)};
         
         glu.gluTessVertex(tobj, dubArr, 0, dubArr);
       }

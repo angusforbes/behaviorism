@@ -65,7 +65,7 @@ public class GeomPolyStrip extends Geom{
       vertices.add(new GeomPoint(p3f.x, p3f.y, p3f.z));
     }
     
-    this.anchor.set(rel.x, rel.y, rel.z);
+    this.translate.set(rel.x, rel.y, rel.z);
     
     //add each GeomPoint to scene hierarchy
     for(int i=0; i<vertices.size(); i++)
@@ -97,17 +97,17 @@ public class GeomPolyStrip extends Geom{
   {
     Path2D.Float p2d = new Path2D.Float();
     GeomPoint gp = this.vertices.get(0);
-    p2d.moveTo(gp.anchor.x, gp.anchor.y);
+    p2d.moveTo(gp.translate.x, gp.translate.y);
     
     for (int i = 1; i < this.vertices.size(); i++)
     {
       gp = this.vertices.get(i);
-      p2d.lineTo(gp.anchor.x, gp.anchor.y);
+      p2d.lineTo(gp.translate.x, gp.translate.y);
     }
     
     //last one...
     gp = this.vertices.get(0);
-    p2d.lineTo(gp.anchor.x, gp.anchor.y);
+    p2d.lineTo(gp.translate.x, gp.translate.y);
     
     this.path2D = p2d;
     this.area = GeomUtils.area(this.path2D);
@@ -121,7 +121,7 @@ public class GeomPolyStrip extends Geom{
     gl.glBegin(gl.GL_QUAD_STRIP);
     for(int i = 0; i < vertices.size(); i++)
     {
-        gl.glVertex3f(vertices.get(i).anchor.x, vertices.get(i).anchor.y, vertices.get(i).anchor.z + offset);
+        gl.glVertex3f(vertices.get(i).translate.x, vertices.get(i).translate.y, vertices.get(i).translate.z + offset);
     }
       
     gl.glEnd();

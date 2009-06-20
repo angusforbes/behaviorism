@@ -86,9 +86,9 @@ public class GeomGluNurbsCurve extends Geom
   {
     for (int i = 0; i < dynamicControlPoints.size(); i++)
     {
-      controlArray[(i * 3) + 0] = dynamicControlPoints.get(i).anchor.x;
-      controlArray[(i * 3) + 1] = dynamicControlPoints.get(i).anchor.y;
-      controlArray[(i * 3) + 2] = dynamicControlPoints.get(i).anchor.z;
+      controlArray[(i * 3) + 0] = dynamicControlPoints.get(i).translate.x;
+      controlArray[(i * 3) + 1] = dynamicControlPoints.get(i).translate.y;
+      controlArray[(i * 3) + 2] = dynamicControlPoints.get(i).translate.z;
     }
   }
 

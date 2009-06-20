@@ -26,7 +26,7 @@ public class GeomPath extends Geom
     for (int i = 0; i < vertices.size(); i++)
     {
         GeomPoint gp = vertices.get(i);
-        gl.glVertex3f(gp.anchor.x, gp.anchor.y, gp.anchor.z);
+        gl.glVertex3f(gp.translate.x, gp.translate.y, gp.translate.z);
     }
     gl.glEnd();
     

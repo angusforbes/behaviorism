@@ -301,14 +301,14 @@ public class SceneGraph
         /*
         if (g instanceof GeomPoint)
         {
-        MatrixUtils.printVector(MatrixUtils.pointToHomogenousCoords(g.anchor));
-        Point3f windowVec = MatrixUtils.project(g.anchor);
+        MatrixUtils.printVector(MatrixUtils.pointToHomogenousCoords(g.translate));
+        Point3f windowVec = MatrixUtils.project(g.translate);
         System.out.println("windowVec = " + windowVec);
 
 
         //          //object coords --> view coords
         //          double[] eyeVec = MatrixUtils.objectCoordsToEyeCoords(
-        //            g.anchor,
+        //            g.translate,
         //            RendererJogl.modelviewMatrix);
         //
         //          double[] clipVec = MatrixUtils.eyeCoordsToClipCoords(eyeVec, RendererJogl.projectionMatrix);
@@ -319,7 +319,7 @@ public class SceneGraph
         //
         //           System.out.println("windowVec by hand = ");
         //   MatrixUtils.printVector(windowVec);
-        //System.out.println("projected = " + BehaviorismDriver.renderer.projectPoint(g.anchor, RendererJogl.modelviewMatrix));
+        //System.out.println("projected = " + BehaviorismDriver.renderer.projectPoint(g.translate, RendererJogl.modelviewMatrix));
         }
          */
         //if ((layer.state.DEPTH_TEST == false && g.state == null) || (g.state != null && g.state.DEPTH_TEST == false))

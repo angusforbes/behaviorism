@@ -140,9 +140,9 @@ public class GeomGluNurbsSurface extends Geom
         int idx = ((i * numPointsV * 3) + (j * 3));
 
         //System.out.println("idx = " + idx);
-        controlArray[idx + 0] = dynamicControlPoints[i][j].anchor.x;
-        controlArray[idx + 1] = dynamicControlPoints[i][j].anchor.y;
-        controlArray[idx + 2] = dynamicControlPoints[i][j].anchor.z;
+        controlArray[idx + 0] = dynamicControlPoints[i][j].translate.x;
+        controlArray[idx + 1] = dynamicControlPoints[i][j].translate.y;
+        controlArray[idx + 2] = dynamicControlPoints[i][j].translate.z;
       }
     }
 

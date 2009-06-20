@@ -1,6 +1,5 @@
 package behaviors.geom.continuous;
 
-import behaviors.geom.continuous.BehaviorGeomContinuous;
 import behaviors.Behavior.LoopEnum;
 import behaviors.BehaviorContinuous.ContinuousBehaviorBuilder;
 import geometry.Geom;
@@ -82,7 +81,7 @@ public class BehaviorTranslate extends BehaviorGeomContinuous
     long lengthMS, 
     Point3f endPt)
   {
-    Point3f ranges = GeomUtils.subtractPoint3f(endPt, g.anchor);
+    Point3f ranges = GeomUtils.subtractPoint3f(endPt, g.translate);
     
     BehaviorTranslate bt = new BehaviorTranslate(
       new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(ranges)).loop(

@@ -35,7 +35,7 @@ public class GeomBlob extends Geom
 
     for (Geom g : gs)
     {
-      p3fs.add(g.anchor);
+      p3fs.add(g.translate);
     }
 
     return p3fs;
@@ -45,7 +45,7 @@ public class GeomBlob extends Geom
   {
     float blobDist = .2f;
     Point3f centerPt = GeomUtils.centerOfAnchorPoints(gpts);
-    centerGeom.anchor = centerPt;
+    centerGeom.translate = centerPt;
     //Point3f centerPt = new Point3f(0f, 0f, 0f);
     
     List<Point3f> pts = getAnchorPointsForGeoms(gpts);

@@ -103,7 +103,7 @@ public class GeomPoly extends Geom
       vertices.add(new GeomPoint(p3f.x, p3f.y, p3f.z));
     }
     
-    this.anchor.set(rel.x, rel.y, rel.z);
+    this.translate.set(rel.x, rel.y, rel.z);
     
     //add each GeomPoint to scene hierarchy
     for(int i=0; i<vertices.size(); i++)
@@ -175,17 +175,17 @@ public class GeomPoly extends Geom
   {
     Path2D.Float p2d = new Path2D.Float();
     GeomPoint gp = this.vertices.get(0);
-    p2d.moveTo(gp.anchor.x, gp.anchor.y);
+    p2d.moveTo(gp.translate.x, gp.translate.y);
     
     for (int i = 1; i < this.vertices.size(); i++)
     {
       gp = this.vertices.get(i);
-      p2d.lineTo(gp.anchor.x, gp.anchor.y);
+      p2d.lineTo(gp.translate.x, gp.translate.y);
     }
     
     //last one...
     gp = this.vertices.get(0);
-    p2d.lineTo(gp.anchor.x, gp.anchor.y);
+    p2d.lineTo(gp.translate.x, gp.translate.y);
     
     this.path2D = p2d;
     this.area = GeomUtils.area(this.path2D);
@@ -197,9 +197,9 @@ public class GeomPoly extends Geom
   /*
   public void transform(GL gl, GLU glu)
   {
-    float hx =  anchor.x;
-    float hy =  anchor.y;
-    float hz =  anchor.z;
+    float hx =  translate.x;
+    float hy =  translate.y;
+    float hz =  translate.z;
     float sax =  scaleAnchor.x;
     float say =  scaleAnchor.y;
     float saz =  scaleAnchor.z;
@@ -210,22 +210,22 @@ public class GeomPoly extends Geom
     //3. rotate commands
     if(rotateAnchor != null)
     {
-      float rax =  rotateAnchor.anchor.x;
-      float ray =  rotateAnchor.anchor.y;
-      float raz =  rotateAnchor.anchor.z;
+      float rax =  rotateAnchor.translate.x;
+      float ray =  rotateAnchor.translate.y;
+      float raz =  rotateAnchor.translate.z;
       
       float rasx =  1f/scale.x;
       float rasy =  1f/scale.y;
       float rasz =  1f;
-      //System.out.println("rotateAnchor.anchor = " + rotateAnchor.anchor);
+      //System.out.println("rotateAnchor.translate = " + rotateAnchor.translate);
       //System.out.println("rotateAnchor.scale = " + rotateAnchor.scale);
 
-      //temp drawing rotate anchor
+      //temp drawing rotate translate
       gl.glColor4f(0f, 1f, 0f, 1f);
       gl.glBegin(gl.GL_POINTS);
       gl.glVertex3f(rax, ray, raz);
       gl.glEnd();
-      //end temp drawing rotate anchor
+      //end temp drawing rotate translate
       
       gl.glTranslatef(rax, ray, raz);
       gl.glRotatef(rotate.x,1.0f,0.0f,0.0f);
@@ -237,7 +237,7 @@ public class GeomPoly extends Geom
 
     //2. scale commands
     
-    //temp drawing scale anchor
+    //temp drawing scale translate
     gl.glColor4f(1f, 0f, 0f,1f);
     gl.glBegin(gl.GL_POINTS);
     //gl.glVertex3f(sax, say, saz);
@@ -249,7 +249,7 @@ public class GeomPoly extends Geom
     gl.glTranslatef(-sax , -say , -saz );
 
     //System.out.println("scaleAnchor = " + scaleAnchor);  
-    //System.out.println("anchor = " + anchor);  
+    //System.out.println("translate = " + translate);
   }
     */
 
@@ -259,8 +259,8 @@ public class GeomPoly extends Geom
       for(int i = 0; i < vertices.size(); i++)
       {
         //System.out.printf("%d: drawing point (%f,%f)\n ", i, vertices.get(i).x, vertices.get(i).y);
-        //gl.glVertex3f(getVert(i).anchor.x + anchor.x, getVert(i).anchor.y + anchor.y, getVert(i).anchor.z + anchor.z);
-        gl.glVertex3f(vertices.get(i).anchor.x, vertices.get(i).anchor.y, vertices.get(i).anchor.z + offset);
+        //gl.glVertex3f(getVert(i).translate.x + translate.x, getVert(i).translate.y + translate.y, getVert(i).translate.z + translate.z);
+        gl.glVertex3f(vertices.get(i).translate.x, vertices.get(i).translate.y, vertices.get(i).translate.z + offset);
       }
       
       gl.glEnd();
@@ -281,12 +281,12 @@ public class GeomPoly extends Geom
       {
         GeomPoint p3f = vertices.get(i);
         
-        //double[] dubArr = new double[]{(float)(p3f.anchor.x + anchor.x),
-        //(float)(p3f.anchor.y + anchor.y),
-        //(float)(p3f.anchor.z + anchor.z + offset)};
-        double[] dubArr = new double[]{(float)(p3f.anchor.x),
-        (float)(p3f.anchor.y),
-        (float)(p3f.anchor.z + offset),
+        //double[] dubArr = new double[]{(float)(p3f.translate.x + translate.x),
+        //(float)(p3f.translate.y + translate.y),
+        //(float)(p3f.translate.z + translate.z + offset)};
+        double[] dubArr = new double[]{(float)(p3f.translate.x),
+        (float)(p3f.translate.y),
+        (float)(p3f.translate.z + offset),
 				r, g, b
 				
 				
@@ -373,9 +373,9 @@ public class GeomPoly extends Geom
   public Point3f draw(GL gl, GLU glu, Point3f pp)
   {
     float hx=0, hy=0, hz=0;
-    hx = anchor.x + pp.x;
-    hy = anchor.y + pp.y;
-    hz = anchor.z + pp.z;
+    hx = translate.x + pp.x;
+    hy = translate.y + pp.y;
+    hz = translate.z + pp.z;
     
     gl.glColor4f(r, g, b, a);
     
@@ -387,8 +387,8 @@ public class GeomPoly extends Geom
       
       for(int i = 0; i < vertsSize(); i++)
       {
-        //System.out.printf("%d: drawing point (%f,%f)\n ", i, g.getVert(i).anchor.x + g.anchor.x, g.getVert(i).anchor.y + g.anchor.y);
-        gl.glVertex3f(getVert(i).anchor.x + hx, getVert(i).anchor.y + hy, getVert(i).anchor.z + hz);
+        //System.out.printf("%d: drawing point (%f,%f)\n ", i, g.getVert(i).translate.x + g.translate.x, g.getVert(i).translate.y + g.translate.y);
+        gl.glVertex3f(getVert(i).translate.x + hx, getVert(i).translate.y + hy, getVert(i).translate.z + hz);
       }
       
       gl.glEnd();
@@ -397,7 +397,7 @@ public class GeomPoly extends Geom
     }
     else //is not a convex polygon, if we aren't sure-- just assume that it is not...
     {
-      //FIX THIS LATER-- after fixing main part above-- just needs to return a valid anchor point
+      //FIX THIS LATER-- after fixing main part above-- just needs to return a valid translate point
       GLUtessellator tobj = BehaviorismDriver.renderer.tessellationObject;
       
       if (tobj == null)
@@ -411,9 +411,9 @@ public class GeomPoly extends Geom
       {
         GeomPoint p3f = getVert(i);
         
-        double[] dubArr = new double[]{(float)(p3f.anchor.x + anchor.x),
-        (float)(p3f.anchor.y + anchor.y),
-        (float)(p3f.anchor.z + anchor.z)};
+        double[] dubArr = new double[]{(float)(p3f.translate.x + translate.x),
+        (float)(p3f.translate.y + translate.y),
+        (float)(p3f.translate.z + translate.z)};
         
         geomInfo[i] = dubArr;
       }

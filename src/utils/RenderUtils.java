@@ -221,7 +221,7 @@ public class RenderUtils
     //now get Geom in world coords
     Point3d geomPt_wc;
 
-    Point3d geomPt = new Point3d(g.anchor.x + offsetPt.x, g.anchor.y + offsetPt.y, g.anchor.z + offsetPt.z);
+    Point3d geomPt = new Point3d(g.translate.x + offsetPt.x, g.translate.y + offsetPt.y, g.translate.z + offsetPt.z);
     if (g.parent != null)
     {
       geomPt_wc = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, g.parent.modelview, RenderUtils.getCamera().modelview);
@@ -286,7 +286,7 @@ public class RenderUtils
   gl.glMultMatrixd(mv, 0);
 
   // translate command
-  gl.glTranslatef(g.anchor.x, g.anchor.y, g.anchor.z);
+  gl.glTranslatef(g.translate.x, g.translate.y, g.translate.z);
 
   // scale commands
   gl.glTranslatef(g.scaleAnchor.x, g.scaleAnchor.y, g.scaleAnchor.z);
@@ -518,9 +518,9 @@ public class RenderUtils
     double hx = 0.0;
     double hy = 0.0;
     double hz = 0.0;
-    //double hx = (double)g.anchor.x;
-    //double hy = (double)g.anchor.y;
-    //double hz = (double)g.anchor.z;
+    //double hx = (double)g.translate.x;
+    //double hy = (double)g.translate.y;
+    //double hz = (double)g.translate.z;
     double screenCoords[] = new double[3];
 
     //System.out.print("screenCoords[2] : ");
@@ -570,16 +570,16 @@ public class RenderUtils
 
     Path2D.Float p2f = new Path2D.Float();
 
-    double hx = 0.0; //(double)g.anchor.x;
-    double hy = 0.0; //(double)g.anchor.y;
-    double hz = 0.0; //(double)g.anchor.z;
+    double hx = 0.0; //(double)g.translate.x;
+    double hy = 0.0; //(double)g.translate.y;
+    double hz = 0.0; //(double)g.translate.z;
 
     double windowCoords[] = new double[3];
 
     GeomPoint gp = g.vertices.get(0);
     //GeomPoint gp = g.selectableBoundary.get(0);
 
-    rj.glu.gluProject(hx + gp.anchor.x, hy + gp.anchor.y, hz + gp.anchor.z,
+    rj.glu.gluProject(hx + gp.translate.x, hy + gp.translate.y, hz + gp.translate.z,
       modelview, 0,
       projection, 0,
       viewport, 0,
@@ -592,7 +592,7 @@ public class RenderUtils
       gp = g.vertices.get(i);
       //gp = g.selectableBoundary.get(i);
 
-      rj.glu.gluProject(hx + gp.anchor.x, hy + gp.anchor.y, hz + gp.anchor.z,
+      rj.glu.gluProject(hx + gp.translate.x, hy + gp.translate.y, hz + gp.translate.z,
         modelview, 0,
         projection, 0,
         viewport, 0,

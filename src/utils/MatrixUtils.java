@@ -156,11 +156,11 @@ public class MatrixUtils
 
   ////higher level utility methods (take in a Geom, or have more logic, etc)
   /**
-   * Returns the anchor point of the inputGeom in terms of the destGeom's coordinate system
+   * Returns the translate point of the inputGeom in terms of the destGeom's coordinate system
    */
   public static Point3d getGeomPointInGeomCoordinates(Geom inputGeom, Geom destGeom)
   {
-    return getGeomPointInGeomCoordinates(new Point3d(inputGeom.anchor), inputGeom.modelview, destGeom.modelview);
+    return getGeomPointInGeomCoordinates(new Point3d(inputGeom.translate), inputGeom.modelview, destGeom.modelview);
   }
 
   public static void debugPointRelativeToGeom(Point3d absPt, Geom g)
@@ -181,13 +181,13 @@ public class MatrixUtils
 
   public static void debugGeom(Geom g)
   {
-    Point3d zeroPt = new Point3d(g.anchor); //new Point3f(0f, 0f, 0f);
+    Point3d zeroPt = new Point3d(g.translate); //new Point3f(0f, 0f, 0f);
     Point3d absPt = getGeomPointInAbsoluteCoordinates(zeroPt, g.modelview);
     Point3d worldPt = getGeomPointInWorldCoordinates(zeroPt, g.modelview, RenderUtils.getCamera().modelview);
     Point3d geomPt = getGeomPointInGeomCoordinates(zeroPt, g.modelview, g.modelview);
 
 
-    System.out.println("orig pt = " + g.anchor);
+    System.out.println("orig pt = " + g.translate);
     System.out.println(" abs pt = " + absPt);
     System.out.println("wrld pt = " + worldPt);
     System.out.println("geom pt = " + geomPt);

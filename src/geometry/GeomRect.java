@@ -96,11 +96,11 @@ public class GeomRect extends Geom
 
   }
 
-  /* Sets an anchor point connected to the Geom to be rotated around.
+  /* Sets an translate point connected to the Geom to be rotated around.
    * This rotateAnchor point is not attached to the scene graph, so attaching behaviors will have
    * no effect. Use determineRotateAnchor(Point3f p) to set an arbitrary point.
    * Or attach it yourself by grabbing it from the Geom itself
-   * and calling addGeom(rotateAnchor.anchor);
+   * and calling addGeom(rotateAnchor.translate);
    */
   @Override
   public void determineRotateAnchor(RotateEnum rotatePosition)
@@ -186,7 +186,7 @@ public class GeomRect extends Geom
         gl.glBegin(GL.GL_POINTS);
         {
           //Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.z);
-          Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.anchor.z);
+          Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.translate.z);
           //Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(test, RenderUtils.getCamera().modelview, modelview);
           Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(test, RenderUtils.getCamera().modelview, modelview);
           gl.glColor4f(1f, 0f, 0f, 1f);
@@ -206,7 +206,7 @@ public class GeomRect extends Geom
 //          gl.glVertex3f(r2f.x, r2f.y + r2f.height, this.z);
 
             //float cz = this.z;
-            float cz = this.anchor.z;
+            float cz = this.translate.z;
 
 
             Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(new Point3d(r2f.getX(), r2f.getY(), cz), RenderUtils.getCamera().modelview, modelview);
@@ -281,7 +281,7 @@ public class GeomRect extends Geom
     this.rectangle = r2d;
      */
     
-    this.rectangle = new Rectangle2D.Double(this.anchor.x, this.anchor.y, w, h);
+    this.rectangle = new Rectangle2D.Double(this.translate.x, this.translate.y, w, h);
     this.area = GeomUtils.area(this.rectangle);
 
     return rectangle;
@@ -298,16 +298,16 @@ public class GeomRect extends Geom
     {
      // this.x = (float)this.rectangle.getX();
      // this.y = (float)this.rectangle.getY();
-      this.anchor.x = (float)this.rectangle.getX();
-      this.anchor.y = (float)this.rectangle.getY();
+      this.translate.x = (float)this.rectangle.getX();
+      this.translate.y = (float)this.rectangle.getY();
       this.w = (float)this.rectangle.getWidth();
       this.h = (float)this.rectangle.getHeight();
       
       /*
       List<Float> floats = BehaviorismDriver.renderer.getScreenRectInGeomCoordnates(this, this.rectangle);
       
-      this.anchor.x = floats.get(0);
-      this.anchor.y = floats.get(1);
+      this.translate.x = floats.get(0);
+      this.translate.y = floats.get(1);
       this.w = floats.get(2);
       this.h = floats.get(3);
       */
@@ -334,20 +334,20 @@ public class GeomRect extends Geom
     /*
       List<Float> floats = BehaviorismDriver.renderer.getScreenRectInGeomCoordnates(this, this.rectangle);
       
-      this.anchor.x = floats.get(0);
-      this.anchor.y = floats.get(1);
+      this.translate.x = floats.get(0);
+      this.translate.y = floats.get(1);
       this.w = floats.get(2);
       this.h = floats.get(3);
      */
       
     //this.x = (float)bounds.getX();
     //this.y = (float)bounds.getY();
-    this.anchor.x = (float)bounds.getX();
-    this.anchor.y = (float)bounds.getY();
+    this.translate.x = (float)bounds.getX();
+    this.translate.y = (float)bounds.getY();
     this.w = (float)bounds.getWidth();
     this.h = (float)bounds.getHeight();
-//    this.anchor.x = this.x;
-//   this.anchor.y = this.y;
+//    this.translate.x = this.x;
+//   this.translate.y = this.y;
     
     scaleAnchor = new Point3f(this.w * .5f, this.h * .5f, 0f);
     //EffectUtils.effectZoomIn(this, System.nanoTime(), 200L, true);
@@ -358,7 +358,7 @@ public class GeomRect extends Geom
 
   public Point3f getCenterAnchor()
   {
-    return new Point3f(anchor.x + w * .5f, anchor.y + h * .5f, anchor.z + d * .5f);
+    return new Point3f(translate.x + w * .5f, translate.y + h * .5f, translate.z + d * .5f);
   }
 
   public Point3f getCenter()
@@ -368,7 +368,7 @@ public class GeomRect extends Geom
 
   public void setRect(Point3f p3f, float w, float h)
   {
-    anchor(p3f);
+    setTranslate(p3f);
     this.w = w;
     this.h = h;
   }
@@ -393,7 +393,7 @@ public class GeomRect extends Geom
         returnGeom.state.BLEND = false;
         returnGeom.setColor(color);
 
-        geom.anchor(exactInset, exactInset, 0f);
+        geom.setTranslate(exactInset, exactInset, 0f);
 
         returnGeom.addGeom(geom, true);
         returnGeom.isSelectable = true; //true;
@@ -454,7 +454,7 @@ public class GeomRect extends Geom
         returnGeom.state.BLEND = false;
         returnGeom.setColor(color);
 
-        geom.anchor(insetw, inseth, 0f);
+        geom.setTranslate(insetw, inseth, 0f);
 
         returnGeom.addGeom(geom, true);
         returnGeom.isSelectable = true; //true;
@@ -499,7 +499,7 @@ public class GeomRect extends Geom
 
         //returnGeom.setColor(1f, 0f, 0f, 0f);
         returnGeom.setColor(color);
-        geom.anchor(-geom.w * .5f, -geom.h * .5f, 0f);
+        geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
         returnGeom.addGeom(geom, true);
 
 
@@ -536,7 +536,7 @@ public class GeomRect extends Geom
         returnGeom.state.BLEND = false;
 
         returnGeom.setColor(0f, 0f, 0f, 0f);
-        geom.anchor(-geom.w * .5f, -geom.h * .5f, 0f);
+        geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
         returnGeom.addGeom(geom, true);
 
 
@@ -569,7 +569,7 @@ public class GeomRect extends Geom
       inseth = (v1.h * .0f) ;
       gc2 = new GeomRect(-v1.w * .5f - insetw, -v1.h * .5f - inseth, 0f,
       v1.w + (insetw * 2f), v1.h + (inseth * 2f));
-      v1.anchor(insetw, inseth, 0f);
+      v1.translate(insetw, inseth, 0f);
       gc2.addGeom(v1, true);
       gc2.isSelectable = true; //true;
       
@@ -626,8 +626,8 @@ public class GeomRect extends Geom
   {
     Geom returnGeom = null;
     Point3f p3f = new Point3f();
-    float ox = origGeom.anchor.x;
-    float oy = origGeom.anchor.y;
+    float ox = origGeom.translate.x;
+    float oy = origGeom.translate.y;
     
     switch (borderType)
     {
@@ -645,7 +645,7 @@ public class GeomRect extends Geom
         returnGeom.addGeom(borderRect2, true);
         borderRect2.setColor(innerInsetColor);
 
-        origGeom.anchor(outerExactInset, outerExactInset, 0f);
+        origGeom.setTranslate(outerExactInset, outerExactInset, 0f);
 
         returnGeom.addGeom(origGeom, true);
         returnGeom.isSelectable = true;
@@ -659,9 +659,9 @@ public class GeomRect extends Geom
         borderRect2.registerDraggableObject(returnGeom);
 
       
-        //returnGeom.anchor(ox, oy, origGeom.z);
-        returnGeom.anchor(ox, oy, origGeom.anchor.z);
-        //returnGeom.anchor(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z);
+        //returnGeom.translate(ox, oy, origGeom.z);
+        returnGeom.setTranslate(ox, oy, origGeom.translate.z);
+        //returnGeom.translate(ox - returnGeom.translate.x, oy - returnGeom.translate.y, origGeom.z);
       
         return returnGeom;
 
@@ -675,8 +675,8 @@ public class GeomRect extends Geom
   {
     GeomRect returnGeom = null;
     Point3f p3f = new Point3f();
-    float ox = origGeom.anchor.x;
-    float oy = origGeom.anchor.y;
+    float ox = origGeom.translate.x;
+    float oy = origGeom.translate.y;
 
     switch (borderType)
     {
@@ -694,7 +694,7 @@ public class GeomRect extends Geom
         returnGeom.addGeom(borderRect2, true);
         borderRect2.setColor(innerInsetColor);
 
-        origGeom.anchor(outerExactInsetW, outerExactInsetH, 0f);
+        origGeom.setTranslate(outerExactInsetW, outerExactInsetH, 0f);
 
         returnGeom.addGeom(origGeom, true);
         returnGeom.isSelectable = true;
@@ -708,9 +708,9 @@ public class GeomRect extends Geom
         borderRect2.registerDraggableObject(returnGeom);
 
 
-        //returnGeom.anchor(ox, oy, origGeom.z);
-        returnGeom.anchor(ox, oy, origGeom.anchor.z);
-        //returnGeom.anchor(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z);
+        //returnGeom.translate(ox, oy, origGeom.z);
+        returnGeom.setTranslate(ox, oy, origGeom.translate.z);
+        //returnGeom.translate(ox - returnGeom.translate.x, oy - returnGeom.translate.y, origGeom.z);
 
         return returnGeom;
 
@@ -723,8 +723,8 @@ public class GeomRect extends Geom
     Geom returnGeom = null;
     Point3f p3f = new Point3f();
 
-    float ox = geom.anchor.x;
-    float oy = geom.anchor.y;
+    float ox = geom.translate.x;
+    float oy = geom.translate.y;
     
     float insetw, inseth;
     float insetw2, inseth2;
@@ -768,7 +768,7 @@ public class GeomRect extends Geom
         returnGeom.addGeom(borderRect2, false);
         borderRect2.setColor(color2);
 
-        geom.anchor(insetw, inseth, 0f);
+        geom.setTranslate(insetw, inseth, 0f);
 
         returnGeom.addGeom(geom, false);
         returnGeom.isSelectable = true; //true;
@@ -781,8 +781,8 @@ public class GeomRect extends Geom
         borderRect2.registerClickableObject(returnGeom);
         borderRect2.registerDraggableObject(returnGeom);
       
-        //returnGeom.anchor(ox, oy, geom.z);
-        returnGeom.anchor(ox, oy, geom.anchor.z);
+        //returnGeom.translate(ox, oy, geom.z);
+        returnGeom.setTranslate(ox, oy, geom.translate.z);
       
         return returnGeom;
     }
@@ -794,8 +794,8 @@ public class GeomRect extends Geom
     Geom returnGeom = null;
     Point3f p3f = new Point3f();
 
-    float ox = geom.anchor.x;
-    float oy = geom.anchor.y;
+    float ox = geom.translate.x;
+    float oy = geom.translate.y;
     
     float t_w,
       t_h,
@@ -845,7 +845,7 @@ public class GeomRect extends Geom
         returnGeom.addGeom(borderRect2, true);
         borderRect2.setColor(color2);
 
-        geom.anchor(insetw, inseth, 0f);
+        geom.setTranslate(insetw, inseth, 0f);
 
         returnGeom.addGeom(geom, true);
         returnGeom.isSelectable = true; //true;
@@ -859,9 +859,9 @@ public class GeomRect extends Geom
         borderRect2.registerDraggableObject(returnGeom);
 
       
-        //returnGeom.anchor(ox, oy, geom.z);
-        returnGeom.anchor(ox, oy, geom.anchor.z);
-        //returnGeom.anchor(ox - returnGeom.anchor.x, oy - returnGeom.anchor.y, origGeom.z);
+        //returnGeom.translate(ox, oy, geom.z);
+        returnGeom.setTranslate(ox, oy, geom.translate.z);
+        //returnGeom.translate(ox - returnGeom.translate.x, oy - returnGeom.translate.y, origGeom.z);
       
         return returnGeom;
 
@@ -891,7 +891,7 @@ public class GeomRect extends Geom
 
         //returnGeom.setColor(1f, 0f, 0f, 0f);
         returnGeom.setColor(color);
-        geom.anchor(-geom.w * .5f, -geom.h * .5f, 0f);
+        geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
         returnGeom.addGeom(geom, true);
 
 
@@ -933,7 +933,7 @@ public class GeomRect extends Geom
         returnGeom.state.BLEND = false;
 
         returnGeom.setColor(0f, 0f, 0f, 0f);
-        geom.anchor(-geom.w * .5f, -geom.h * .5f, 0f);
+        geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
         returnGeom.addGeom(geom, true);
 
 

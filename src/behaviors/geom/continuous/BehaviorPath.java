@@ -168,9 +168,9 @@ public class BehaviorPath extends BehaviorGeomContinuous
   //public void change(Geom g)
   public void updateGeom(Geom g)
   {
-    g.anchor.x += offset_x;
-    g.anchor.y += offset_y;
-    g.anchor.z += offset_z;
+    g.translate.x += offset_x;
+    g.translate.y += offset_y;
+    g.translate.z += offset_z;
   }
   
   //public void change(Geom g, long currentNano)
@@ -205,20 +205,20 @@ public class BehaviorPath extends BehaviorGeomContinuous
       
       System.out.println("calc offset point : percentage = " + (1f - percentage) + " prevPoint = " + prevPoint);
       
-      //g.anchor.x += offsetPt.x;
-      //g.anchor.y += offsetPt.y;
-      //g.anchor.z += offsetPt.z;
+      //g.translate.x += offsetPt.x;
+      //g.translate.y += offsetPt.y;
+      //g.translate.z += offsetPt.z;
       offset_x += offsetPt.x;
       offset_y += offsetPt.y;
       offset_z += offsetPt.z;
      
-      //System.out.println("DIRECTION = " + direction + ", anchor = " + g.anchor);
-      //updatePreviousPoint(g.anchor);
+      //System.out.println("DIRECTION = " + direction + ", translate = " + g.translate);
+      //updatePreviousPoint(g.translate);
       
       if (loopBehavior == LoopEnum.ONCE)
       {
         this.isDone = true;
-        //System.out.println("anchor = " + g.anchor);
+        //System.out.println("translate = " + g.translate);
        
         return;
       }
@@ -235,9 +235,9 @@ public class BehaviorPath extends BehaviorGeomContinuous
             offsetPt = calculateAnchorOffsets(prevPoint, getPointFromPercentage(1f));
           }
           /*
-          g.anchor.x -= offsetPt.x;
-          g.anchor.y -= offsetPt.y;
-          g.anchor.z -= offsetPt.z;
+          g.translate.x -= offsetPt.x;
+          g.translate.y -= offsetPt.y;
+          g.translate.z -= offsetPt.z;
           */
           offset_x -= offsetPt.x;
           offset_y -= offsetPt.y;
@@ -283,9 +283,9 @@ public class BehaviorPath extends BehaviorGeomContinuous
     }
 
     /*
-    g.anchor.x += offsetPt.x;
-    g.anchor.y += offsetPt.y;
-    g.anchor.z += offsetPt.z;
+    g.translate.x += offsetPt.x;
+    g.translate.y += offsetPt.y;
+    g.translate.z += offsetPt.z;
     */
     offset_x += offsetPt.x;
     offset_y += offsetPt.y;

@@ -196,7 +196,7 @@ public class EffectUtils {
 
         for (Geom g : geomList) {
             BehaviorTranslate.translate(g, Utils.nanoPlusMillis(startNano, incTime * idx), 2100L - (incSpeed * idx),
-                    new Point3f(0f, -10f - g.anchor.y, 0f));
+                    new Point3f(0f, -10f - g.translate.y, 0f));
 
             BehaviorIsDone.destroyAtMillis(g, Utils.nanoPlusMillis(startNano, (incTime * idx) + 2100L - (incSpeed * idx)), 0, true);
             idx++;

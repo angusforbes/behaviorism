@@ -125,8 +125,8 @@ public class GeomTextOutset extends GeomRect
     /**
      * getMatrixIndex convenience method which positions the text within the given box area.
      * Justifications are based on the
-     * boundaries of the box, as opposed to the anchor point (as with the "contstrain" methods).
-     * The box's x and y coordinates are the anchor of this object.
+     * boundaries of the box, as opposed to the translate point (as with the "contstrain" methods).
+     * The box's x and y coordinates are the translate of this object.
      * Note that this box is simply for the initial placement. The bounds of the box
      * are not preserved once the GeomText object is created.
      * @param bw
@@ -339,10 +339,10 @@ public class GeomTextOutset extends GeomRect
       switch (justifyX)
       {
         case 0:
-          this.anchor.x += (builder.boxWidth * .5f) - (this.w * .5f);
+          this.translate.x += (builder.boxWidth * .5f) - (this.w * .5f);
           break;
         case 1:
-          this.anchor.x += (builder.boxWidth) -= this.w;
+          this.translate.x += (builder.boxWidth) -= this.w;
           break;
         case -1:
           break;
@@ -350,10 +350,10 @@ public class GeomTextOutset extends GeomRect
       switch (justifyY)
       {
         case 0:
-          this.anchor.y += (builder.boxHeight * .5f) - (this.h * .5f);
+          this.translate.y += (builder.boxHeight * .5f) - (this.h * .5f);
           break;
         case 1:
-          this.anchor.y += (builder.boxHeight) -= this.h;
+          this.translate.y += (builder.boxHeight) -= this.h;
           break;
         case -1:
           break;
@@ -364,10 +364,10 @@ public class GeomTextOutset extends GeomRect
       switch (justifyX)
       {
         case 0:
-          this.anchor.x -= this.w * .5f;
+          this.translate.x -= this.w * .5f;
           break;
         case 1:
-          this.anchor.x -= this.w;
+          this.translate.x -= this.w;
           break;
         case -1:
           break;
@@ -375,10 +375,10 @@ public class GeomTextOutset extends GeomRect
       switch (justifyY)
       {
         case 0:
-          this.anchor.y -= this.h * .5f;
+          this.translate.y -= this.h * .5f;
           break;
         case 1:
-          this.anchor.y -= this.h;
+          this.translate.y -= this.h;
           break;
         case -1:
           break;
@@ -421,11 +421,11 @@ public class GeomTextOutset extends GeomRect
 
 // objToCamProj is the vector in world coordinates from the
 // local origin to the camera projected in the XZ plane
-//	objToCamProj[0] = cam.anchor.x - this.anchor.x ;
+//	objToCamProj[0] = cam.translate.x - this.translate.x ;
 //	objToCamProj[1] = 0;
-//	objToCamProj[2] = cam.anchor.z - this.anchor.z ;
+//	objToCamProj[2] = cam.translate.z - this.translate.z ;
 
-    Vector3f objToCamProj = new Vector3f(cam.anchor.x - this.anchor.x, 0f, cam.anchor.z - this.anchor.z);
+    Vector3f objToCamProj = new Vector3f(cam.translate.x - this.translate.x, 0f, cam.translate.z - this.translate.z);
 // This is the original lookAt vector for the object
 // in world coordinates
     Vector3f lookAt = new Vector3f(0f, 0f, 1f);
@@ -468,7 +468,7 @@ public class GeomTextOutset extends GeomRect
 //	objToCam[0] = camX - objPosX;
 //	objToCam[1] = camY - objPosY;
 //	objToCam[2] = camZ - objPosZ;
-    Vector3f objToCam = new Vector3f(cam.anchor.x - anchor.x, cam.anchor.y - anchor.y, cam.anchor.z - anchor.z);
+    Vector3f objToCam = new Vector3f(cam.translate.x - translate.x, cam.translate.y - translate.y, cam.translate.z - translate.z);
 
 // Normalize to get the cosine afterwards
     objToCam.normalize();
@@ -491,7 +491,7 @@ public class GeomTextOutset extends GeomRect
 
 
     gl.glPushMatrix();
-    temp_mv = MatrixUtils.translate(temp_mv, anchor.x, anchor.y, anchor.z);
+    temp_mv = MatrixUtils.translate(temp_mv, translate.x, translate.y, translate.z);
 
     gl.glLoadMatrixd(temp_mv, 0);
     gl.glColor4f(0f, 0f, 1f, 1f);
@@ -516,9 +516,9 @@ public class GeomTextOutset extends GeomRect
 
     Cam cam = BehaviorismDriver.renderer.cam;
 
-    float dist = cam.anchor.distance(new Point3f(anchor.x + (w * .5f), anchor.y + (h * .5f), anchor.z));
-//    System.out.println("camera at " + cam.anchor);
-//    System.out.println("object at " + (new Point3f(anchor.x + (w * .5f), anchor.y + (h * .5f), anchor.z)));
+    float dist = cam.translate.distance(new Point3f(translate.x + (w * .5f), translate.y + (h * .5f), translate.z));
+//    System.out.println("camera at " + cam.translate);
+//    System.out.println("object at " + (new Point3f(translate.x + (w * .5f), translate.y + (h * .5f), translate.z)));
 //    System.out.println("dist = " + dist);
 
     double[] temp_mv = MatrixUtils.getIdentity();
@@ -687,7 +687,7 @@ public class GeomTextOutset extends GeomRect
 
   public String toString()
   {
-    return "GeomText2 [" + text + "] : x/y/z/w = " + anchor.x + "/" + anchor.y + "/" + anchor.z + "/" + scale.x + ", justify = " + justifyY;
+    return "GeomText2 [" + text + "] : x/y/z/w = " + translate.x + "/" + translate.y + "/" + translate.z + "/" + scale.x + ", justify = " + justifyY;
   }
 
   public void setWidthAndHeight(float maxw, float maxh)

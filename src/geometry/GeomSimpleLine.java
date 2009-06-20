@@ -41,7 +41,7 @@ public class GeomSimpleLine extends Geom
     GeomSimpleLine line = new GeomSimpleLine(new Point3f(),
       new Point3f(w, h, 0f));
 
-    line.anchor(0f, 0f, 0f);
+    line.setTranslate(0f, 0f, 0f);
     return line;
   }
 
@@ -55,24 +55,24 @@ public class GeomSimpleLine extends Geom
 
   public GeomSimpleLine(Point3f anchor, Point3f p1, Point3f p2)
   {
-    this.anchor = anchor;
+    this.translate = anchor;
     ends[0] = new GeomPoint(p1.x, p1.y, p1.z);
     ends[1] = new GeomPoint(p2.x, p2.y, p2.z);
   }
 
   public GeomSimpleLine(Point3f p1, Point3f p2)
   {
-    anchor = p1;
+    translate = p1;
     ends[0] = new GeomPoint(p1.x, p1.y, p1.z);
     ends[1] = new GeomPoint(p2.x, p2.y, p2.z);
   }
 
   public void draw(GL gl)
   {
-    //System.out.println("in simpleline, anchor = " + anchor);
-    //float hx = anchor.x;
-    //float hy = anchor.y;
-    //float hz = anchor.z;
+    //System.out.println("in simpleline, translate = " + translate);
+    //float hx = translate.x;
+    //float hy = translate.y;
+    //float hz = translate.z;
 
     if (isStippled == true)
     {
@@ -88,10 +88,10 @@ public class GeomSimpleLine extends Geom
     gl.glColor4f(r, g, b, a);
     gl.glBegin(gl.GL_LINES);
 
-    //gl.glVertex3f(ends[0].anchor.x + hx, ends[0].anchor.y + hy, ends[0].anchor.z + hz);
-    //gl.glVertex3f(ends[1].anchor.x + hx, ends[1].anchor.y + hy, ends[1].anchor.z + hz);
-    gl.glVertex3f(ends[0].anchor.x, ends[0].anchor.y, ends[0].anchor.z + offset);
-    gl.glVertex3f(ends[1].anchor.x, ends[1].anchor.y, ends[1].anchor.z + offset);
+    //gl.glVertex3f(ends[0].translate.x + hx, ends[0].translate.y + hy, ends[0].translate.z + hz);
+    //gl.glVertex3f(ends[1].translate.x + hx, ends[1].translate.y + hy, ends[1].translate.z + hz);
+    gl.glVertex3f(ends[0].translate.x, ends[0].translate.y, ends[0].translate.z + offset);
+    gl.glVertex3f(ends[1].translate.x, ends[1].translate.y, ends[1].translate.z + offset);
 
     gl.glEnd();
 
@@ -103,15 +103,15 @@ public class GeomSimpleLine extends Geom
   /*
   public Point3f draw(GL gl, GLU glu, Point3f pp) {
   
-  float hx =  anchor.x + pp.x;
-  float hy =  anchor.y + pp.y;
-  float hz =  anchor.z + pp.z;
+  float hx =  translate.x + pp.x;
+  float hy =  translate.y + pp.y;
+  float hz =  translate.z + pp.z;
   
   gl.glColor4f(r, g, b, a);
   gl.glBegin(gl.GL_LINES);
   
-  gl.glVertex3f(ends[0].anchor.x + hx, ends[0].anchor.y + hy, ends[0].anchor.z + hz);
-  gl.glVertex3f(ends[1].anchor.x + hx, ends[1].anchor.y + hy, ends[1].anchor.z + hz);
+  gl.glVertex3f(ends[0].translate.x + hx, ends[0].translate.y + hy, ends[0].translate.z + hz);
+  gl.glVertex3f(ends[1].translate.x + hx, ends[1].translate.y + hy, ends[1].translate.z + hz);
   
   gl.glEnd();  
   

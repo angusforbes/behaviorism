@@ -112,12 +112,12 @@ public class GeomClosestLineBetweenPolys extends GeomLine
       return;
     }
    
-    firstOffsetPt.anchor(MatrixUtils.toPoint3f(
+    firstOffsetPt.setTranslate(MatrixUtils.toPoint3f(
       RenderUtils.rayIntersect(
         (firstOffsetPt), (int) r1_ip.getX(), (int) r1_ip.getY())
       ) 
     );
-    secondOffsetPt.anchor(MatrixUtils.toPoint3f(
+    secondOffsetPt.setTranslate(MatrixUtils.toPoint3f(
       RenderUtils.rayIntersect(
         (secondOffsetPt), (int) r2_ip.getX(), (int) r2_ip.getY()
       ))
@@ -160,8 +160,8 @@ public class GeomClosestLineBetweenPolys extends GeomLine
       return;
     }
 
-    Point3f k1 = firstOffsetPt.anchor;
-    Point3f k2 = secondOffsetPt.anchor;
+    Point3f k1 = firstOffsetPt.translate;
+    Point3f k2 = secondOffsetPt.translate;
       
     gl.glLineWidth(this.lineWidth);
 

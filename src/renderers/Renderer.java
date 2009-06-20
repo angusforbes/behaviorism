@@ -146,10 +146,10 @@ public class Renderer implements GLEventListener
         lowerleft.x, lowerleft.y, upperright.x - lowerleft.x, upperright.y - lowerleft.y);
 
 
-      worldBoundaryPoints.get(0).anchor(lowerleft.x, lowerleft.y, 0f);
-      worldBoundaryPoints.get(1).anchor(upperright.x, lowerleft.y, 0f);
-      worldBoundaryPoints.get(2).anchor(upperright.x, upperright.y, 0f);
-      worldBoundaryPoints.get(3).anchor(lowerleft.x, upperright.y, 0f);
+      worldBoundaryPoints.get(0).setTranslate(lowerleft.x, lowerleft.y, 0f);
+      worldBoundaryPoints.get(1).setTranslate(upperright.x, lowerleft.y, 0f);
+      worldBoundaryPoints.get(2).setTranslate(upperright.x, upperright.y, 0f);
+      worldBoundaryPoints.get(3).setTranslate(lowerleft.x, upperright.y, 0f);
     }
 
   //extractFrustum();

@@ -220,13 +220,13 @@ public class MouseHandler extends MouseAdapter
     if (button == 1)
     {
       System.out.println("drag camera 1");
-      cam.moveX(xDif * 0.01f);
-      cam.moveY(yDif * -0.01f);
+      cam.translateX(xDif * 0.01f);
+      cam.translateY(yDif * -0.01f);
     }
     else if (button == 2)
     {
       System.out.println("drag camera 2");
-      cam.moveZ(yDif * 0.05f);
+      cam.translateZ(yDif * 0.05f);
     }
     else if (button == 3)
     {
@@ -241,7 +241,7 @@ public class MouseHandler extends MouseAdapter
     if (button == 1)
     {
       System.out.println("HERE - button 1 drag...");
-      selectedGeom.draggableObject.anchor(new Point3f(RenderUtils.rayIntersect(selectedGeom.draggableObject, mx, my, offsetPt)));
+      selectedGeom.draggableObject.setTranslate(new Point3f(RenderUtils.rayIntersect(selectedGeom.draggableObject, mx, my, offsetPt)));
     }
     else if (button == 2)
     {
@@ -275,9 +275,9 @@ public class MouseHandler extends MouseAdapter
         offsetPt = MatrixUtils.getWorldPointInGeomCoordinates(ptWorld, RenderUtils.getCamera().modelview, selectedGeom.draggableObject.parent.modelview);
       }
 
-      offsetPt = new Point3d(offsetPt.x - selectedGeom.draggableObject.anchor.x,
-        offsetPt.y - selectedGeom.draggableObject.anchor.y,
-        offsetPt.z - selectedGeom.draggableObject.anchor.z);
+      offsetPt = new Point3d(offsetPt.x - selectedGeom.draggableObject.translate.x,
+        offsetPt.y - selectedGeom.draggableObject.translate.y,
+        offsetPt.z - selectedGeom.draggableObject.translate.z);
     }
   }
 
@@ -428,9 +428,9 @@ public class MouseHandler extends MouseAdapter
       /*
       Point3f ps = new Point3f();
       
-      ps.x = selectedGeom.draggableObject.anchor.x;
-      ps.y = selectedGeom.draggableObject.anchor.y;
-      ps.z = selectedGeom.draggableObject.anchor.z;
+      ps.x = selectedGeom.draggableObject.translate.x;
+      ps.y = selectedGeom.draggableObject.translate.y;
+      ps.z = selectedGeom.draggableObject.translate.z;
       BehaviorismDriver.renderer.cam.CameraMove(ps);
        */
 
@@ -534,12 +534,12 @@ public class MouseHandler extends MouseAdapter
     if (notches < 0) //moved up 
     {
       System.out.println("up");
-      BehaviorismDriver.renderer.getCamera().moveZ(notches * 0.05f);
+      BehaviorismDriver.renderer.getCamera().translateZ(notches * 0.05f);
     }
     else //moved down
     {
       System.out.println("down");
-      BehaviorismDriver.renderer.getCamera().moveZ(notches * 0.05f);
+      BehaviorismDriver.renderer.getCamera().translateZ(notches * 0.05f);
     }
   }
 }

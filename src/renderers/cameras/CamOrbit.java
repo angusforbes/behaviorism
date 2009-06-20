@@ -16,12 +16,12 @@ import javax.vecmath.Point3f;
 public class CamOrbit extends Cam
 {
 	/** 
-	 * anchor = the point that you are rotating around and either facing, or facing away from.
-	 * rotateAnchor = position of the camera relative to the anchor (in general use a negative z value only)
+	 * translate = the point that you are rotating around and either facing, or facing away from.
+	 * rotateAnchor = position of the camera relative to the translate (in general use a negative z value only)
 	 */
 	public CamOrbit()
 	{
-		anchor = new Point3f(0f, 0f, 10f); //lookAt point
+		translate = new Point3f(0f, 0f, 10f); //lookAt point
 
 		//if the z value of rotateAnchor is negative, then the camera will point TOWARD the object
 		//situated at the lookAt point (which it is rotating around). Otherwise is will point 
@@ -37,19 +37,19 @@ public class CamOrbit extends Cam
 	 */
 	public CamOrbit(Point3f lookAtPoint, float viewDistance)
 	{
-		this.anchor = lookAtPoint;
+		this.translate = lookAtPoint;
 		this.rotateAnchor = new GeomPoint(0f, 0f, viewDistance);
 	}
 	
 	public CamOrbit(float x, float y, float z, float viewDistance)
 	{
-		this.anchor = new Point3f(x, y, z);
+		this.translate = new Point3f(x, y, z);
 		this.rotateAnchor = new GeomPoint(0f, 0f, viewDistance);
 	}
 
 	public CamOrbit(Point3f lookAtPoint, GeomPoint rotateAnchor)
 	{
-		this.anchor = lookAtPoint;
+		this.translate = lookAtPoint;
 		this.rotateAnchor = rotateAnchor;
 	}
 
@@ -61,13 +61,13 @@ public class CamOrbit extends Cam
   @Override
 	public void setPerspective(GL gl, GLU glu)
 	{
-		gl.glTranslatef(rotateAnchor.anchor.x, rotateAnchor.anchor.y, rotateAnchor.anchor.z);
+		gl.glTranslatef(rotateAnchor.translate.x, rotateAnchor.translate.y, rotateAnchor.translate.z);
 
 		gl.glRotatef((float) rotate.x, 1.0f, 0.0f, 0.0f);
 		gl.glRotatef((float) rotate.y, 0.0f, 1.0f, 0.0f);
 		gl.glRotatef((float) rotate.z, 0.0f, 0.0f, 1.0f);
 		
-		gl.glTranslatef(anchor.x, anchor.y, anchor.z);
+		gl.glTranslatef(translate.x, translate.y, translate.z);
 	}
 
   @Override
@@ -89,20 +89,20 @@ public class CamOrbit extends Cam
 	}
 
   @Override
-	public void moveX(float x)
+	public void translateX(float x)
 	{
-			//rotateAnchor.anchor.x += x;
+			//rotateAnchor.translate.x += x;
 	}
 
   @Override
-	public void moveY(float y)
+	public void translateY(float y)
 	{
-			//rotateAnchor.anchor.y += y;
+			//rotateAnchor.translate.y += y;
 	}
 
   @Override
-	public void moveZ(float z)
+	public void translateZ(float z)
 	{
-			rotateAnchor.anchor.z += z;
+			rotateAnchor.translate.z += z;
 	}
 }

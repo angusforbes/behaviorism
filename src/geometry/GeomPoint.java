@@ -31,21 +31,21 @@ public class GeomPoint extends Geom
   
   public GeomPoint(Point3f anchor)
   {
-    this.anchor = anchor;
+    this.translate = anchor;
   }
   public GeomPoint(Point3f anchor, float pointSize)
   {
-    this.anchor = anchor;
+    this.translate = anchor;
     this.pointSize = pointSize;
   }
   
   public GeomPoint(float x, float y, float z)
   {
-    anchor.set(x, y, z);
+    translate.set(x, y, z);
   }
   public GeomPoint(float x, float y, float z, float pointSize)
   {
-    anchor.set(x, y, z);
+    translate.set(x, y, z);
     this.pointSize = pointSize;
   }
   
@@ -55,8 +55,8 @@ public class GeomPoint extends Geom
     gl.glPointSize(this.pointSize);
     
     gl.glBegin(gl.GL_POINTS);
-    //gl.glVertex3f(anchor.x, anchor.y , anchor.z);  //draws the point, it should be the point plus anchor
-    gl.glVertex3f(0f, 0f, 0f);  //draws the point, it should be the point plus anchor
+    //gl.glVertex3f(translate.x, translate.y , translate.z);  //draws the point, it should be the point plus translate
+    gl.glVertex3f(0f, 0f, 0f);  //draws the point, it should be the point plus translate
     gl.glEnd();
   }
   
@@ -65,9 +65,9 @@ public class GeomPoint extends Geom
   public Point3f draw(GL gl, GLU glu, Point3f pp)
   {
     
-    float hx =  anchor.x + pp.x;
-    float hy =  anchor.y + pp.y;
-    float hz =  anchor.z + pp.z;
+    float hx =  translate.x + pp.x;
+    float hy =  translate.y + pp.y;
+    float hz =  translate.z + pp.z;
     
     
     gl.glColor4f(r, g, b, a);
@@ -84,7 +84,7 @@ public class GeomPoint extends Geom
   
   public void setPos(float xx, float yy, float zz)
   {
-    anchor.set(xx, yy, zz);
+    translate.set(xx, yy, zz);
   }
   
   public void setTexCoord(float xx, float yy)
@@ -97,7 +97,7 @@ public class GeomPoint extends Geom
     List<Point3f> gps = new ArrayList<Point3f>(); 
     for (GeomPoint p3f : pts)
     {
-      gps.add(new Point3f(p3f.anchor));
+      gps.add(new Point3f(p3f.translate));
     }
     return gps;
   }

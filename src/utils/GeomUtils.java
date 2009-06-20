@@ -330,8 +330,8 @@ public class GeomUtils
 
     for (int i = 0; i < geoms.size(); i++)
     {
-      xxx += geoms.get(i).anchor.x;
-      yyy += geoms.get(i).anchor.y;
+      xxx += geoms.get(i).translate.x;
+      yyy += geoms.get(i).translate.y;
     }
     return new Point3f(xxx / geoms.size(), yyy / geoms.size(), 0f);
   }
@@ -690,7 +690,7 @@ public class GeomUtils
   {
     return getDistanceBetweenPoints(toPoint3f(gp1), toPoint3f(gp2));
   }
-  //anchor??
+  //translate??
 
   public static Point2D toPoint2D(Point3f p3f)
   {
@@ -709,7 +709,7 @@ public class GeomUtils
 
   public static Point3f toPoint3f(GeomPoint gp)
   {
-    return new Point3f(gp.anchor.x, gp.anchor.y, gp.anchor.z);
+    return new Point3f(gp.translate.x, gp.translate.y, gp.translate.z);
   }
   public static Point3f toPoint3f(Point2D p2d)
   {
@@ -809,8 +809,8 @@ public class GeomUtils
         //GeomPoint p1 = (GeomPoint) a;
         //GeomPoint p2 = (GeomPoint) b;
 
-        float r1 = getAngleBetweenPoints(centerPt.anchor, p1.anchor);
-        float r2 = getAngleBetweenPoints(centerPt.anchor, p2.anchor);
+        float r1 = getAngleBetweenPoints(centerPt.translate, p1.translate);
+        float r2 = getAngleBetweenPoints(centerPt.translate, p2.translate);
 
         if (r1 > r2)
         {
@@ -852,10 +852,10 @@ public class GeomUtils
 
   public static float getMinAngleBetweenPointAndGeom(Point3f centerPt, GeomRect rect, boolean overlap)
   {
-    Point3f a = new Point3f(rect.anchor);
-    Point3f b = new Point3f(rect.anchor.x + rect.w, rect.anchor.y, rect.anchor.z);
-    Point3f c = new Point3f(rect.anchor.x + rect.w, rect.anchor.y + rect.h, rect.anchor.z);
-    Point3f d = new Point3f(rect.anchor.x, rect.anchor.y + rect.h, rect.anchor.z);
+    Point3f a = new Point3f(rect.translate);
+    Point3f b = new Point3f(rect.translate.x + rect.w, rect.translate.y, rect.translate.z);
+    Point3f c = new Point3f(rect.translate.x + rect.w, rect.translate.y + rect.h, rect.translate.z);
+    Point3f d = new Point3f(rect.translate.x, rect.translate.y + rect.h, rect.translate.z);
 
     float minAngle = getAngleBetweenPoints(centerPt, a, overlap);
 
@@ -889,10 +889,10 @@ public class GeomUtils
 
   public static float getMaxAngleBetweenPointAndGeom(Point3f centerPt, GeomRect rect, boolean overlap)
   {
-    Point3f a = new Point3f(rect.anchor);
-    Point3f b = new Point3f(rect.anchor.x + rect.w, rect.anchor.y, rect.anchor.z);
-    Point3f c = new Point3f(rect.anchor.x + rect.w, rect.anchor.y + rect.h, rect.anchor.z);
-    Point3f d = new Point3f(rect.anchor.x, rect.anchor.y + rect.h, rect.anchor.z);
+    Point3f a = new Point3f(rect.translate);
+    Point3f b = new Point3f(rect.translate.x + rect.w, rect.translate.y, rect.translate.z);
+    Point3f c = new Point3f(rect.translate.x + rect.w, rect.translate.y + rect.h, rect.translate.z);
+    Point3f d = new Point3f(rect.translate.x, rect.translate.y + rect.h, rect.translate.z);
 
     float maxAngle = getAngleBetweenPoints(centerPt, a, overlap);
 
@@ -1187,8 +1187,8 @@ public class GeomUtils
       @Override
       public int compare(Geom a, Geom b)
       {
-        float dA = linePointDist(lineA, lineB, a.anchor);
-        float dB = linePointDist(lineA, lineB, b.anchor);
+        float dA = linePointDist(lineA, lineB, a.translate);
+        float dB = linePointDist(lineA, lineB, b.translate);
         if (dA > dB)
         {
           return 1;

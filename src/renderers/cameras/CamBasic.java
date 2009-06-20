@@ -22,8 +22,8 @@ public class CamBasic extends Cam
 {
 
   /** 
-   * to rotate the camera in place, set the anchor to the location of where you want
-   * the camera to be, and make sure that the rotateAnchor.anchor is set to (0f, 0f, 0f)
+   * to rotate the camera in place, set the translate to the location of where you want
+   * the camera to be, and make sure that the rotateAnchor.translate is set to (0f, 0f, 0f)
    */
   public CamBasic(Point3f p3f)
   {
@@ -43,7 +43,7 @@ public class CamBasic extends Cam
 
   public void initialize(Point3f anchorPt)
   {
-    this.anchor = new Point3f(anchorPt);
+    this.translate = new Point3f(anchorPt);
     this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
     this.resetAnchor = new Point3f(anchorPt);
 
@@ -74,7 +74,7 @@ public class CamBasic extends Cam
     modelview = MatrixUtils.rotate(modelview, rotate.x, 1.0f, 0.0f, 0.0f);
     modelview = MatrixUtils.rotate(modelview, rotate.y, 0.0f, 1.0f, 0.0f);
     modelview = MatrixUtils.rotate(modelview, rotate.z, 0.0f, 0.0f, 1.0f);
-    modelview = MatrixUtils.translate(modelview, anchor.x, anchor.y, -anchor.z);
+    modelview = MatrixUtils.translate(modelview, translate.x, translate.y, -translate.z);
     //return modelview;
   }
 
@@ -85,7 +85,7 @@ public class CamBasic extends Cam
       gl.glRotatef((float) rotate.y, 0.0f, 1.0f, 0.0f);
       gl.glRotatef((float) rotate.z, 0.0f, 0.0f, 1.0f);
 
-      gl.glTranslatef(anchor.x, anchor.y, anchor.z);
+      gl.glTranslatef(translate.x, translate.y, translate.z);
   }
 
   @Override
@@ -111,29 +111,29 @@ public class CamBasic extends Cam
 
   /*
   @Override
-  public void moveX(float x)
+  public void translateX(float x)
   {
-    anchor.x += x;
+    translate.x += x;
   }
 
   @Override
-  public void moveY(float y)
+  public void translateY(float y)
   {
-    anchor.y += y;
+    translate.y += y;
   }
 
   @Override
-  public void moveZ(float z)
+  public void translateZ(float z)
   {
-    anchor.z += z;
+    translate.z += z;
   }
   */
   @Override
   public void moveTo(float x, float y, float z, long when, long howfast)
   {
-    float dist_x = x - anchor.x;
-    float dist_y = y - anchor.y;
-    float dist_z = z - anchor.z;
+    float dist_x = x - translate.x;
+    float dist_y = y - translate.y;
+    float dist_z = z - translate.z;
 
     Behavior moveBehavior = BehaviorTranslate.translate(when, howfast,
       new Point3f(dist_x, dist_y, dist_z));
@@ -144,9 +144,9 @@ public class CamBasic extends Cam
   @Override
   public void jumpTo(float x, float y, float z)
   {
-    anchor.x = x;
-    anchor.y = y;
-    anchor.z = z;
+    translate.x = x;
+    translate.y = y;
+    translate.z = z;
   }
 }
 

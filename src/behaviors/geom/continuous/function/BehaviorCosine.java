@@ -55,7 +55,7 @@ public class BehaviorCosine extends BehaviorGeomContinuous
     {
       float curY = getValFromCosineWave(percentage); 
       
-      g.anchor.x += (curY - prevY);
+      g.translate.x += (curY - prevY);
 
       prevY = curY;
     }

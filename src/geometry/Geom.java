@@ -27,34 +27,25 @@ public abstract class Geom //extends Point3f //Object
    * A name for this Geom. Does not need to be unique.
    */
   public String name = null;
-
   /**
    * A unique id for this Geom.
    */
   public String id = null; //not currently used...
-
   /**
    * A List of all child Geoms attached to this Geom.
    */
   public List<Geom> geoms = new CopyOnWriteArrayList<Geom>();
-
   /**
    * A List of all Behaviors attached to this Geom.
    */
   public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
-
   /**
    * A root Data node that can hold various types of Data attached to this Geom.
+   * This should be NULL by default, only used if needed!!!
    */
-  public Data data = new Data();
-
-  /** this will soon be deprecated-- we should be using just regular x,y,z */
-  public Point3f anchor = new Point3f(0f, 0f, 0f);
-
-  //public float x = 0f;
-  //public float y = 0f;
-  //public float z = 0f;
-
+  public Data data = null; //new Data();
+  public Point3f translate = new Point3f(0f, 0f, 0f);
+  public Point3f translateAnchor = new Point3f(0f, 0f, 0f);
   /**
    * The relative point (in parent's coordinates) around which the object is to rotate.
    * By default it is set to be the lower left corner of the object
@@ -65,7 +56,6 @@ public abstract class Geom //extends Point3f //Object
    * getMatrixIndex point which describes the rotation around the x, y, and z axes. Rotations are in degrees, not radians.
    */
   public Point3d rotate = new Point3d(0, 0, 0);
-  
   /**
    * The relative point (in parent's coordinates) around which the object is to scale.
    * By default it is set to be the lower left corner of the object
@@ -83,16 +73,12 @@ public abstract class Geom //extends Point3f //Object
   public float h = 1f;
   public float d = 0f;
   /** we are not really using this... should we be? Looks we are *always* using ScaleEnum.CENTER (in the transform) */
-
   @Deprecated
   public ScaleEnum scaleDirection = ScaleEnum.NE; //default
-
   public float r = (float) Math.random();
   public float g = (float) Math.random();
   public float b = (float) Math.random();
   public float a = 1f;
-  
-  
   @Deprecated
   public float area = 0f; //i think i was using this for an picking alogrithm. it was a dumb idea. this shouldn't be stored.
 
@@ -100,9 +86,7 @@ public abstract class Geom //extends Point3f //Object
   public float offset = 0f;
 
   //various flags for rendering, texturing, picking, timing, etc.
-
   public boolean isTransformed = true; //if true, we will update the transformation matrix
-
   public boolean isActive = false; //if true, it will be displayed
   public boolean isDone = false; //if true, it will be removed
   public boolean isTextured = false; //if true, we will handle texture coords
@@ -147,12 +131,12 @@ public abstract class Geom //extends Point3f //Object
 
   public Geom(float x, float y, float z)
   {
-    anchor(x, y, z);
+    setTranslate(x, y, z);
   }
 
   public Geom(Point3f p3f)
   {
-    anchor(p3f);
+    setTranslate(p3f);
   }
 
   /**
@@ -166,7 +150,6 @@ public abstract class Geom //extends Point3f //Object
   //public abstract void draw(GL gl, GLU glu, float offset);
   public abstract void draw(GL gl);
 
-
   public float getOffset()
   {
     return this.offset;
@@ -176,7 +159,6 @@ public abstract class Geom //extends Point3f //Object
   {
     this.offset = offset;
   }
-
 
   /**
    * Checks to see if the entire Geom is completely viewable within the screen bounds.
@@ -211,11 +193,11 @@ public abstract class Geom //extends Point3f //Object
       gl.glBegin(gl.GL_POINTS);
 
       //gl.glVertex3f(0f, 0f, 0f);
-      gl.glVertex3f(rotateAnchor.anchor.x, rotateAnchor.anchor.y, rotateAnchor.anchor.z);
+      gl.glVertex3f(rotateAnchor.translate.x, rotateAnchor.translate.y, rotateAnchor.translate.z);
       /*
-      gl.glVertex3f(anchor.x + rotateAnchor.anchor.x,
-      anchor.y + rotateAnchor.anchor.y,
-      anchor.z + rotateAnchor.anchor.z);
+      gl.glVertex3f(translate.x + rotateAnchor.translate.x,
+      translate.y + rotateAnchor.translate.y,
+      translate.z + rotateAnchor.translate.z);
        */
       gl.glEnd();
     }
@@ -241,8 +223,7 @@ public abstract class Geom //extends Point3f //Object
   {
     return MatrixUtils.toPoint3f(
       //MatrixUtils.getGeomPointInWorldCoordinates(MatrixUtils.toPoint3d(geomPt), modelview, RendererJogl.modelviewMatrix));
-      MatrixUtils.getGeomPointInWorldCoordinates(MatrixUtils.toPoint3d(geomPt), modelview, RenderUtils.getCamera().modelview)
-      );
+      MatrixUtils.getGeomPointInWorldCoordinates(MatrixUtils.toPoint3d(geomPt), modelview, RenderUtils.getCamera().modelview));
 
   }
 
@@ -255,7 +236,19 @@ public abstract class Geom //extends Point3f //Object
   {
   }
 
-  //if camera is transformed, then everything must be transofrmed?
+  //thinking about this...
+  //if rotateAnchor is relative to current Geom - Then -
+  //  update modelview with translate
+  //  then update modelview with rotateAnchor, rotate, then update modelview with -rotateAnchor
+  //if rotateAnchor is relative to parent Geom - Then -
+  //  put the translation AFTER the rotation
+  //
+  //same with scale setTranslate...
+
+  //these should be both set to TRUE as the defaults.
+  boolean rotateRelative = true;
+  boolean scaleRelative = true;
+
   public void transform2()
   {
     if (!isTransformed)
@@ -265,17 +258,71 @@ public abstract class Geom //extends Point3f //Object
 
     /* System.arrayCopy is slightly faster that Arrays.copyOf, allegedly. */
     System.arraycopy(parent.modelview, 0, modelview, 0, 16);
-    //modelview = Arrays.copyOf(parent.modelview, 16);
 
-    modelview = MatrixUtils.translate(modelview, anchor.x, anchor.y, anchor.z);
+    if (rotateRelative == true && scaleRelative == true)
+    {
+      transformTranslate();
+      transformRotate();
+      transformScale();
+    }
+    else if (rotateRelative == true && scaleRelative == false)
+    {
+      transformScale();
+      transformTranslate();
+      transformRotate();
+    }
+    else if (rotateRelative == false && scaleRelative == true)
+    {
+      transformRotate();
+      transformTranslate();
+      transformScale();
+    }
+    else if (rotateRelative == false && scaleRelative == false)
+    {
+      transformRotate();
+      transformScale();
+      transformTranslate();
+    }
+  }
+
+  private void transformTranslate()
+  {
+    if (translateAnchor.x + translate.x == 0f &&
+      translateAnchor.y + translate.y == 0f &&
+      translateAnchor.z + translate.z == 0f)
+    {
+      return;
+    }
+
+    //modelview = MatrixUtils.translate(modelview, translate.x, translate.y, translate.z);
+    modelview = MatrixUtils.translate(modelview,
+      translateAnchor.x + translate.x,
+      translateAnchor.y + translate.y,
+      translateAnchor.z + translate.z);
+  }
+
+  private void transformRotate()
+  {
+    if (rotate.x == 0f && rotate.y == 0f && rotate.z == 0f)
+    {
+      return;
+    }
 
     if (rotateAnchor != null)
     {
-      modelview = MatrixUtils.translate(modelview, rotateAnchor.anchor.x, rotateAnchor.anchor.y, rotateAnchor.anchor.z);
+      modelview = MatrixUtils.translate(modelview, rotateAnchor.translate.x, rotateAnchor.translate.y, rotateAnchor.translate.z);
       modelview = MatrixUtils.rotate(modelview, rotate.x, 1f, 0f, 0f);
       modelview = MatrixUtils.rotate(modelview, rotate.y, 0f, 1f, 0f);
       modelview = MatrixUtils.rotate(modelview, rotate.z, 0f, 0f, 1f);
-      modelview = MatrixUtils.translate(modelview, -rotateAnchor.anchor.x, -rotateAnchor.anchor.y, -rotateAnchor.anchor.z);
+      modelview = MatrixUtils.translate(modelview, -rotateAnchor.translate.x, -rotateAnchor.translate.y, -rotateAnchor.translate.z);
+    }
+  }
+
+  private void transformScale()
+  {
+    if (scale.x == 1f && scale.y == 1f && scale.z == 1f)
+    {
+      return;
     }
 
     modelview = MatrixUtils.translate(modelview, scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
@@ -299,7 +346,7 @@ public abstract class Geom //extends Point3f //Object
     //System.out.println("modelview was :");
     //MatrixUtils.printDoubleArray(temp);
 
-    gl.glTranslatef(anchor.x, anchor.y, anchor.z);
+    gl.glTranslatef(translate.x, translate.y, translate.z);
 
     //gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, temp, 0);
     //System.out.println("modelview is :");
@@ -308,12 +355,12 @@ public abstract class Geom //extends Point3f //Object
     // rotate commands
     if (rotateAnchor != null)
     {
-      gl.glTranslatef(rotateAnchor.anchor.x, rotateAnchor.anchor.y, rotateAnchor.anchor.z);
+      gl.glTranslatef(rotateAnchor.translate.x, rotateAnchor.translate.y, rotateAnchor.translate.z);
       gl.glRotatef((float) rotate.x, 1.0f, 0.0f, 0.0f);
       gl.glRotatef((float) rotate.y, 0.0f, 1.0f, 0.0f);
       //System.out.println("rotate y = " + (float)rotate.y);
       gl.glRotatef((float) rotate.z, 0.0f, 0.0f, 1.0f);
-      gl.glTranslatef(-rotateAnchor.anchor.x, -rotateAnchor.anchor.y, -rotateAnchor.anchor.z);
+      gl.glTranslatef(-rotateAnchor.translate.x, -rotateAnchor.translate.y, -rotateAnchor.translate.z);
     }
 
     // scale commands
@@ -589,71 +636,69 @@ public abstract class Geom //extends Point3f //Object
     }
   }
 
-
   public void anchorX(float x)
   {
-    if (x != anchor.x)
+    if (x != translate.x)
     {
-      anchor.setX(x);
+      translate.setX(x);
       isTransformed = true;
     }
   }
 
   public void anchorY(float y)
   {
-    if (y != anchor.y)
+    if (y != translate.y)
     {
-      anchor.setY(y);
+      translate.setY(y);
       isTransformed = true;
     }
   }
 
   public void anchorZ(float z)
   {
-    if (z != anchor.z)
+    if (z != translate.z)
     {
-      anchor.setZ(z);
+      translate.setZ(z);
       isTransformed = true;
     }
   }
 
   public void move(float x, float y, float z)
   {
-    moveX(x);
-    moveY(y);
-    moveZ(z);
+    translateX(x);
+    translateY(y);
+    translateZ(z);
   }
 
-  public void moveX(float x)
+  public void translateX(float x)
   {
     if (x != 0f)
     {
-      anchor.setX(anchor.x + x);
+      translate.setX(translate.x + x);
       isTransformed = true;
     }
   }
 
-  public void moveY(float y)
+  public void translateY(float y)
   {
     if (y != 0f)
     {
-      anchor.setY(anchor.y + y);
+      translate.setY(translate.y + y);
       isTransformed = true;
     }
   }
 
-  public void moveZ(float z)
+  public void translateZ(float z)
   {
     if (z != 0f)
     {
-      anchor.setZ(anchor.z + z);
+      translate.setZ(translate.z + z);
       isTransformed = true;
     }
   }
 
   public void scaleX(float x)
   {
-    System.out.println("in scaleX ... x = " + x);
     if (x != 0f)
     {
       scale.setX(scale.x + x);
@@ -675,6 +720,24 @@ public abstract class Geom //extends Point3f //Object
     if (z != 0f)
     {
       scale.setZ(scale.z + z);
+      isTransformed = true;
+    }
+  }
+
+  public void setScale(float x, float y, float z)
+  {
+    if (x != scale.x && y != scale.y && z != scale.z)
+    {
+      scale.set(x, y, z);
+      isTransformed = true;
+    }
+  }
+
+  public void setScale(Point3d p3d)
+  {
+    if (!this.scale.equals(p3d))
+    {
+      scale.set(p3d);
       isTransformed = true;
     }
   }
@@ -705,31 +768,48 @@ public abstract class Geom //extends Point3f //Object
       isTransformed = true;
     }
   }
-  
-  public void anchor(Point3f p3f)
+
+  public void setRotate(float x, float y, float z)
   {
-    if (!this.anchor.equals(p3f))
+    if (x != rotate.x && y != rotate.y && z != rotate.z)
     {
-      anchor.set(p3f);
+      rotate.set(x, y, z);
       isTransformed = true;
     }
   }
 
-  public void anchor(float x, float y, float z)
+  public void setRotate(Point3d p3d)
   {
-    if (x != anchor.x && y != anchor.y && z != anchor.z)
+    if (!this.rotate.equals(p3d))
     {
-      anchor.set(x, y, z);
+      rotate.set(p3d);
+      isTransformed = true;
+    }
+  }
+
+  public void setTranslate(Point3f p3f)
+  {
+    if (!this.translate.equals(p3f))
+    {
+      translate.set(p3f);
+      isTransformed = true;
+    }
+  }
+
+  public void setTranslate(float x, float y, float z)
+  {
+    if (x != translate.x && y != translate.y && z != translate.z)
+    {
+      translate.set(x, y, z);
       isTransformed = true;
     }
   }
 
   /*
-    this.scaleAnchor = new Point3f(w * .5f, h * .5f, 0f);
-    this.rotateAnchor = new GeomPoint(w * .5f, h * .5f, 0f);
+  this.scaleAnchor = new Point3f(w * .5f, h * .5f, 0f);
+  this.rotateAnchor = new GeomPoint(w * .5f, h * .5f, 0f);
   
-  */
-
+   */
   /**
    * Defaults to rotating and scaling around the center (maybe make this an option?)
    * @param x
@@ -741,32 +821,31 @@ public abstract class Geom //extends Point3f //Object
   /*
   public void setPos(float x, float y, float z, float w, float h)
   {
-    anchor.set(x, y, z);
-    //this.x = x;
-    //this.y = y;
-    //this.z = z;
-    this.w = w;
-    this.h = h;
+  translate.set(x, y, z);
+  //this.x = x;
+  //this.y = y;
+  //this.z = z;
+  this.w = w;
+  this.h = h;
 
-    this.scaleAnchor = new Point3f(w * .5f, h * .5f, 0f);
-    this.rotateAnchor = new GeomPoint(w * .5f, h * .5f, 0f);
+  this.scaleAnchor = new Point3f(w * .5f, h * .5f, 0f);
+  this.rotateAnchor = new GeomPoint(w * .5f, h * .5f, 0f);
   }
-  */
+   */
   /*
   public void setPos(Point3f p3f, float w, float h, Point3f scaleAnchor, GeomPoint rotateAnchor)
   {
-    anchor.set(p3f);
-    //this.x = p3f.x;
-    //this.y = p3f.y;
-    //this.z = p3f.z;
-    this.w = w;
-    this.h = h;
+  translate.set(p3f);
+  //this.x = p3f.x;
+  //this.y = p3f.y;
+  //this.z = p3f.z;
+  this.w = w;
+  this.h = h;
 
-    this.scaleAnchor = scaleAnchor;
-    this.rotateAnchor = rotateAnchor;
+  this.scaleAnchor = scaleAnchor;
+  this.rotateAnchor = rotateAnchor;
   }
-  */
-
+   */
   public Colorf getColor()
   {
     return new Colorf(this.r, this.g, this.b, this.a);
@@ -906,8 +985,8 @@ public abstract class Geom //extends Point3f //Object
   public static float getAngleBetweenGeoms(Geom g1, Geom g2)
   {
     //just 2d angle, not solid angle
-    float ny = g1.anchor.y - g2.anchor.y;
-    float nx = g1.anchor.x - g2.anchor.x;
+    float ny = g1.translate.y - g2.translate.y;
+    float nx = g1.translate.x - g2.translate.x;
 
     return (float) Math.atan2(ny, nx);
   }
@@ -917,9 +996,9 @@ public abstract class Geom //extends Point3f //Object
   public static float getDistanceBetweenGeoms(Geom g1, Geom g2)
   {
     //just 2d distance // now 3d
-    float ny = g1.anchor.y - g2.anchor.y;
-    float nx = g1.anchor.x - g2.anchor.x;
-    float nz = g1.anchor.z - g2.anchor.z;
+    float ny = g1.translate.y - g2.translate.y;
+    float nx = g1.translate.x - g2.translate.x;
+    float nz = g1.translate.z - g2.translate.z;
 
     return (float) Math.sqrt(ny * ny + nx * nx + nz * nz);
   }
@@ -928,9 +1007,9 @@ public abstract class Geom //extends Point3f //Object
   public static Point3f getNormalVectorBetweenGeoms(Geom g1, Geom g2)
   {
     //just 2d distance // now 3d
-    float ny = g1.anchor.y - g2.anchor.y;
-    float nx = g1.anchor.x - g2.anchor.x;
-    float nz = g1.anchor.z - g2.anchor.z;
+    float ny = g1.translate.y - g2.translate.y;
+    float nx = g1.translate.x - g2.translate.x;
+    float nz = g1.translate.z - g2.translate.z;
 
     float lngt = getDistanceBetweenGeoms(g1, g2);
     if (lngt == 0)
@@ -1023,6 +1102,11 @@ public abstract class Geom //extends Point3f //Object
     this.scaleAnchor = scaleAnchor;
   }
 
+  public void setTranslateAnchor(Point3f translateAnchor)
+  {
+    this.translateAnchor = translateAnchor;
+  }
+
   public void determineRotateAnchor(RotateEnum re)
   {
     //should make these do something! prob make the default behave like GeomRect, and then have special subclasses override
@@ -1038,7 +1122,7 @@ public abstract class Geom //extends Point3f //Object
    * automatically takes care of centering based on scaleAnchor (which must already be defined).
    * Additionally, the rotateAnchor is added to the scene graph so that
    * behaviors can be attached to it (ie behaviors that translate position).
-   * Attach behaviors by grabbing it from the Geom itself (rotateAnchor.anchor).
+   * Attach behaviors by grabbing it from the Geom itself (rotateAnchor.translate).
    */
   public void determineRotateAnchor(Point3f ra)
   {
@@ -1059,9 +1143,9 @@ public abstract class Geom //extends Point3f //Object
   @Deprecated
   public void centerGeom(Point3f centerPt)
   {
-    this.anchor.x = centerPt.x - (this.w * .5f);
-    this.anchor.y = centerPt.y - (this.h * .5f);
-    this.anchor.z = centerPt.z - (this.d * .5f);
+    this.translate.x = centerPt.x - (this.w * .5f);
+    this.translate.y = centerPt.y - (this.h * .5f);
+    this.translate.z = centerPt.z - (this.d * .5f);
   }
 
   @Override
@@ -1077,8 +1161,8 @@ public abstract class Geom //extends Point3f //Object
     {
       str += "id=" + id + " : ";
     }
-    
-    str += "anchor = " + anchor;
+
+    str += "anchor = " + translate;
     return str;
   }
 
@@ -1227,7 +1311,6 @@ public abstract class Geom //extends Point3f //Object
   /**
    * Reduces the visual prominence of this node and its children.
    */
-  
   // who uses this???? I think it was from the IGERT demo... should remove or move it into to the igert project
   /*
   @Deprecated
@@ -1235,113 +1318,112 @@ public abstract class Geom //extends Point3f //Object
   @Deprecated
   public void fade()
   {
-    Colorf c = getColor();
-    c.a *= 0.5f;
-    setColor(c);
-    if (state == null)
-    {
-      state = new State();
-    }
-    state.BLEND = true;
-    for (Geom myg : geoms)
-    {
-      myg.fade();
-    }
+  Colorf c = getColor();
+  c.a *= 0.5f;
+  setColor(c);
+  if (state == null)
+  {
+  state = new State();
   }
-  */
+  state.BLEND = true;
+  for (Geom myg : geoms)
+  {
+  myg.fade();
+  }
+  }
+   */
   //TO DO: I don't know who uses these anymore. I think maybe Basak used them??? They shouldn't be here!
   /*
   public Point3f getMinAnchor()
   {
-    Point3d geomPt_wc;
-    Point3d geomPt = new Point3d(anchor.x, anchor.y, anchor.z);
-    Point3d worldPt = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, modelview, RendererJogl.modelviewMatrix);
-    Point3f worldPtf = new Point3f((float) worldPt.x, (float) worldPt.y, (float) worldPt.z);
-    Point3f min = BehaviorismDriver.renderer.projectPoint(worldPtf, RendererJogl.modelviewMatrix);
+  Point3d geomPt_wc;
+  Point3d geomPt = new Point3d(translate.x, translate.y, translate.z);
+  Point3d worldPt = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, modelview, RendererJogl.modelviewMatrix);
+  Point3f worldPtf = new Point3f((float) worldPt.x, (float) worldPt.y, (float) worldPt.z);
+  Point3f min = BehaviorismDriver.renderer.projectPoint(worldPtf, RendererJogl.modelviewMatrix);
 
-    for (Geom g : geoms)
-    {
-      Point3f gmin = g.getMinAnchor();
-      if (gmin.x < min.x)
-      {
-        min.x = gmin.x;
-      }
-      if (gmin.y < min.y)
-      {
-        min.y = gmin.y;
-      }
-      if (gmin.z < min.z)
-      {
-        min.z = gmin.z;
-      }
-    }
-    return min;
+  for (Geom g : geoms)
+  {
+  Point3f gmin = g.getMinAnchor();
+  if (gmin.x < min.x)
+  {
+  min.x = gmin.x;
+  }
+  if (gmin.y < min.y)
+  {
+  min.y = gmin.y;
+  }
+  if (gmin.z < min.z)
+  {
+  min.z = gmin.z;
+  }
+  }
+  return min;
   }
 
   public Point3f getMaxAnchor()
   {
-    Point3d geomPt_wc;
-    Point3d geomPt = new Point3d(anchor.x, anchor.y, anchor.z);
-    Point3d worldPt = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, modelview, RendererJogl.modelviewMatrix);
-    Point3f worldPtf = new Point3f((float) worldPt.x, (float) worldPt.y, (float) worldPt.z);
-    Point3f max = BehaviorismDriver.renderer.projectPoint(worldPtf, RendererJogl.modelviewMatrix);
-    for (Geom g : geoms)
-    {
-      Point3f gmax = g.getMaxAnchor();
-      if (gmax.x > max.x)
-      {
-        max.x = gmax.x;
-      }
-      if (gmax.y > max.y)
-      {
-        max.y = gmax.y;
-      }
-      if (gmax.z > max.z)
-      {
-        max.z = gmax.z;
-      }
-    }
-    return max;
+  Point3d geomPt_wc;
+  Point3d geomPt = new Point3d(translate.x, translate.y, translate.z);
+  Point3d worldPt = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, modelview, RendererJogl.modelviewMatrix);
+  Point3f worldPtf = new Point3f((float) worldPt.x, (float) worldPt.y, (float) worldPt.z);
+  Point3f max = BehaviorismDriver.renderer.projectPoint(worldPtf, RendererJogl.modelviewMatrix);
+  for (Geom g : geoms)
+  {
+  Point3f gmax = g.getMaxAnchor();
+  if (gmax.x > max.x)
+  {
+  max.x = gmax.x;
+  }
+  if (gmax.y > max.y)
+  {
+  max.y = gmax.y;
+  }
+  if (gmax.z > max.z)
+  {
+  max.z = gmax.z;
+  }
+  }
+  return max;
   }
 
   public Point3f getCentroid()
   {
-    int nchildren = countChildren();
-    Point3f sum = sumChildAnchors();
-    sum.x /= nchildren;
-    sum.y /= nchildren;
-    sum.z /= nchildren;
-    return sum;
+  int nchildren = countChildren();
+  Point3f sum = sumChildAnchors();
+  sum.x /= nchildren;
+  sum.y /= nchildren;
+  sum.z /= nchildren;
+  return sum;
   }
 
   private int countChildren()
   {
-    int nchildren = 1;
-    for (Geom g : geoms)
-    {
-      nchildren += g.countChildren();
-    }
-    return nchildren;
+  int nchildren = 1;
+  for (Geom g : geoms)
+  {
+  nchildren += g.countChildren();
+  }
+  return nchildren;
   }
 
   private Point3f sumChildAnchors()
   {
-    Point3d geomPt_wc;
-    Point3d geomPt = new Point3d(anchor.x, anchor.y, anchor.z);
-    Point3d worldPt = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, modelview, RendererJogl.modelviewMatrix);
-    Point3f worldPtf = new Point3f((float) worldPt.x, (float) worldPt.y, (float) worldPt.z);
-    Point3f sum = BehaviorismDriver.renderer.projectPoint(worldPtf, RendererJogl.modelviewMatrix);
-    for (Geom g : geoms)
-    {
-      Point3f sum1 = g.sumChildAnchors();
-      sum.x += sum1.x;
-      sum.y += sum1.y;
-      sum.z += sum1.z;
-    }
-    return sum;
+  Point3d geomPt_wc;
+  Point3d geomPt = new Point3d(translate.x, translate.y, translate.z);
+  Point3d worldPt = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, modelview, RendererJogl.modelviewMatrix);
+  Point3f worldPtf = new Point3f((float) worldPt.x, (float) worldPt.y, (float) worldPt.z);
+  Point3f sum = BehaviorismDriver.renderer.projectPoint(worldPtf, RendererJogl.modelviewMatrix);
+  for (Geom g : geoms)
+  {
+  Point3f sum1 = g.sumChildAnchors();
+  sum.x += sum1.x;
+  sum.y += sum1.y;
+  sum.z += sum1.z;
   }
-  */
-  
+  return sum;
+  }
+   */
   //TO DO - need to fix this to work with list of textures...
   /**
    * Recursively calls the dispose() method this Geom and all attached children.

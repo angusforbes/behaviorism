@@ -280,9 +280,9 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //        g.h += offset_h;
 //        g.d += offset_d;
 //        
-//        //g.anchor.x -= (offset_w / 2f);
-//        //g.anchor.y -= (offset_h / 2f);
-//        //g.anchor.z -= (offset_d / 2f);
+//        //g.translate.x -= (offset_w / 2f);
+//        //g.translate.y -= (offset_h / 2f);
+//        //g.translate.z -= (offset_d / 2f);
 //        
 //      }
 //      else
@@ -290,9 +290,9 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //        g.w -= offset_w;
 //        g.h -= offset_h;
 //        g.d -= offset_d;
-//        //g.anchor.x += (offset_w / 2f);
-//        //g.anchor.y += (offset_h / 2f);
-//        //g.anchor.z += (offset_d / 2f);
+//        //g.translate.x += (offset_w / 2f);
+//        //g.translate.y += (offset_h / 2f);
+//        //g.translate.z += (offset_d / 2f);
 //        
 //      }
 //      
@@ -323,9 +323,9 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //        
 //        if (centerGeom == true)
 //        {
-//          g.anchor.x -= (offset_w / 2f);
-//          g.anchor.y -= (offset_h / 2f);
-//          g.anchor.z -= (offset_d / 2f);
+//          g.translate.x -= (offset_w / 2f);
+//          g.translate.y -= (offset_h / 2f);
+//          g.translate.z -= (offset_d / 2f);
 //        }
 //      }
 //      else
@@ -336,9 +336,9 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //        if (centerGeom == true)
 //        {
 //          
-//          g.anchor.x += (offset_w / 2f);
-//          g.anchor.y += (offset_h / 2f);
-//          g.anchor.z += (offset_d / 2f);
+//          g.translate.x += (offset_w / 2f);
+//          g.translate.y += (offset_h / 2f);
+//          g.translate.z += (offset_d / 2f);
 //        }
 //      }
 //      
@@ -371,9 +371,9 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //      
 //      if (centerGeom == true)
 //      {
-//        g.anchor.x -= (offset_w / 2f);
-//        g.anchor.y -= (offset_h / 2f);
-//        g.anchor.z -= (offset_d / 2f);
+//        g.translate.x -= (offset_w / 2f);
+//        g.translate.y -= (offset_h / 2f);
+//        g.translate.z -= (offset_d / 2f);
 //      }
 //    }
 //    else
@@ -385,9 +385,9 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //      if (centerGeom == true)
 //      {
 //        
-//        g.anchor.x += (offset_w / 2f);
-//        g.anchor.y += (offset_h / 2f);
-//        g.anchor.z += (offset_d / 2f);
+//        g.translate.x += (offset_w / 2f);
+//        g.translate.y += (offset_h / 2f);
+//        g.translate.z += (offset_d / 2f);
 //      }
 //    }
 //    
@@ -405,9 +405,9 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //    {
 //      case ONCE:
 //      {
-//        g.anchor.x = maxw;
-//        g.anchor.y = maxh;
-//        g.anchor.z = maxd;
+//        g.translate.x = maxw;
+//        g.translate.y = maxh;
+//        g.translate.z = maxd;
 //        this.remove = true;
 //        return;
 //      }
@@ -415,15 +415,15 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //        startNano += lengthNano;
 //        if (!isAbsolute)
 //        {
-//          g.anchor.x += minw;
-//          g.anchor.y += minh;
-//          g.anchor.z += mind;
+//          g.translate.x += minw;
+//          g.translate.y += minh;
+//          g.translate.z += mind;
 //        }
 //        else
 //        {
-//          g.anchor.x = minw;
-//          g.anchor.y = minh;
-//          g.anchor.z = mind;
+//          g.translate.x = minw;
+//          g.translate.y = minh;
+//          g.translate.z = mind;
 //        }
 //        return;
 //      case REVERSE:
@@ -433,30 +433,30 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //        {
 //          if (!isAbsolute)
 //          {
-//            g.anchor.x += minw;
-//            g.anchor.y += minh;
-//            g.anchor.z += mind;
+//            g.translate.x += minw;
+//            g.translate.y += minh;
+//            g.translate.z += mind;
 //          }
 //          else
 //          {
-//            g.anchor.x = minw;
-//            g.anchor.y = minh;
-//            g.anchor.z = mind;
+//            g.translate.x = minw;
+//            g.translate.y = minh;
+//            g.translate.z = mind;
 //          }
 //        }
 //        else
 //        {
 //          if (!isAbsolute)
 //          {
-//            g.anchor.x += maxw - this.centerOffset;
-//            g.anchor.y += maxh;
-//            g.anchor.z += maxd;
+//            g.translate.x += maxw - this.centerOffset;
+//            g.translate.y += maxh;
+//            g.translate.z += maxd;
 //          }
 //          else
 //          {
-//            g.anchor.x = maxw - this.centerOffset;
-//            g.anchor.y = maxh;
-//            g.anchor.z = maxd;
+//            g.translate.x = maxw - this.centerOffset;
+//            g.translate.y = maxh;
+//            g.translate.z = maxd;
 //            
 //          }
 //        }
@@ -494,15 +494,15 @@ public class BehaviorSize extends BehaviorGeomContinuous
 //    
 //    if (!isAbsolute)
 //    {
-//      g.anchor.x += offset_w  - this.centerOffset;
-//      g.anchor.y += offset_h;
-//      g.anchor.z += offset_d;
+//      g.translate.x += offset_w  - this.centerOffset;
+//      g.translate.y += offset_h;
+//      g.translate.z += offset_d;
 //    }
 //    else
 //    {
-//      g.anchor.x = offset_w; //  - this.centerOffset;
-//      g.anchor.y = offset_h;
-//      g.anchor.z = offset_d;
+//      g.translate.x = offset_w; //  - this.centerOffset;
+//      g.translate.y = offset_h;
+//      g.translate.z = offset_d;
 //      
 //    }
 //    

@@ -104,7 +104,7 @@ public class GeomCircle extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (outerRadius * Math.cos(Math.toRadians(angle)))),
           (float) (0 + (outerRadius * Math.sin(Math.toRadians(angle)))),
-          anchor.z //z
+          translate.z //z
           ));
         angle += inc;
 
@@ -114,7 +114,7 @@ public class GeomCircle extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (innerRadius * Math.cos(Math.toRadians(angle)))),
           (float) (0 + (innerRadius * Math.sin(Math.toRadians(angle)))),
-          anchor.z //z
+          translate.z //z
           ));
         angle -= inc;
       }
@@ -127,7 +127,7 @@ public class GeomCircle extends GeomPoly
       {
         this.vertices.add(new GeomPoint((float) (0 + (outerRadius * Math.cos(Math.toRadians(angle)))),
           (float) (0 + (outerRadius * Math.sin(Math.toRadians(angle)))),
-          anchor.z //z
+          translate.z //z
           ));
         angle += inc;
 
@@ -140,7 +140,7 @@ public class GeomCircle extends GeomPoly
         {
           this.vertices.add(new GeomPoint((float) (0 + (innerRadius * Math.cos(Math.toRadians(angle)))),
             (float) (0 + (innerRadius * Math.sin(Math.toRadians(angle)))),
-            anchor.z //z
+            translate.z //z
             ));
           angle -= inc;
         }
@@ -243,11 +243,11 @@ public class GeomCircle extends GeomPoly
       GeomPoint gp = vertices.get(i);
       double[] dubArr = new double[]
       {
-        (gp.anchor.x),
-        (gp.anchor.y),
-        (gp.anchor.z + offset),
-        (gp.anchor.x / (outerRadius * 2) + .5),
-        (gp.anchor.y / (outerRadius * 2) + .5)
+        (gp.translate.x),
+        (gp.translate.y),
+        (gp.translate.z + offset),
+        (gp.translate.x / (outerRadius * 2) + .5),
+        (gp.translate.y / (outerRadius * 2) + .5)
       //Utils.random(), Utils.random(), Utils.random()
       };
 
@@ -273,11 +273,11 @@ public class GeomCircle extends GeomPoly
       System.out.println("gp = " + gp);
       double[] dubArr = new double[]
       {
-        gp.anchor.x,
-        gp.anchor.y,
-        gp.anchor.z + offset,
-        (gp.anchor.x / (outerRadius * 2) + .5),
-        (gp.anchor.y / (outerRadius * 2) + .5)
+        gp.translate.x,
+        gp.translate.y,
+        gp.translate.z + offset,
+        (gp.translate.x / (outerRadius * 2) + .5),
+        (gp.translate.y / (outerRadius * 2) + .5)
       //Utils.random(), Utils.random(), Utils.random()
       };
 
@@ -298,11 +298,11 @@ public class GeomCircle extends GeomPoly
 
         double[] dubArr = new double[]
         {
-          (p3f.anchor.x),
-          (p3f.anchor.y),
-          ((p3f.anchor.z) + offset),
-          (p3f.anchor.x / (outerRadius * 2) + .5),
-          (p3f.anchor.y / (outerRadius * 2) + .5)
+          (p3f.translate.x),
+          (p3f.translate.y),
+          ((p3f.translate.z) + offset),
+          (p3f.translate.x / (outerRadius * 2) + .5),
+          (p3f.translate.y / (outerRadius * 2) + .5)
         };
 
         glu.gluTessVertex(tobj, dubArr, 0, dubArr);

@@ -55,7 +55,7 @@ public class BehaviorSine extends BehaviorGeomContinuous
     {
       float curY = getValFromSineWave(percentage); 
       
-      g.anchor.y += (curY - prevY);
+      g.translate.y += (curY - prevY);
 
       prevY = curY;
     }

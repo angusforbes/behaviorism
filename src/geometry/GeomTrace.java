@@ -90,7 +90,7 @@ public class GeomTrace extends GeomPoint
     //gl.glBegin(gl.GL_POINTS);
 
     //Point3f p3f1 = new Point3f(0f, 0f, 0f);
-    Point3f p3f1 = new Point3f(this.anchor);
+    Point3f p3f1 = new Point3f(this.translate);
     //synchronized(trace)
     {
       for (int i = 0; i < trace.size(); i++)
@@ -102,13 +102,13 @@ public class GeomTrace extends GeomPoint
       }
       gl.glEnd();
     }
-  //trace.add(new Point3f(0f - anchor.x, 0f - anchor.y, 0f - anchor.z));
+  //trace.add(new Point3f(0f - translate.x, 0f - translate.y, 0f - translate.z));
     /*
   gl.glColor4f(r, g, b, a);
   gl.glPointSize(this.pointSize);
 
   gl.glBegin(gl.GL_POINTS);
-  gl.glVertex3f(anchor.x, anchor.y , anchor.z);  //draws the point, it should be the point plus anchor
+  gl.glVertex3f(translate.x, translate.y , translate.z);  //draws the point, it should be the point plus translate
   gl.glEnd();
    */
   }

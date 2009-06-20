@@ -138,17 +138,17 @@ public class GeomSimpleText extends GeomRect
 
     if (this.rotateAnchor != null)
     {
-      this.rotateAnchor.anchor.x = this.w * .5f;
-      this.rotateAnchor.anchor.y = this.h * .5f;
+      this.rotateAnchor.translate.x = this.w * .5f;
+      this.rotateAnchor.translate.y = this.h * .5f;
     }
   }
 
   private void drawBounds(GL gl)
   {
     gl.glBegin(gl.GL_QUADS);
-    float x = anchor.x;
-    float y = anchor.y;
-    float z = anchor.z;
+    float x = translate.x;
+    float y = translate.y;
+    float z = translate.z;
 
     gl.glVertex3f(x, y, z);
     gl.glVertex3f(x + w, y, z);
