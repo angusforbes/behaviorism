@@ -18,7 +18,9 @@ public class GeomPath extends Geom
 
   public void draw(GL gl)
   {
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
+
+    //gl.glColor4f(r, g, b, a);
 
     //gl.glLineWidth(1f);
     gl.glBegin(gl.GL_LINE_STRIP);

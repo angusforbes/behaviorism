@@ -30,7 +30,9 @@ public class GeomGlutSphere extends Geom
   public void draw(GL gl)
   {
     gl.glLineWidth(1f);
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
+
+    //gl.glColor4f(r, g, b, a);
     if (isSolid == true)
     {
       BehaviorismDriver.renderer.glut.glutSolidSphere(radius, slices, stacks);

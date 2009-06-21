@@ -4,7 +4,6 @@ package geometry;
 import java.util.LinkedList;
 import java.util.List;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
 
 /*
@@ -80,7 +79,7 @@ public class GeomTrace extends GeomPoint
   public void draw(GL gl)
   {
     //System.out.println("in GeomTrace() : trace size = " + trace.size());
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
     //gl.glColor4f(1f, 1f, 1f, 1f);
     gl.glLineWidth(this.lineWidth);
 

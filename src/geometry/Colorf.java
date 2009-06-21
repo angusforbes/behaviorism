@@ -227,6 +227,11 @@ public class Colorf
     return new Colorf(nr, ng, nb, na);
   }
 
+  public Color toJavaColor()
+  {
+    return new Color(r, g, b, a);
+  }
+
   public static Color toJavaColor(Colorf c)
   {
     return new Color(c.r, c.g, c.b, c.a);

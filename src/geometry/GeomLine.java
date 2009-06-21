@@ -100,7 +100,8 @@ public class GeomLine extends Geom
 
     gl.glLineWidth(this.lineWidth);
 
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
+
     
     gl.glBegin(gl.GL_LINES);
     {

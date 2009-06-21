@@ -223,8 +223,10 @@ public class GeomEllipse extends GeomPoly
       
       gl.glDisable(GL.GL_DEPTH_TEST);
     }
-    
-    gl.glColor4f(r, g, b, a);
+
+    gl.glColor4fv(color.array(), 0);
+
+    //gl.glColor4f(r, g, b, a);
     
     if (startAngle == 0f && endAngle == 360f)
     {
@@ -312,7 +314,7 @@ public class GeomEllipse extends GeomPoly
   
   
   
-  
+ /*
   public void determineRotateAnchor(RotateEnum rotatePosition)
   {
     switch (rotatePosition)
@@ -323,6 +325,7 @@ public class GeomEllipse extends GeomPoly
     }
     
   }
+  */
   /*
   public void handleDoubleClick(MouseEvent me)
   {

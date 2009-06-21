@@ -160,7 +160,9 @@ public class GeomGluNurbsSurface extends Geom
 
 //    gl.glEnable(GL.GL_AUTO_NORMAL);
 //    gl.glDisable(GL.GL_BLEND);
-    gl.glColor4f(r, g, b, a);
+
+      gl.glColor4fv(color.array(), 0);
+    //gl.glColor4f(r, g, b, a);
     gl.glLineWidth(1);
 
     GLUnurbs nurbs = BehaviorismDriver.renderer.nurbsRenderer;

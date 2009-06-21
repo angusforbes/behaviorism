@@ -212,7 +212,7 @@ public class SceneGraph
         g.isTransformed = true;
       }
 
-      g.transform2(); //EXPERIMENTAL ONE
+      g.transform();
       BehaviorismDriver.renderer.currentWorld.layers.get(g.layerNum).attachedGeoms.add(g);
       traverseGeoms(gl, g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
 

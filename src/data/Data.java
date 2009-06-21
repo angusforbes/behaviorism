@@ -1,7 +1,6 @@
 /* Data.java (created on December 12, 2007, 5:39 PM) */
 package data;
 
-import geometry.BorderEnum;
 import geometry.Geom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -305,6 +304,7 @@ public class Data
     return null;
   }
 
+  /*
   public Geom makeShape(BorderEnum borderType) //to be overwritten by Data classes that can draw themselves
 
   {
@@ -312,4 +312,5 @@ public class Data
   //return null;
 
   }
+   */
 }

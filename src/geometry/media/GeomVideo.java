@@ -49,7 +49,9 @@ public class GeomVideo extends GeomRect
   {
     if (!updateTextures())
     {
-      gl.glColor4f(r, g, b, a);
+      gl.glColor4fv(color.array(), 0);
+
+    //  gl.glColor4f(r, g, b, a);
       this.textures.get(0).texture.bind();
       //this.texture.bind();
 

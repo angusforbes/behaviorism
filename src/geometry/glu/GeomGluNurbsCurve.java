@@ -101,7 +101,9 @@ public class GeomGluNurbsCurve extends Geom
       updateControlArray();
     }
 
-    gl.glColor4f(r, g, b, a);
+      gl.glColor4fv(color.array(), 0);
+
+    //gl.glColor4f(r, g, b, a);
     gl.glLineWidth(1);
 
     GLUnurbs nurbs = BehaviorismDriver.renderer.nurbsRenderer;

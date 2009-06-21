@@ -215,7 +215,11 @@ public class Renderer implements GLEventListener
 
   private void clearScreen()
   {
-    gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a); //background color of world
+    gl.glClearColor(
+      currentWorld.color.r,
+      currentWorld.color.g,
+      currentWorld.color.b,
+      currentWorld.color.a); //background color of world
     gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
   }
 
@@ -281,7 +285,7 @@ public class Renderer implements GLEventListener
     System.out.println("GLSL version = " + gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION));
 
     //gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);                    // Black Background
-    gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a);                    // Black Background
+  //  gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a);                    // Black Background
 
 //    gl.glEnable(gl.GL_LIGHT0);					// Enable Default Light (Quick And Dirty)	( NEW )
 //    //gl.glEnable(gl.GL_LIGHTING);				// Enable Lighting				( NEW )

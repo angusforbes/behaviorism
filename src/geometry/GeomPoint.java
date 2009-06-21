@@ -51,7 +51,8 @@ public class GeomPoint extends Geom
   
   public void draw(GL gl)
   {
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
+
     gl.glPointSize(this.pointSize);
     
     gl.glBegin(gl.GL_POINTS);

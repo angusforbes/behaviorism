@@ -103,7 +103,7 @@ public class BehaviorTranslate extends BehaviorGeomContinuous
   {
     if (isActive == true)
     {
-      g.move(offsets[0], offsets[1], offsets[2]);
+      g.translate(offsets[0], offsets[1], offsets[2]);
     }
   }
 }

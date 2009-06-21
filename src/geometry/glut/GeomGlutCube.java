@@ -25,7 +25,9 @@ public class GeomGlutCube extends Geom
 
   public void draw(GL gl)
   {
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
+
+    //gl.glColor4f(r, g, b, a);
     if (isSolid == true)
     {
       BehaviorismDriver.renderer.glut.glutSolidCube(length);

@@ -11,8 +11,6 @@ import javax.vecmath.Point3f;
 import behaviorism.BehaviorismDriver;
 import geometry.Colorf;
 import geometry.GeomRect;
-import geometry.RotateEnum;
-import geometry.ScaleEnum;
 import handlers.FontHandler;
 import java.util.Arrays;
 import java.util.List;
@@ -589,7 +587,7 @@ public class GeomTextOutset extends GeomRect
 
     //System.out.println("using textRenderer: " + this.textRenderer.getFont());
     textRenderer.begin3DRendering();
-    textRenderer.setColor(this.r, this.g, this.b, this.a);
+    textRenderer.setColor(color.toJavaColor());
     textRenderer.draw3D(this.text, useX, useY, offset, this.scaleVal);
     textRenderer.end3DRendering();
 

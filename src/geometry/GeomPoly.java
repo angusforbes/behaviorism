@@ -287,7 +287,7 @@ public class GeomPoly extends Geom
         double[] dubArr = new double[]{(float)(p3f.translate.x),
         (float)(p3f.translate.y),
         (float)(p3f.translate.z + offset),
-				r, g, b
+				color.r, color.g, color.b
 				
 				
 				};
@@ -357,8 +357,8 @@ public class GeomPoly extends Geom
   {
     GLU glu = BehaviorismDriver.renderer.glu;
 
-		gl.glColor4f(r, g, b, a);
-     
+		gl.glColor4fv(color.array(), 0);
+
     if (isConvex == true)
     {
 			drawConvex(gl, glu, offset);

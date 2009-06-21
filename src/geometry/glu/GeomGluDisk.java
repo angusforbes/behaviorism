@@ -42,7 +42,9 @@ public class GeomGluDisk extends Geom
   {
     GLU glu = BehaviorismDriver.renderer.glu;
 
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
+
+    //gl.glColor4f(r, g, b, a);
     glu.gluPartialDisk(BehaviorismDriver.renderer.quadricRenderer,
       this.innerRadius, this.outerRadius,
       this.resolution, this.resolution,

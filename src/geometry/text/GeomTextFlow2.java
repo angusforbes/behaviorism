@@ -2,13 +2,8 @@
 
 package geometry.text;
 
-import behaviorism.BehaviorismDriver;
 import behaviors.geom.continuous.BehaviorScale;
 import com.sun.opengl.util.j2d.TextRenderer;
-import geometry.text.GeomTextFlow;
-import geometry.RotateEnum;
-import geometry.ScaleEnum;
-import handlers.FontHandler;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
@@ -23,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
-import utils.RenderUtils;
 import utils.Utils;
 
 /**
@@ -414,8 +408,8 @@ public class GeomTextFlow2 extends GeomTextOutset
     GeomTextFlow gtf = new GeomTextFlow(x, y, z, w, h, text);
     gtf.setColor(1f, 1f, 1f, 1f);
     gtf.debugDrawBackground = true;
-    gtf.determineRotateAnchor(RotateEnum.CENTER);
-    gtf.determineScaleAnchor(ScaleEnum.CENTER);
+   // gtf.determineRotateAnchor(RotateEnum.CENTER);
+   // gtf.determineScaleAnchor(ScaleEnum.CENTER);
 
     GeomTextFlow gtf2 = new GeomTextFlow(-.35f, gtf.h / 8f, 0f, .36f, 1f, "\u201C");
     gtf2.setColor(1f, 1f, 1f, 1f);

@@ -138,8 +138,10 @@ public class GeomSimpleText extends GeomRect
 
     if (this.rotateAnchor != null)
     {
-      this.rotateAnchor.translate.x = this.w * .5f;
-      this.rotateAnchor.translate.y = this.h * .5f;
+      //this.rotateAnchor.translate.x = this.w * .5f;
+      //this.rotateAnchor.translate.y = this.h * .5f;
+      this.rotateAnchor.x = this.w * .5f;
+      this.rotateAnchor.y = this.h * .5f;
     }
   }
 
@@ -176,7 +178,8 @@ public class GeomSimpleText extends GeomRect
     }
 
     textRenderer.begin3DRendering();
-    textRenderer.setColor(r, g, b, a);
+    textRenderer.setColor(color.r, color.g, color.b, color.a);
+
     textRenderer.draw3D(text, leftMarginPx * scaleVal, (bottomMarginPx * scaleVal) + (metrics.getDescent() * scaleVal), (offset), scaleVal);
     textRenderer.end3DRendering();
   }

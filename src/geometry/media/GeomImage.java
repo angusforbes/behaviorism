@@ -204,7 +204,9 @@ public class GeomImage extends GeomRect
 
     }
 
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
+
+    //gl.glColor4f(r, g, b, a);
 
     //this.texture.enable();
     this.textures.get(0).texture.bind(); //assuming that we are using only one texture.

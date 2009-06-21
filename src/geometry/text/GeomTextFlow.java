@@ -379,8 +379,8 @@ public class GeomTextFlow extends GeomTextOutset
     GeomTextFlow gtf = new GeomTextFlow(x, y, z, w, h, text);
     gtf.setColor(1f, 1f, 1f, 1f);
     gtf.debugDrawBackground = true;
-    gtf.determineRotateAnchor(RotateEnum.CENTER);
-    gtf.determineScaleAnchor(ScaleEnum.CENTER);
+//    gtf.determineRotateAnchor(RotateEnum.CENTER);
+//    gtf.determineScaleAnchor(ScaleEnum.CENTER);
 
     GeomTextFlow gtf2 = new GeomTextFlow(-.35f, gtf.h / 8f, 0f, .36f, 1f, "\u201C");
     gtf2.setColor(1f, 1f, 1f, 1f);

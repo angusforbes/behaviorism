@@ -208,7 +208,9 @@ public class GeomCircle extends GeomPoly
 //    gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 //    gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
+
+    //gl.glColor4f(r, g, b, a);
     gl.glPushMatrix();
     gl.glScalef(1f, -1f, 1f);
 
@@ -318,6 +320,7 @@ public class GeomCircle extends GeomPoly
 
   }
 
+  /*
   public void determineRotateAnchor(RotateEnum rotatePosition)
   {
     switch (rotatePosition)
@@ -328,6 +331,7 @@ public class GeomCircle extends GeomPoly
     }
 
   }
+   */
   /*
   public void handleDoubleClick(MouseEvent me)
   {

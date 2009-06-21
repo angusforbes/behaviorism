@@ -85,7 +85,9 @@ public class GeomSimpleLine extends Geom
     //gl.glLineWidth(.5f);
     //gl.glLineWidth(2.5f);
 
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
+
+    //gl.glColor4f(r, g, b, a);
     gl.glBegin(gl.GL_LINES);
 
     //gl.glVertex3f(ends[0].translate.x + hx, ends[0].translate.y + hy, ends[0].translate.z + hz);

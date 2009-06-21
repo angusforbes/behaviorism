@@ -44,10 +44,10 @@ public class BehaviorRGBA extends BehaviorGeomContinuous
   {
     if (isActive == true)
     {
-      g.r += offsets[0];
-      g.g += offsets[1];
-      g.b += offsets[2];
-      g.a += offsets[3];
+      g.color.r += offsets[0];
+      g.color.g += offsets[1];
+      g.color.b += offsets[2];
+      g.color.a += offsets[3];
 
     }
 

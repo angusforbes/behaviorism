@@ -9,7 +9,6 @@
 package geometry;
 
 import algorithms.Corner;
-import renderers.State;
 import java.awt.geom.Rectangle2D;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
@@ -36,10 +35,13 @@ public class GeomRect extends Geom
   //public java.util.List<Corner> corners = Collections.synchronizedList(new ArrayList<Corner>());
   public java.util.List<Corner> corners = new Vector<Corner>();
 
+
+  //temp while we are cleaning stuff up... shouldn't be here...
   public GeomRect()
   {
     this.isSelectable = true;
   }
+  
 
   public GeomRect(Rectangle2D rect)
   {
@@ -51,6 +53,7 @@ public class GeomRect extends Geom
     this.isSelectable = true;
   }
 
+  /*
   public GeomRect(float x, float y, float z, float w, float h,
     ScaleEnum scaleDirection, RotateEnum rotatePosition)
   {
@@ -68,6 +71,7 @@ public class GeomRect extends Geom
     this.scale.y = 1f;
     this.scale.z = 1f;
   }
+  */
 
   public GeomRect(float x, float y, float z, float w, float h)
   {
@@ -102,6 +106,7 @@ public class GeomRect extends Geom
    * Or attach it yourself by grabbing it from the Geom itself
    * and calling addGeom(rotateAnchor.translate);
    */
+  /*
   @Override
   public void determineRotateAnchor(RotateEnum rotatePosition)
   {
@@ -173,7 +178,7 @@ public class GeomRect extends Geom
         break;
     }
   }
-
+  */
 
   public void debugPackingAlgorithm(GL gl)
   {
@@ -249,7 +254,7 @@ public class GeomRect extends Geom
     }
     
     
-    gl.glColor4f(r, g, b, a);
+    gl.glColor4fv(color.array(), 0);
     gl.glBegin(gl.GL_QUADS);
     gl.glVertex3f(0f, 0f, offset);
     gl.glVertex3f(w, 0f, offset);
@@ -372,7 +377,8 @@ public class GeomRect extends Geom
     this.w = w;
     this.h = h;
   }
-  
+
+  /*
   public static Geom createBorderGeomWithExactInset(Geom geom, BorderEnum borderType, 
     float exactInset, Colorf color)
   {
@@ -459,24 +465,6 @@ public class GeomRect extends Geom
         returnGeom.addGeom(geom, true);
         returnGeom.isSelectable = true; //true;
 
-
-        /*
-        
-        //add text
-        t_w = v1.w;
-        t_h = .35f * v1.h * .5f;
-        t_x = 0f;
-        t_y = 0f;
-        System.out.println("title = " + vd.title);
-        gt2 = new GeomText2(t_x, t_y, 0f, t_w, t_h, "" + vd.title);
-        gt2.backgroundColor = v1.backgroundColor; //background of entire bounds
-        gt2.setColor(1f,1f,1f,1f);
-        gt2.registerSelectableObject(gc2);
-        
-        v1.addGeom(gt2, true);
-        
-        
-         */
         //returnGeom = gc2;
         break;
 
@@ -562,37 +550,6 @@ public class GeomRect extends Geom
         returnGeom.registerClickableObject(geom);
         return returnGeom;
       //break;
-        /*
-      case NONE:
-      default:
-      insetw = (v1.w * .0f) ;
-      inseth = (v1.h * .0f) ;
-      gc2 = new GeomRect(-v1.w * .5f - insetw, -v1.h * .5f - inseth, 0f,
-      v1.w + (insetw * 2f), v1.h + (inseth * 2f));
-      v1.translate(insetw, inseth, 0f);
-      gc2.addGeom(v1, true);
-      gc2.isSelectable = true; //true;
-      
-      v1.registerSelectableObject(gc2);
-      gc2.registerClickableObject(v1);
-      v1.registerDraggableObject(gc2);
-      
-      //add text
-      t_w = v1.w;
-      t_h = .35f * v1.h * .5f;
-      t_x = 0f;
-      t_y = 0f;
-      gt2 = new GeomText2(t_x, t_y, 0f, t_w, t_h, vd.title);
-      //gt2.backgroundColor = v1.backgroundColor; //background of entire bounds
-      gt2.registerSelectableObject(gc2); //THIS IS CORRECT-- uncomment...
-      v1.addGeom(gt2, true);
-      
-      returnGeom = gc2;
-      break;
-      //Hmm, I should be able to forgo the above and just do the following two lines:
-      //v1.isSelectable = true;
-      //return v1;
-       */
     }
 
 
@@ -604,7 +561,7 @@ public class GeomRect extends Geom
     returnGeom.registerSelectableObject(geom);
     return returnGeom;
   }
-
+  */
     
   /** 
    * Creates a composite Geom by adding the origGeom on top of two GeomRects to build
@@ -621,6 +578,8 @@ public class GeomRect extends Geom
    * @param innerInsetColor
    * @return
    */
+
+  /*
   public static Geom createBorderGeomWithExactInset(Geom origGeom, BorderEnum borderType, 
     float outerExactInset, Colorf outerInsetColor, float innerExactInset, Colorf innerInsetColor)
   {
@@ -668,7 +627,8 @@ public class GeomRect extends Geom
     }
     return null; //error
   }
-
+  */
+  /*
   public static GeomRect createBorderGeomWithExactWidthAndHeightInset(Geom origGeom, BorderEnum borderType,
     float outerExactInsetW, float outerExactInsetH, Colorf outerInsetColor,
     float innerExactInsetW, float innerExactInsetH, Colorf innerInsetColor)
@@ -717,7 +677,8 @@ public class GeomRect extends Geom
     }
     return null; //error
   }
-
+  */
+  /*
   public static Geom createBorderGeom2_isActiveFalse(Geom geom, BorderEnum borderType, float insetPerc, Colorf color, float insetPerc2, Colorf color2)
   {
     Geom returnGeom = null;
@@ -788,7 +749,8 @@ public class GeomRect extends Geom
     }
     return geom;
   }
-  
+    */
+  /*
   public static Geom createBorderGeom2(Geom geom, BorderEnum borderType, float insetPerc, Colorf color, float insetPerc2, Colorf color2)
   {
     Geom returnGeom = null;
@@ -970,6 +932,7 @@ public class GeomRect extends Geom
     returnGeom.registerSelectableObject(geom);
     return returnGeom;
   }
+  */
 
   @Override
   public boolean checkIsCompletelyVisible()

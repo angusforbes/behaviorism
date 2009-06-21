@@ -30,7 +30,7 @@ public class EffectUtils {
 
 
         Behavior b2 = BehaviorRGBA.colorChange(startNano, lengthMS,
-                new Colorf(g.r, g.g, g.b, g.a));
+                new Colorf(g.color.r, g.color.g, g.color.b, g.color.a));
 
         g.attachBehavior(b2);
         g.setColor(0f, 0f, 0f, 0f);
@@ -79,7 +79,7 @@ public class EffectUtils {
         g.attachBehavior(b1);
 
         Behavior b2 = BehaviorRGBA.colorChange(startNano, lengthMS,
-                Colorf.distance(g.r, g.g, g.b, g.a,
+                Colorf.distance(g.color.r, g.color.g, g.color.b, g.color.a,
                 0f, 0f, 0f, 0f));
         g.attachBehavior(b2);
 
@@ -122,7 +122,7 @@ public class EffectUtils {
 
     public static void effectFadeOut(Geom g, long startNano, long lengthMS, boolean includeChildren) {
         Behavior b = BehaviorRGBA.colorChange(startNano, lengthMS,
-                Colorf.distance(g.r, g.g, g.b, g.a,
+                Colorf.distance(g.color.r, g.color.g, g.color.b, g.color.a,
                 0f, 0f, 0f, 0f));
         g.attachBehavior(b);
 
@@ -144,7 +144,7 @@ public class EffectUtils {
     public static void effectFadeIn(Geom g, long startNano, long lengthMS, boolean includeChildren) {
 
         Behavior b = BehaviorRGBA.colorChange(startNano, lengthMS,
-                new Colorf(g.r, g.g, g.b, g.a));
+                new Colorf(g.color.r, g.color.g, g.color.b, g.color.a));
 
         g.attachBehavior(b);
         g.setColor(0f, 0f, 0f, 0f);

@@ -44,7 +44,8 @@ public class CamBasic extends Cam
   public void initialize(Point3f anchorPt)
   {
     this.translate = new Point3f(anchorPt);
-    this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
+    //this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
+    this.rotateAnchor = new Point3f(0f, 0f, 0f);
     this.resetAnchor = new Point3f(anchorPt);
 
     setViewPlanes(1.0, 100.0);

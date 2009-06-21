@@ -163,15 +163,15 @@ public class GeomTextPath extends GeomPoly
     
 		//gl.glColor4f(1f, 0f, 0f, .5f);
 		//drawConvex(gl, glu, offset);
-		this.r = 1f;
-		this.g = 0f;
-		this.b = 0f;
-		this.a = .3f;
+		this.color.r = 1f;
+		this.color.g = 0f;
+		this.color.b = 0f;
+		this.color.a = .3f;
 		//drawTesselated(gl, glu, offset);
-		this.r = 1f;
-		this.g = 1f;
-		this.b = 1f;
-		this.a = 1f;
+		this.color.r = 1f;
+		this.color.g = 1f;
+		this.color.b = 1f;
+		this.color.a = 1f;
 
 		calculateUnrotatedPixelWidthAndHeight(gl);
 
@@ -222,7 +222,7 @@ public class GeomTextPath extends GeomPoly
 			gl.glRotatef(chunk.angle, 0f, 0f, 1f);
 
 			textRenderer.begin3DRendering();
-			textRenderer.setColor(this.r, this.g, this.b, this.a);
+			textRenderer.setColor(this.color.r, this.color.g, this.color.b, this.color.a);
 			textRenderer.draw3D(ch, pos, this.ypos, offset, this.scaleVal);
 			textRenderer.end3DRendering();
 
@@ -348,7 +348,7 @@ public class GeomTextPath extends GeomPoly
 		System.out.println("pxWidth / pxHeight = " + this.pxWidth + "/" + this.pxHeight);
 		
 		//to debug -- if all is well this should be in the center of the
-		//  screen and should NOT move at all during x/y translations rotations
+		//  screen and should NOT translate at all during x/y translations rotations
 		gl.glColor4f(1f,1f,1f,.5f);
 		gl.glBegin(gl.GL_POLYGON);
 		gl.glVertex3f(0f, 0f, 0f);

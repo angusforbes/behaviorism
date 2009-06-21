@@ -9,6 +9,15 @@ import behaviors.geom.discrete.BehaviorIsPaused;
 abstract public class Behavior
 {
 
+   /**
+   * A name for this Behavior. Does not need to be unique.
+   */
+  public String name = null;
+  /**
+   * A unique id for this Behavior.
+   */
+  public String id = null; //not currently used...
+
   public static boolean debugBehaviors = false;    //public boolean remove = false;
   public boolean isDone = false;
   public boolean isPaused = false;
@@ -453,11 +462,16 @@ abstract public class Behavior
    * Internally, a behavior is attached to the Geom's rotateAnchor which is exactly the same as
    * "bl", except that the x range = -1f instead of 1f.
    */
+  //This method should be put somewhere else! Also, need to handle the rotation anchor prpoerly,
+  //since I removed the determineRotateAnchor method!
+  //also I made rotateAnchor be a Point3f instead of a GeomPoint
+
   public static void compositeSpiralSpringBehavior(
     Point3f rotateOffset, BehaviorContinuous br, BehaviorContinuous bl, BehaviorContinuous bs,
     Geom geom) //should work for any Geom
   {
-    geom.determineRotateAnchor(rotateOffset);
+    /*
+    //geom.determineRotateAnchor(rotateOffset);
 
     Behavior rotateAnchorBehaviorLine3D = behaviors.geom.continuous.BehaviorTranslate.translate(
       bl.startTime,
@@ -469,19 +483,17 @@ abstract public class Behavior
 
     rotateAnchorBehaviorLine3D.aps = bl.aps;
 
-    /*
-    geom.rotateAnchor.scale = new Point3f(1f, 1f, 1f);
-    BehaviorScale rotateAnchorBehaviorScale3D = new BehaviorScale(
-    bs.startTime, 
-    Utils.nanosToMillis(bs.lengthNano),
-    bs.loopBehavior, 
-    1f, 1f, 0f, //range of line
-    1f/(bs.range_x + 1f), 1f/(bs.range_y + 1f), 0f //range of line
-    );
     
-    
-    rotateAnchorBehaviorScale3D.aps = bs.aps;
-     */
+//    geom.rotateAnchor.scale = new Point3f(1f, 1f, 1f);
+//    BehaviorScale rotateAnchorBehaviorScale3D = new BehaviorScale(
+//    bs.startTime,
+//    Utils.nanosToMillis(bs.lengthNano),
+//    bs.loopBehavior,
+//    1f, 1f, 0f, //range of line
+//    1f/(bs.range_x + 1f), 1f/(bs.range_y + 1f), 0f //range of line
+//    );
+//    rotateAnchorBehaviorScale3D.aps = bs.aps;
+     
     geom.attachBehavior(br);
     geom.attachBehavior(bl);
     if (bs != null) {
@@ -489,10 +501,25 @@ abstract public class Behavior
     }
     geom.rotateAnchor.attachBehavior(rotateAnchorBehaviorLine3D);
   //geom.rotateAnchor.attachBehavior(rotateAnchorBehaviorScale3D);
+     */
   }
 
+   @Override
   public String toString()
   {
-    return "this is a Behavior of type " + getClass();
+    String str = "" + getClass() + " : ";
+    if (name != null)
+    {
+      str += "name=" + name + " : ";
+    }
+    if (id != null)
+    {
+      str += "id=" + id + " : ";
+    }
+
+    str += "lengthMS=" + Utils.nanosToMillis(lengthNano) + ", percentage="+percentage + ", dir="+ direction +
+      " loop="+loopBehavior;
+    return str;
   }
+
 }
