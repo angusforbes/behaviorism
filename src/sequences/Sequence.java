@@ -1,7 +1,7 @@
 package sequences;
 
-import behaviorism.BehaviorismDriver;
 import java.util.List;
+import utils.RenderUtils;
 import worlds.World;
 
 /**
@@ -46,7 +46,7 @@ abstract public class Sequence
 					{
 						Sequence s = sequences.get(i);
 
-						if (BehaviorismDriver.renderer.currentWorld.isPaused == true)
+						if (RenderUtils.getWorld().isPaused == true)
 						{
 							//System.out.println("paused!");
 							if (s.pauseNano == -1)

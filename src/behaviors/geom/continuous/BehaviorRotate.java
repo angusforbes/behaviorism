@@ -49,9 +49,9 @@ public class BehaviorRotate extends BehaviorGeomContinuous
   {
     if (isActive == true)
     {
-      g.rotate.x += offsets[0];
-      g.rotate.y += offsets[1];
-      g.rotate.z += offsets[2];
+      g.rotateX(offsets[0]);
+      g.rotateY(offsets[1]);
+      g.rotateZ(offsets[2]);
     }
   }
 

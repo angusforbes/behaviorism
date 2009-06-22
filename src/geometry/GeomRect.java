@@ -76,10 +76,8 @@ public class GeomRect extends Geom
   {
     super(x, y+h);
 
-    Point3f upperright = MatrixUtils.toPoint3f(
-      RenderUtils.rayIntersect(Renderer.getInstance().currentWorld,
-      x + w, y));
-
+    Point3f upperright = MatrixUtils.pixelToWorld(x+w, y);
+      
     this.w = upperright.x - translate.x;
     this.h = upperright.y - translate.y;
 
@@ -100,14 +98,6 @@ public class GeomRect extends Geom
     this.isSelectable = true;
     this.w = w;
     this.h = h;
-  }
-
-  public void pixelToWorld(int x, int y, int w, int h)
-  {
-  }
-
-  public void pixelHeight(int h)
-  {
   }
   /* Sets an translate point connected to the Geom to be rotated around.
    * This rotateAnchor point is not attached to the scene graph, so attaching behaviors will have

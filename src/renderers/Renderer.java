@@ -4,20 +4,17 @@
  */
 package renderers;
 
+import behaviorism.Behaviorism;
 import renderers.cameras.Cam;
-import behaviorism.BehaviorismDriver;
 import handlers.MouseHandler;
 import handlers.KeyboardHandler;
 import geometry.GeomPoint;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.*;
 import com.sun.opengl.util.*;
-import com.sun.opengl.util.j2d.TextRenderer;
 import java.awt.geom.Rectangle2D;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
-import handlers.FontHandler;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +168,7 @@ public class Renderer implements GLEventListener
   {
     gl.glMatrixMode(gl.GL_PROJECTION);
     gl.glLoadIdentity();
-    glu.gluOrtho2D(0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight, 0);
+    glu.gluOrtho2D(0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight, 0);
 
     gl.glMatrixMode(gl.GL_MODELVIEW);
     gl.glLoadIdentity();
@@ -179,7 +176,7 @@ public class Renderer implements GLEventListener
 
   private boolean isReady(GLAutoDrawable drawable)
   {
-    if (BehaviorismDriver.doneShutdown.get() == true) //then we are in the process of closing the openGL context
+    if (Behaviorism.getInstance().doneShutdown.get() == true) //then we are in the process of closing the openGL context
     {
       return false;
     }
@@ -231,7 +228,7 @@ public class Renderer implements GLEventListener
       w.cleanUp();
     }
     System.err.println("in RendererJogl : we have disposed of all resources... ");
-    BehaviorismDriver.doneShutdown.set(true);
+    Behaviorism.getInstance().doneShutdown.set(true);
   }
 
   @Override
@@ -256,7 +253,7 @@ public class Renderer implements GLEventListener
     //that screen has been reshaped.
     boundsHaveChanged = false;
 
-    if (BehaviorismDriver.isShutdown.get() == true)
+    if (Behaviorism.getInstance().isShutdown.get() == true)
     {
       shutdown();
     }
@@ -370,8 +367,8 @@ public class Renderer implements GLEventListener
     height = (height == 0) ? 1 : height;
 
     //don't really want to bother with this... just update the viewport...
-    BehaviorismDriver.canvasWidth = width;
-    BehaviorismDriver.canvasHeight = height;
+    Behaviorism.getInstance().canvasWidth = width;
+    Behaviorism.getInstance().canvasHeight = height;
 
     this.cam.setViewport(0,0,width, height);
 

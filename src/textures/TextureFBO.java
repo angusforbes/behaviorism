@@ -1,7 +1,7 @@
 /* TextureFBO.java ~ Jun 4, 2009 */
 package textures;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import com.sun.opengl.util.texture.TextureIO;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
@@ -27,7 +27,7 @@ public class TextureFBO extends TextureImage
   @Override
   public boolean updateTexture()
   {
-    //if (BehaviorismDriver.renderer.boundsHaveChanged == true || texture == null) //texture needs to be intialized
+    //if (Behaviorism.renderer.boundsHaveChanged == true || texture == null) //texture needs to be intialized
     if ( texture == null) //texture needs to be intialized
     {
       System.out.println("reinitialize!!!!!!!!!");
@@ -66,7 +66,7 @@ public class TextureFBO extends TextureImage
 
     // we are finished drawing to our FBO, so unbind it and return to our original viewport, etc
     gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight); //(int) renderHeight);
+    gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight); //(int) renderHeight);
   }
 
   @Override

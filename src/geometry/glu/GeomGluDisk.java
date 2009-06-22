@@ -2,11 +2,11 @@
 
 package geometry.glu;
 
-import behaviorism.BehaviorismDriver;
 import geometry.Geom;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
+import renderers.Renderer;
 
 /**
  *
@@ -40,12 +40,12 @@ public class GeomGluDisk extends Geom
 
   public void draw(GL gl)
   {
-    GLU glu = BehaviorismDriver.renderer.glu;
+    GLU glu = Renderer.getInstance().glu;
 
     gl.glColor4fv(color.array(), 0);
 
     //gl.glColor4f(r, g, b, a);
-    glu.gluPartialDisk(BehaviorismDriver.renderer.quadricRenderer,
+    glu.gluPartialDisk(Renderer.getInstance().quadricRenderer,
       this.innerRadius, this.outerRadius,
       this.resolution, this.resolution,
       this.startAngle, this.endAngle - this.startAngle);

@@ -1,7 +1,7 @@
 /* BehaviorDiscrete.java ~ Aug 14, 2008 */
 package behaviors;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -315,7 +315,7 @@ abstract public class BehaviorDiscrete extends Behavior
      */
     
     //System.out.println("I am registered...");
-    //BehaviorismDriver.renderer.currentWorld.registerBehavior(this);
+    //Behaviorism.renderer.currentWorld.registerBehavior(this);
 
   //reverseLengthNanos(lengthNano, lengthNanos);
   }
@@ -345,7 +345,7 @@ abstract public class BehaviorDiscrete extends Behavior
   
   setAccelerationPoints(builder.accelerationPoints);
   
-  BehaviorismDriver.renderer.currentWorld.registerBehavior(this);
+  Behaviorism.renderer.currentWorld.registerBehavior(this);
   }
    */
 }

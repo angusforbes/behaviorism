@@ -2,11 +2,11 @@
 
 package geometry.glu;
 
-import behaviorism.BehaviorismDriver;
 import geometry.Geom;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
+import renderers.Renderer;
 
 /**
  *
@@ -40,7 +40,7 @@ public class GeomGluSphere extends Geom
 
   public void draw(GL gl)
   {
-      GLU glu = BehaviorismDriver.renderer.glu;
+      GLU glu = Renderer.getInstance().glu;
 
       gl.glColor4fv(color.array(), 0);
 

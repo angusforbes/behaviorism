@@ -10,6 +10,7 @@ import java.util.Arrays;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3d;
 import javax.vecmath.SingularMatrixException;
+import renderers.Renderer;
 
 /** 
  * This class contains static utility methods having to do with matrix manipulations. 
@@ -288,6 +289,14 @@ public class MatrixUtils
     return da;
   }
 
+  //this works, but the rayIntersect method is kind fo confusing... maybe clean it up sometime?
+  public static Point3f pixelToWorld(int x, int y)
+  {
+    return MatrixUtils.toPoint3f(
+        RenderUtils.rayIntersect(
+          RenderUtils.getWorld(), x, y)
+      );
+  }
   public static double[] getIdentity()
   {
     Matrix4d m4d = new Matrix4d();

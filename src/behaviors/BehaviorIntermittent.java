@@ -2,8 +2,8 @@
 
 package behaviors;
 
-import behaviorism.BehaviorismDriver;
 import java.util.List;
+import utils.RenderUtils;
 
 /**
  *
@@ -241,8 +241,8 @@ public class BehaviorIntermittent extends BehaviorDiscrete
     this.startTime = startNano; //nothing will happen before the startTime
      */
     
-    System.out.println("I am registered...");
-    BehaviorismDriver.renderer.currentWorld.registerBehavior(this);
+    //System.out.println("I am registered...");
+    //RenderUtils.getWorld().registerBehavior(this);
 
   //reverseLengthNanos(lengthNano, lengthNanos);
   }

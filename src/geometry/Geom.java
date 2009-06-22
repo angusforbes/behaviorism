@@ -154,14 +154,7 @@ public abstract class Geom
    */
   public Geom(int x, int y)
   {
-    setTranslate(
-      MatrixUtils.toPoint3f(
-        RenderUtils.rayIntersect(
-          Renderer.getInstance().currentWorld, x, y)
-          //Renderer.getInstance().getCamera(), x, y)
-        )
-      );
-
+    setTranslate(MatrixUtils.pixelToWorld(x,y));
   }
 
   public Geom(float x, float y, float z)

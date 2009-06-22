@@ -1,6 +1,6 @@
 package geometry;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3f;
 import utils.GeomUtils;
+import utils.RenderUtils;
 import utils.Utils;
 
 public class GeomPoly extends Geom
@@ -268,7 +269,7 @@ public class GeomPoly extends Geom
 	protected void drawTesselated(GL gl, GLU glu, float offset)
 	{
 
-      GLUtessellator tobj = BehaviorismDriver.renderer.tessellationObject;
+      GLUtessellator tobj = RenderUtils.getRenderer().tessellationObject;
       
       if (tobj == null)
       {
@@ -355,7 +356,7 @@ public class GeomPoly extends Geom
 	
   public void draw(GL gl)
   {
-    GLU glu = BehaviorismDriver.renderer.glu;
+    GLU glu = RenderUtils.getRenderer().glu;
 
 		gl.glColor4fv(color.array(), 0);
 
@@ -398,7 +399,7 @@ public class GeomPoly extends Geom
     else //is not a convex polygon, if we aren't sure-- just assume that it is not...
     {
       //FIX THIS LATER-- after fixing main part above-- just needs to return a valid translate point
-      GLUtessellator tobj = BehaviorismDriver.renderer.tessellationObject;
+      GLUtessellator tobj = Behaviorism.renderer.tessellationObject;
       
       if (tobj == null)
       {

@@ -4,7 +4,7 @@
  */
 package handlers;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import renderers.Renderer;
 import geometry.Geom;
 import java.awt.Point;
@@ -124,7 +124,7 @@ public class MouseHandler extends MouseAdapter
 
     Point2D.Float ptPixel = new Point2D.Float((float) mx, (float) my);
 
-    Geom testMouseOverGeom = selectPossibleGeom(BehaviorismDriver.renderer.currentWorld.geoms, ptPixel);
+    Geom testMouseOverGeom = selectPossibleGeom(RenderUtils.getWorld().geoms, ptPixel);
     if (testMouseOverGeom != null)
     {
       mouseOverGeom = testMouseOverGeom.mouseoverableObject;
@@ -154,7 +154,7 @@ public class MouseHandler extends MouseAdapter
 
     Point2D.Float ptPixel = new Point2D.Float((float) mx, (float) my);
 
-    pickGeom(BehaviorismDriver.renderer.currentWorld.geoms, ptPixel);
+    pickGeom(RenderUtils.getWorld().geoms, ptPixel);
 
     if (selectedGeom != null)
     {
@@ -220,7 +220,7 @@ public class MouseHandler extends MouseAdapter
 
   private /*static*/ void dragCamera()
   {
-    Cam cam = BehaviorismDriver.renderer.getCamera();
+    Cam cam = RenderUtils.getCamera();
     int xDif = mx - pre_mx;
     int yDif = my - pre_my;
 
@@ -337,7 +337,7 @@ public class MouseHandler extends MouseAdapter
   //this was commented out before, so it might cause problems
   //but in principle it is the right thing to do!
 
-  //BehaviorismDriver.renderer.currentWorld.adjustZOrder(selectedGeom);
+  //Behaviorism.renderer.currentWorld.adjustZOrder(selectedGeom);
   }
 
   /**
@@ -439,7 +439,7 @@ public class MouseHandler extends MouseAdapter
       ps.x = selectedGeom.draggableObject.translate.x;
       ps.y = selectedGeom.draggableObject.translate.y;
       ps.z = selectedGeom.draggableObject.translate.z;
-      BehaviorismDriver.renderer.cam.CameraMove(ps);
+      Behaviorism.renderer.cam.CameraMove(ps);
        */
 
       }
@@ -542,12 +542,12 @@ public class MouseHandler extends MouseAdapter
     if (notches < 0) //moved up 
     {
       //System.out.println("up");
-      BehaviorismDriver.renderer.getCamera().translateZ(notches * 0.05f);
+      RenderUtils.getCamera().translateZ(notches * 0.05f);
     }
     else //moved down
     {
       //System.out.println("down");
-      BehaviorismDriver.renderer.getCamera().translateZ(notches * 0.05f);
+      RenderUtils.getCamera().translateZ(notches * 0.05f);
     }
   }
 }

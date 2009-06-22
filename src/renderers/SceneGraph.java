@@ -1,8 +1,8 @@
 package renderers;
 
+import behaviorism.Behaviorism;
 import renderers.layers.RendererLayer;
 import behaviors.Behavior;
-import behaviorism.BehaviorismDriver;
 import handlers.MouseHandler;
 import behaviors.geom.GeomUpdater;
 import com.sun.opengl.util.j2d.TextRenderer;
@@ -12,7 +12,6 @@ import java.util.List;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
 import handlers.FontHandler;
-import java.awt.Font;
 import java.util.Map;
 import sequences.Sequence;
 import utils.RenderUtils;
@@ -139,10 +138,10 @@ public class SceneGraph
     updateCameraBehavior();
 
     // execute high=level sequences
-    Sequence.executeSequences(BehaviorismDriver.renderer.currentWorld.sequences, this.currentNano);
+    Sequence.executeSequences(RenderUtils.getWorld().sequences, this.currentNano);
 
     // clear layers -- bleh (think about...)
-    for (Map.Entry<Integer, RendererLayer> entry : BehaviorismDriver.renderer.currentWorld.layers.entrySet())
+    for (Map.Entry<Integer, RendererLayer> entry : RenderUtils.getWorld().layers.entrySet())
     {
       RendererLayer layer = entry.getValue();
       layer.attachedGeoms.clear(); //can we do this only if there is an actual change?
@@ -153,12 +152,12 @@ public class SceneGraph
 //      BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed,
 //      offset);
     List worldGeom = new ArrayList();
-    worldGeom.add(BehaviorismDriver.renderer.currentWorld);
+    worldGeom.add(RenderUtils.getWorld());
     traverseGeoms(gl, worldGeom,
-      BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed,
+      RenderUtils.getWorld().isTransformed || RenderUtils.getCamera().isTransformed,
       offset);
-    BehaviorismDriver.renderer.currentWorld.isTransformed = false;
-    BehaviorismDriver.renderer.cam.isTransformed = false;
+    RenderUtils.getWorld().isTransformed = false;
+    RenderUtils.getCamera().isTransformed = false;
 
     //iterate through layers and render each element to screen.
     drawGeoms(gl);
@@ -166,14 +165,14 @@ public class SceneGraph
 
   private void updateCameraBehavior()
   {
-    Geom cam = BehaviorismDriver.renderer.getCamera();
+    Geom cam = RenderUtils.getCamera();
 
     if (cam == null)
     {
       return;
     }
 
-    if (BehaviorismDriver.renderer.currentWorld.isPaused != true)
+    if (RenderUtils.getWorld().isPaused != true)
     {
       for (int i = cam.behaviors.size() - 1; i >= 0; i--)
       {
@@ -194,7 +193,7 @@ public class SceneGraph
       }
     }
 
-    BehaviorismDriver.renderer.setPerspective3D();
+    RenderUtils.getRenderer().setPerspective3D();
   }
 
   private void traverseGeoms(GL gl, List<Geom> geoms, boolean parentTransformed, float prevOffset) //, long currentNano, int level, float prevOffset)
@@ -213,7 +212,7 @@ public class SceneGraph
       }
 
       g.transform();
-      BehaviorismDriver.renderer.currentWorld.layers.get(g.layerNum).attachedGeoms.add(g);
+      RenderUtils.getWorld().layers.get(g.layerNum).attachedGeoms.add(g);
       traverseGeoms(gl, g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
 
       g.isTransformed = false;
@@ -244,7 +243,7 @@ public class SceneGraph
 
 
     invisiblePickingGeoms.clear();
-    for (Map.Entry<Integer, RendererLayer> entry : BehaviorismDriver.renderer.currentWorld.layers.entrySet())
+    for (Map.Entry<Integer, RendererLayer> entry : RenderUtils.getWorld().layers.entrySet())
     {
       //System.out.println("layer at pos " + entry.getKey() + " has " + entry.getValue().attachedGeoms.size() + " entries.");
       RendererLayer layer = entry.getValue();
@@ -424,7 +423,7 @@ public class SceneGraph
   {
     gl.glPushMatrix();
     {
-      gl.glLoadMatrixd(BehaviorismDriver.renderer.cam.modelview, 0);
+      gl.glLoadMatrixd(RenderUtils.getCamera().modelview, 0);
 
       float minx = -5f,
         miny = -5f;
@@ -479,22 +478,22 @@ public class SceneGraph
     }
 
     //Set to orthographic projectionMatrix
-    BehaviorismDriver.renderer.setPerspective2D();
+    RenderUtils.getRenderer().setPerspective2D();
 
     //draw selected debugging info
-    if (SceneGraph.drawDebugFrameRate == true)
+    if (drawDebugFrameRate == true)
     {
-      BehaviorismDriver.viz.drawFrameRate(gl);
+      drawFrameRate(gl);
     }
 
-    if (SceneGraph.drawDebugMouseDraggedPoint == true)
+    if (drawDebugMouseDraggedPoint == true)
     {
-      BehaviorismDriver.viz.drawDebugSelectPoint(gl);
+      drawDebugSelectPoint(gl);
     }
 
     if (SceneGraph.drawDebugMouseMovedPoint == true)
     {
-      BehaviorismDriver.viz.drawDebugMousePoint(gl);
+      drawDebugMousePoint(gl);
     }
   }
 
@@ -551,7 +550,7 @@ public class SceneGraph
 
     TextRenderer debugTextRenderer = FontHandler.getInstance().getDefaultFont(18);
 
-    debugTextRenderer.beginRendering(BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
+    debugTextRenderer.beginRendering(Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
     debugTextRenderer.setColor(1f, 1f, 1f, 1f);
     debugTextRenderer.draw("fps: " + this.fps, 5, 5);
     debugTextRenderer.endRendering();

@@ -4,11 +4,12 @@
  */
 package handlers;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import renderers.SceneGraph;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import renderers.cameras.Cam;
+import utils.RenderUtils;
 
 /** 
  * KeyboardHandler is a wrapper for KeyListener supporting various modes
@@ -152,12 +153,12 @@ public class KeyboardHandler implements KeyListener
     if (keys[KeyEvent.VK_C])
     {
       System.err.println("********* RESET **********");
-      BehaviorismDriver.renderer.currentWorld.reset();
+      RenderUtils.getWorld().reset();
       return;
     }
     if (keys[KeyEvent.VK_ESCAPE])
     {
-      BehaviorismDriver.shutDown();
+      Behaviorism.getInstance().shutDown();
       //RendererJogl.animator.stop();
       //System.exit(0);
       return;
@@ -166,7 +167,7 @@ public class KeyboardHandler implements KeyListener
     {
       if (keysPressing[KeyEvent.VK_SPACE] == false)
       {
-        BehaviorismDriver.viz.isStepping = !BehaviorismDriver.viz.isStepping;
+        SceneGraph.getInstance().isStepping = !SceneGraph.getInstance().isStepping;
 
         g_keyMode = ModeEnum.MODE_STEP;
 
@@ -179,7 +180,7 @@ public class KeyboardHandler implements KeyListener
     {
       if (keysPressing[KeyEvent.VK_R] == false)
       {
-        BehaviorismDriver.viz.reverse = true;
+        SceneGraph.getInstance().reverse = true;
         keysPressing[KeyEvent.VK_R] = true;
       }
       return;
@@ -187,9 +188,9 @@ public class KeyboardHandler implements KeyListener
 
     //check world-specific keys. if any world-specific keys were pressed, return so that we don't try to
     //apply that key to a mode-specific action.
-    if (BehaviorismDriver.renderer.currentWorld != null)
+    if (RenderUtils.getWorld() != null)
     {
-      if (BehaviorismDriver.renderer.currentWorld.checkKeys(keys, keysPressing))
+      if (RenderUtils.getWorld().checkKeys(keys, keysPressing))
       {
         return;
       }
@@ -301,7 +302,7 @@ public class KeyboardHandler implements KeyListener
   public /*static*/ void check_keyPressedCam()
   {
     //MouseHandler.handleCam = true;
-    Cam cam = BehaviorismDriver.renderer.getCamera();
+    Cam cam = RenderUtils.getCamera();
 
     if (keys[KeyEvent.VK_UP])
     {
@@ -543,7 +544,7 @@ public class KeyboardHandler implements KeyListener
     {
       if (keysPressing[KeyEvent.VK_ENTER] == false)
       {
-        BehaviorismDriver.viz.isStepping = !BehaviorismDriver.viz.isStepping;
+        SceneGraph.getInstance().isStepping = !SceneGraph.getInstance().isStepping;
         keysPressing[KeyEvent.VK_ENTER] = true;
       }
     }
@@ -551,13 +552,13 @@ public class KeyboardHandler implements KeyListener
     {
       if (keys[KeyEvent.VK_LEFT])
       {
-        BehaviorismDriver.viz.step = -1; //-= 1;
+        SceneGraph.getInstance().step = -1; //-= 1;
       }
       else
       {
         if (keys[KeyEvent.VK_RIGHT])
         {
-          BehaviorismDriver.viz.step = 1; //+= 1;
+          SceneGraph.getInstance().step = 1; //+= 1;
         }
         else
         {
@@ -565,7 +566,7 @@ public class KeyboardHandler implements KeyListener
           {
             //if (keysPressing[KeyEvent.VK_UP] == false)
             {
-              BehaviorismDriver.viz.stepSize += 1L;
+              SceneGraph.getInstance().stepSize += 1L;
             //keysPressing[KeyEvent.VK_UP] = true;
             }
           }
@@ -575,10 +576,10 @@ public class KeyboardHandler implements KeyListener
             {
               //if (keysPressing[KeyEvent.VK_DOWN] == false)
               {
-                BehaviorismDriver.viz.stepSize -= 1L;
-                if (BehaviorismDriver.viz.stepSize <= 1L)
+                SceneGraph.getInstance().stepSize -= 1L;
+                if (SceneGraph.getInstance().stepSize <= 1L)
                 {
-                  BehaviorismDriver.viz.stepSize = 1L;
+                  SceneGraph.getInstance().stepSize = 1L;
                 }
 
               //keysPressing[KeyEvent.VK_DOWN] = true;
@@ -586,7 +587,7 @@ public class KeyboardHandler implements KeyListener
             }
             else
             {
-              BehaviorismDriver.viz.step = 0;
+              SceneGraph.getInstance().step = 0;
             }
           }
         }

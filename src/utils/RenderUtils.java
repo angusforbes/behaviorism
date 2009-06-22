@@ -1,7 +1,7 @@
 /* RenderUtils.java ~ Jun 18, 2009 */
 package utils;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import geometry.Geom;
 import geometry.GeomPoint;
 import geometry.GeomPoly;
@@ -17,6 +17,7 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import renderers.Renderer;
 import renderers.cameras.Cam;
+import worlds.World;
 
 /**
  *
@@ -150,14 +151,16 @@ public class RenderUtils
 
   public static Renderer getRenderer()
   {
-    return BehaviorismDriver.renderer;
+    return Renderer.getInstance();
   }
-
+  public static World getWorld()
+  {
+    return getRenderer().currentWorld;
+  }
   public static Cam getCamera()
   {
-    return BehaviorismDriver.renderer.currentWorld.cam;
+    return getWorld().cam;
   }
-
   public static double[] getModelview()
   {
     return getCamera().modelview;
@@ -579,7 +582,7 @@ public class RenderUtils
       projection, 0,
       viewport, 0,
       screenCoords, 0);
-    p2f.moveTo((float) screenCoords[0], (float) (BehaviorismDriver.canvasHeight - screenCoords[1]));
+    p2f.moveTo((float) screenCoords[0], (float) (Behaviorism.getInstance().canvasHeight - screenCoords[1]));
     //System.out.print(" " + screenCoords[2]);
 
     rj.glu.gluProject(hx + g.w, hy, hz,
@@ -587,7 +590,7 @@ public class RenderUtils
       projection, 0,
       viewport, 0,
       screenCoords, 0);
-    p2f.lineTo((float) screenCoords[0], (float) (BehaviorismDriver.canvasHeight - screenCoords[1]));
+    p2f.lineTo((float) screenCoords[0], (float) (Behaviorism.getInstance().canvasHeight - screenCoords[1]));
     //System.out.print(" " + screenCoords[2]);
 
     rj.glu.gluProject(hx + g.w, hy + g.h, hz,
@@ -595,7 +598,7 @@ public class RenderUtils
       projection, 0,
       viewport, 0,
       screenCoords, 0);
-    p2f.lineTo((float) screenCoords[0], (float) (BehaviorismDriver.canvasHeight - screenCoords[1]));
+    p2f.lineTo((float) screenCoords[0], (float) (Behaviorism.getInstance().canvasHeight - screenCoords[1]));
     //System.out.print(" " + screenCoords[2]);
 
     rj.glu.gluProject(hx, hy + g.h, hz,
@@ -603,7 +606,7 @@ public class RenderUtils
       projection, 0,
       viewport, 0,
       screenCoords, 0);
-    p2f.lineTo((float) screenCoords[0], (float) (BehaviorismDriver.canvasHeight - screenCoords[1]));
+    p2f.lineTo((float) screenCoords[0], (float) (Behaviorism.getInstance().canvasHeight - screenCoords[1]));
     //System.out.print(" " + screenCoords[2]);
 
     p2f.closePath();
@@ -633,7 +636,7 @@ public class RenderUtils
       projection, 0,
       viewport, 0,
       windowCoords, 0);
-    p2f.moveTo((float) windowCoords[0], (float) (BehaviorismDriver.canvasHeight - windowCoords[1]));
+    p2f.moveTo((float) windowCoords[0], (float) (Behaviorism.getInstance().canvasHeight - windowCoords[1]));
 
     //System.out.println("g.verts.size = " + g.selectableBoundary.size());
     for (int i = 1; i < g.vertices.size(); i++) //for (int i = 1; i < g.selectableBoundary.size(); i++)
@@ -646,7 +649,7 @@ public class RenderUtils
         projection, 0,
         viewport, 0,
         windowCoords, 0);
-      p2f.lineTo((float) windowCoords[0], (float) (BehaviorismDriver.canvasHeight - windowCoords[1]));
+      p2f.lineTo((float) windowCoords[0], (float) (Behaviorism.getInstance().canvasHeight - windowCoords[1]));
     }
 
     p2f.closePath();

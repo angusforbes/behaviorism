@@ -1,13 +1,14 @@
 /* TextureFBO.java ~ Jun 4, 2009 */
 package fbos;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import textures.*;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
 import java.util.List;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
+import renderers.Renderer;
 import shaders.Program;
 import static javax.media.opengl.GL.*;
 
@@ -111,7 +112,7 @@ public class FboPingPong
   public void unbind(GL gl)
   {
     gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
+    gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
   }
 
   /**
@@ -176,7 +177,7 @@ public class FboPingPong
     }
 
     gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight);
+    gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
 
     if (readTextureId == texture1.getTextureObject())
     {
@@ -224,7 +225,7 @@ public class FboPingPong
     gl.glPushMatrix();
     {
       gl.glLoadIdentity();
-      BehaviorismDriver.renderer.glu.gluOrtho2D(0, fboWidth, fboHeight, 0);
+      Renderer.getInstance().glu.gluOrtho2D(0, fboWidth, fboHeight, 0);
 
       gl.glMatrixMode(gl.GL_MODELVIEW);
 
@@ -271,7 +272,7 @@ public class FboPingPong
     gl.glPushMatrix();
     {
       gl.glLoadIdentity();
-      BehaviorismDriver.renderer.glu.gluOrtho2D(0, fboWidth, fboHeight, 0);
+      Renderer.getInstance().glu.gluOrtho2D(0, fboWidth, fboHeight, 0);
 
       gl.glMatrixMode(gl.GL_MODELVIEW);
 
@@ -339,7 +340,7 @@ public class FboPingPong
 
     // we are finished drawing to our FBO, so unbind it and return to our original viewport, etc
     gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    gl.glViewport(0, 0, BehaviorismDriver.canvasWidth, BehaviorismDriver.canvasHeight); //(int) renderHeight);
+    gl.glViewport(0, 0, Behaviorism.canvasWidth, Behaviorism.canvasHeight); //(int) renderHeight);
      */
   }
 

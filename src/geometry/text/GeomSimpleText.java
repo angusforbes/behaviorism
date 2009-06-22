@@ -1,7 +1,7 @@
 /* GeomSimpleText.java ~ Feb 10, 2009 */
 package geometry.text;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import com.sun.opengl.util.j2d.TextRenderer;
 import geometry.Colorf;
 import geometry.GeomRect;
@@ -56,6 +56,21 @@ public class GeomSimpleText extends GeomRect
   public GeomSimpleText(Point3f p3f, String text, TextRenderer textRenderer)
   {
     super(p3f, 0f, 0f);
+    this.text = text;
+    this.textRenderer = textRenderer;
+    calculateBounds();
+  }
+
+  public GeomSimpleText(int x, int y, String text, String fontName, int fontStyle, float fontSize)
+  {
+    super(x, y, 0, 0);
+    this.text = text;
+    setFont(fontName, fontStyle, fontSize);
+  }
+
+  public GeomSimpleText(int x, int y, String text, TextRenderer textRenderer)
+  {
+    super(x, y, 0, 0);
     this.text = text;
     this.textRenderer = textRenderer;
     calculateBounds();
@@ -128,8 +143,8 @@ public class GeomSimpleText extends GeomRect
     //	{
     bounds = font.getStringBounds(this.text, frc);
 
-    float worldHeight = Renderer.screenBoundsInWorldCoords.height; //BehaviorismDriver.world.getWorldRect().h;
-    this.scaleVal = ((worldHeight / (float) BehaviorismDriver.canvasHeight));
+    float worldHeight = Renderer.screenBoundsInWorldCoords.height; //Behaviorism.world.getWorldRect().h;
+    this.scaleVal = ((worldHeight / (float) Behaviorism.getInstance().canvasHeight));
 
     metrics = font.getLineMetrics(text, frc);
 

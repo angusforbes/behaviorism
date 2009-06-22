@@ -1,6 +1,6 @@
 /* BehaviorPath.java (created on August 15, 2007, 4:22 PM) */
 package behaviors.geom.continuous;
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import geometry.Geom;
 import java.util.*;
 import javax.vecmath.Point3f;
@@ -22,7 +22,7 @@ public class BehaviorPath extends BehaviorGeomContinuous
           float startPercent,
           int direction)
   {
-       BehaviorismDriver.renderer.currentWorld.registerBehavior(this);
+       //RenderUtils.getWorld().registerBehavior(this);
  
     this.direction = direction;
     initializeKeyFramesFromPoints(points);

@@ -8,7 +8,7 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import geometry.Colorf;
 import geometry.GeomRect;
 import handlers.FontHandler;
@@ -408,7 +408,7 @@ public class GeomTextOutset extends GeomRect
 
     float angleCosine;
 
-    Cam cam = BehaviorismDriver.renderer.cam;
+    //Cam cam = Behaviorism.renderer.cam;
     double[] temp_mv = Arrays.copyOf(RenderUtils.getCamera().modelview, 16);
     double[] temp_pj = RenderUtils.getCamera().projection;
     int[] temp_vp = RenderUtils.getCamera().viewport;
@@ -423,7 +423,7 @@ public class GeomTextOutset extends GeomRect
 //	objToCamProj[1] = 0;
 //	objToCamProj[2] = cam.translate.z - this.translate.z ;
 
-    Vector3f objToCamProj = new Vector3f(cam.translate.x - this.translate.x, 0f, cam.translate.z - this.translate.z);
+    Vector3f objToCamProj = new Vector3f(RenderUtils.getCamera().translate.x - this.translate.x, 0f, RenderUtils.getCamera().translate.z - this.translate.z);
 // This is the original lookAt vector for the object
 // in world coordinates
     Vector3f lookAt = new Vector3f(0f, 0f, 1f);
@@ -466,7 +466,7 @@ public class GeomTextOutset extends GeomRect
 //	objToCam[0] = camX - objPosX;
 //	objToCam[1] = camY - objPosY;
 //	objToCam[2] = camZ - objPosZ;
-    Vector3f objToCam = new Vector3f(cam.translate.x - translate.x, cam.translate.y - translate.y, cam.translate.z - translate.z);
+    Vector3f objToCam = new Vector3f(RenderUtils.getCamera().translate.x - translate.x, RenderUtils.getCamera().translate.y - translate.y, RenderUtils.getCamera().translate.z - translate.z);
 
 // Normalize to get the cosine afterwards
     objToCam.normalize();
@@ -512,9 +512,9 @@ public class GeomTextOutset extends GeomRect
     double[] temp_pj = RenderUtils.getCamera().projection;
     int[] temp_vp = RenderUtils.getCamera().viewport;
 
-    Cam cam = BehaviorismDriver.renderer.cam;
+    //Cam cam = Behaviorism.renderer.cam;
 
-    float dist = cam.translate.distance(new Point3f(translate.x + (w * .5f), translate.y + (h * .5f), translate.z));
+    float dist = RenderUtils.getCamera().translate.distance(new Point3f(translate.x + (w * .5f), translate.y + (h * .5f), translate.z));
 //    System.out.println("camera at " + cam.translate);
 //    System.out.println("object at " + (new Point3f(translate.x + (w * .5f), translate.y + (h * .5f), translate.z)));
 //    System.out.println("dist = " + dist);

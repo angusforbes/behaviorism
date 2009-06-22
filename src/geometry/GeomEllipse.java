@@ -2,12 +2,12 @@
 
 package geometry;
 
-import behaviorism.BehaviorismDriver;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3f;
 import handlers.MouseHandler;
+import renderers.Renderer;
 import utils.RenderUtils;
 
 public class GeomEllipse extends GeomPoly
@@ -185,7 +185,7 @@ public class GeomEllipse extends GeomPoly
   
   public void draw(GL gl)
   {
-    GLU glu = BehaviorismDriver.renderer.glu;
+    GLU glu = Renderer.getInstance().glu;
     
     if (this == MouseHandler.selectedGeom)
     {
@@ -194,7 +194,7 @@ public class GeomEllipse extends GeomPoly
    
 	//	gl.glRotatef(30f,0f,0f,1f);
     //get Tesselator object
-    GLUtessellator tobj = BehaviorismDriver.renderer.tessellationObject;
+    GLUtessellator tobj = Renderer.getInstance().tessellationObject;
     
     if (tobj == null)
     {

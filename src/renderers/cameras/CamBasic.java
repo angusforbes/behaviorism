@@ -4,7 +4,7 @@
  */
 package renderers.cameras;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import behaviors.Behavior;
 import behaviors.geom.continuous.BehaviorTranslate;
 import geometry.GeomPoint;

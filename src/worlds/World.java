@@ -9,9 +9,7 @@ import geometry.Geom;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import sequences.Sequence;
-import behaviorism.BehaviorismDriver;
 import geometry.GeomPoint;
-import behaviors.Behavior;
 import geometry.GeomPoly;
 import geometry.GeomRect;
 import java.awt.geom.Rectangle2D;
@@ -26,6 +24,7 @@ import renderers.cameras.Cam;
 import renderers.cameras.CamBasic;
 import renderers.layers.BackToFrontLayer;
 import renderers.layers.RendererLayer;
+import utils.RenderUtils;
 
 //public abstract class World
 public abstract class World extends GeomPoint //does this make sense?
@@ -69,6 +68,10 @@ public abstract class World extends GeomPoint //does this make sense?
     return loadPropertiesFile("behaviorism.properties");
   }
 
+  //logic should be:
+  //look in local directory...
+  //look in behaviorism.jar (this *should* always exisit)
+  //use defualts...
   public static Properties loadPropertiesFile(String fileName)
   {
     Properties properties = new Properties();
@@ -290,6 +293,7 @@ public abstract class World extends GeomPoint //does this make sense?
   }
   }
    */
+  /*
   public void registerBehavior(Behavior b)
   {
     //synchronized(behaviors)
@@ -297,6 +301,7 @@ public abstract class World extends GeomPoint //does this make sense?
       //behaviors.add(b);
     }
   }
+  */
 
   /** 
   This rewinds to the parent-most node of the Geom. It then traverses all the nodes back down to the Geom, 
@@ -342,7 +347,7 @@ public abstract class World extends GeomPoint //does this make sense?
     this.cam = cam;
 
     //make sure renderer has this camera
-    BehaviorismDriver.renderer.installWorld(this);
+    RenderUtils.getRenderer().installWorld(this); //is this right??????
     
     //BehaviorismDriver.renderer.setCamera(cam);
   }

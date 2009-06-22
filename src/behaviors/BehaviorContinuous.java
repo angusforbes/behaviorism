@@ -1,6 +1,6 @@
 package behaviors;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import behaviors.Behavior.LoopEnum;
 import behaviors.BehaviorGeom.BehaviorBuilder;
 import java.util.List;
@@ -354,6 +354,6 @@ abstract public class BehaviorContinuous extends Behavior
     setAccelerationPoints(builder.accelerationPoints);
 
     /* I don't think we need to register behaviors globally */
-    //BehaviorismDriver.renderer.currentWorld.registerBehavior(this);
+    //Behaviorism.renderer.currentWorld.registerBehavior(this);
   }
 }

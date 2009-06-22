@@ -1,13 +1,14 @@
 /* GeomCircle.java (created on October 26, 2007, 8:18 PM) */
 package geometry;
 //hohoho this is MASTER
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import javax.media.opengl.GL;
 import static javax.media.opengl.GL.*;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3f;
 import handlers.MouseHandler;
+import renderers.Renderer;
 import textures.TextureImage;
 import utils.RenderUtils;
 
@@ -164,10 +165,10 @@ public class GeomCircle extends GeomPoly
       return;
     }
 
-    GLU glu = BehaviorismDriver.renderer.glu;
+    GLU glu = Renderer.getInstance().glu;
 
     //get Tesselator object
-    GLUtessellator tobj = BehaviorismDriver.renderer.tessellationObject;
+    GLUtessellator tobj = Renderer.getInstance().tessellationObject;
 
     if (tobj == null)
     {

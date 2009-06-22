@@ -2,11 +2,10 @@
 
 package geometry.glut;
 
-import behaviorism.BehaviorismDriver;
 import geometry.Geom;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
+import renderers.Renderer;
 
 /**
  *
@@ -30,11 +29,11 @@ public class GeomGlutCube extends Geom
     //gl.glColor4f(r, g, b, a);
     if (isSolid == true)
     {
-      BehaviorismDriver.renderer.glut.glutSolidCube(length);
+      Renderer.getInstance().glut.glutSolidCube(length);
     }
     else
     {
-      BehaviorismDriver.renderer.glut.glutWireCube(length);
+      Renderer.getInstance().glut.glutWireCube(length);
     }
   }
 }

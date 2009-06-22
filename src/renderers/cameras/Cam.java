@@ -1,6 +1,6 @@
 package renderers.cameras;
 
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import geometry.GeomPoint;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
@@ -98,7 +98,7 @@ public abstract class Cam extends GeomPoint
     projection = MatrixUtils.perspective(
       fovy,
       aspect,
-      //((float) BehaviorismDriver.canvasWidth) / BehaviorismDriver.canvasHeight,
+      //((float) Behaviorism.canvasWidth) / Behaviorism.canvasHeight,
       nearPlane, farPlane
       );
 

@@ -1,8 +1,8 @@
 /* BehaviorGeom.java (created on August 28, 2007, 12:54 PM) */
 package behaviors;
 
-import behaviorism.BehaviorismDriver;
 import geometry.Geom;
+import utils.RenderUtils;
 import utils.Utils;
 
 abstract public class BehaviorGeom extends Behavior
@@ -37,7 +37,6 @@ abstract public class BehaviorGeom extends Behavior
       System.err.println("startPercent must be between 0f and 1f!");
     }
 
-    BehaviorismDriver.renderer.currentWorld.registerBehavior(this);
     this.startPercent = startPercent;
 
     this.lengthNano = Utils.millisToNanos(lengthMS);

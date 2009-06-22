@@ -5,7 +5,7 @@
 package geometry.text;
 
 import geometry.*;
-import behaviorism.BehaviorismDriver;
+import behaviorism.Behaviorism;
 import com.sun.opengl.util.j2d.TextRenderer;
 import handlers.FontHandler;
 import java.awt.Font;
@@ -159,7 +159,7 @@ public class GeomTextPath extends GeomPoly
 	@Override
 	public void draw(GL gl)
 	{
-    GLU glu = BehaviorismDriver.renderer.glu;
+    GLU glu = Renderer.getInstance().glu;
     
 		//gl.glColor4f(1f, 0f, 0f, .5f);
 		//drawConvex(gl, glu, offset);
@@ -316,7 +316,7 @@ public class GeomTextPath extends GeomPoly
 		//System.out.println("world_z for child = " + world_z);
 		}
 
-		BehaviorismDriver.renderer.resetPerspective3D();
+		Renderer.getInstance().resetPerspective3D();
 
 		translate(gl, -w / 2f, -h / 2f, (float) (world_z));
 

@@ -2,11 +2,10 @@
 
 package geometry.glut;
 
-import behaviorism.BehaviorismDriver;
 import geometry.Geom;
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
+import utils.RenderUtils;
 
 /**
  *
@@ -35,11 +34,11 @@ public class GeomGlutSphere extends Geom
     //gl.glColor4f(r, g, b, a);
     if (isSolid == true)
     {
-      BehaviorismDriver.renderer.glut.glutSolidSphere(radius, slices, stacks);
+      RenderUtils.getRenderer().glut.glutSolidSphere(radius, slices, stacks);
     }
     else
     {
-      BehaviorismDriver.renderer.glut.glutWireSphere(radius, slices, stacks);
+      RenderUtils.getRenderer().glut.glutWireSphere(radius, slices, stacks);
     }
   }
 

@@ -1,15 +1,14 @@
 /* GeomGluNurbsSurface.java ~ Apr 13, 2009 */
 package geometry.glu;
 
-import behaviorism.BehaviorismDriver;
 import geometry.Geom;
 import geometry.GeomPoint;
-import java.util.Arrays;
 import java.util.List;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUnurbs;
 import javax.vecmath.Point3f;
+import renderers.Renderer;
 
 /**
  *
@@ -151,7 +150,7 @@ public class GeomGluNurbsSurface extends Geom
 
   public void draw(GL gl)
   {
-      GLU glu = BehaviorismDriver.renderer.glu;
+      GLU glu = Renderer.getInstance().glu;
 
     if (dynamicControlPoints != null) //and there has been a change
     {
@@ -165,7 +164,7 @@ public class GeomGluNurbsSurface extends Geom
     //gl.glColor4f(r, g, b, a);
     gl.glLineWidth(1);
 
-    GLUnurbs nurbs = BehaviorismDriver.renderer.nurbsRenderer;
+    GLUnurbs nurbs = Renderer.getInstance().nurbsRenderer;
 
 
     glu.gluBeginSurface(nurbs);
