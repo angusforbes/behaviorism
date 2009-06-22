@@ -10,7 +10,6 @@ import java.awt.Point;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import javax.media.opengl.GL;
@@ -39,10 +38,17 @@ public class RenderUtils
    * @param y
    * @return - a double array holding the x, y, z world coordinate of the screen point
    */
-  public static double[] getWorldCoordsForScreenCoord(int x, int y)
+  public static Point3f getWorldCoordsForScreenCoord(int x, int y)
   {
     Renderer rj = getRenderer();
 
+    double[] pt = MatrixUtils.unproject(new double[]{x, y},
+      rj.getCamera().modelview,
+      rj.getCamera().projection,
+      rj.getCamera().viewport);
+
+    return MatrixUtils.toPoint3f(new Point3d(pt[0], pt[1], pt[2]));
+    /*
     double modelview[] = new double[16];
     double projection[] = new double[16];
     int viewport[] = new int[4];
@@ -59,9 +65,11 @@ public class RenderUtils
 
     //get z value from scene
     FloatBuffer zBuf = FloatBuffer.allocate(1);
+
     rj.gl.glReadPixels(x, (int) y, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, zBuf);
     float z = zBuf.get();
-
+//    float z = 0f;
+// System.out.println("in RenderUtils.getWorldCoordsForScreenCoord() : z depth value = " + z);
     //unproject mouse coords into world coords!
     rj.glu.gluUnProject((double) x, (double) y, (double) z,
       modelview, 0,
@@ -69,14 +77,25 @@ public class RenderUtils
       viewport, 0,
       worldCoords, 0);
 
+//    System.out.println("in RenderUtils.getWorldCoordsForScreenCoord() : "+ Arrays.toString(worldCoords));
     return worldCoords;
+     */
   }
 
   /**
    * the z variable is between 0 and 1 (the near plane and the far plane!)
    */
+  /*
   public static Point3f getWorldCoordsForScreenCoord(int x, int y, double z, double[] modelview)
   {
+//    Renderer rj = getRenderer();
+//
+//    return MatrixUtils.unproject(new double[]{x, y},
+//      rj.getCamera().modelview,
+//      rj.getCamera().projection,
+//      rj.getCamera().viewport);
+
+
     Renderer rj = getRenderer();
 
     double projection[] = new double[16];
@@ -95,7 +114,8 @@ public class RenderUtils
 
     return new Point3f((float) worldCoords[0], (float) worldCoords[1], (float) worldCoords[2]);
   }
-
+  */
+  
   public static Rectangle2D.Float getScreenRectangleForWorldCoords(GeomRect gr)
   {
     Path2D.Float p2d = getScreenShapeForWorldCoords(gr);
@@ -138,6 +158,18 @@ public class RenderUtils
     return BehaviorismDriver.renderer.currentWorld.cam;
   }
 
+  public static double[] getModelview()
+  {
+    return getCamera().modelview;
+  }
+  public static double[] getProjection()
+  {
+    return getCamera().projection;
+  }
+  public static int[] getViewport()
+  {
+    return getCamera().viewport;
+  }
 
   public static List<Float> getScreenRectInGeomCoordnates(Geom g, Rectangle2D.Float r2f)
   {
@@ -190,19 +222,33 @@ public class RenderUtils
     //5. transfrom point into parent's coordinates
     //6. return point
 
-    //double modelview[] = new double[16];
+    double modelview[] = new double[16];
     double projection[] = new double[16];
     int viewport[] = new int[4];
     double wcsN[] = new double[3];
     double wcsF[] = new double[3];
     //double offsets[] = new double[3];
 
+    modelview = RenderUtils.getCamera().modelview;
     projection = RenderUtils.getCamera().projection;
     viewport = RenderUtils.getCamera().viewport;
 
     //invert y value properly
     y = (int) ((float) viewport[3] - (float) y);
 
+    wcsN = MatrixUtils.unproject(
+      new double[]{x, y, 0},
+      modelview,
+      projection,
+      viewport);
+
+    wcsF = MatrixUtils.unproject(
+      new double[]{x, y, 1},
+      modelview,
+      projection,
+      viewport);
+
+    /*
     rj.glu.gluUnProject((double) x, (double) y, 0.0, //-1?
       RenderUtils.getCamera().modelview, 0,
       projection, 0,
@@ -214,6 +260,7 @@ public class RenderUtils
       projection, 0,
       viewport, 0,
       wcsF, 0);
+    */
 
     Point3d nearPt = new Point3d(wcsN[0], wcsN[1], wcsN[2]);
     Point3d farPt = new Point3d(wcsF[0], wcsF[1], wcsF[2]);
@@ -222,6 +269,8 @@ public class RenderUtils
     Point3d geomPt_wc;
 
     Point3d geomPt = new Point3d(g.translate.x + offsetPt.x, g.translate.y + offsetPt.y, g.translate.z + offsetPt.z);
+    //Point3f posPt = g.getPosition();
+    //Point3d geomPt = new Point3d(posPt.x + offsetPt.x, posPt.y + offsetPt.y, posPt.z + offsetPt.z);
     if (g.parent != null)
     {
       geomPt_wc = MatrixUtils.getGeomPointInWorldCoordinates(geomPt, g.parent.modelview, RenderUtils.getCamera().modelview);

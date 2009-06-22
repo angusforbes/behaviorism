@@ -115,10 +115,11 @@ public class MouseHandler extends MouseAdapter
 
   private /*static*/ void processMouseMoving()
   {
-    double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
+    //double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
+    //Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
+    Point3f ptWorld = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 
-    Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
-    debugWorldPoint = MatrixUtils.toPoint3f(ptWorld);
+    debugWorldPoint = ptWorld;
     mouseWorld.set(ptWorld);
 
     Point2D.Float ptPixel = new Point2D.Float((float) mx, (float) my);
@@ -140,11 +141,15 @@ public class MouseHandler extends MouseAdapter
 
   private /*static*/ void processMousePressing()
   {
-    double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 
-    Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
-    System.out.println("ptWorld = " + ptWorld);
-    debugWorldPoint = MatrixUtils.toPoint3f(ptWorld);
+//    double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
+//    Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
+//    System.out.printf("ptWorld = %f/%f/%f\n", ptWorld.x, ptWorld.y, ptWorld.z);
+//
+    Point3f ptWorld = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
+
+    //System.out.printf("ptWorld2 = %f/%f/%f\n", coords2[0],  coords2[1],  coords2[2]);
+    debugWorldPoint = ptWorld;
     mouseWorld.set(ptWorld);
 
     Point2D.Float ptPixel = new Point2D.Float((float) mx, (float) my);
@@ -157,15 +162,15 @@ public class MouseHandler extends MouseAdapter
       //hmm, or selectableObject??
 
       
-      System.out.println("you picked " + selectedGeom);
+      ///System.out.println("you picked " + selectedGeom);
       
       Point3d p3d_a = MatrixUtils.getGeomPointInAbsoluteCoordinates(
       new Point3d(0, 0, 0), selectedGeom.modelview);
       Point3d p3d_b = MatrixUtils.getGeomPointInAbsoluteCoordinates(
       new Point3d(selectedGeom.w, selectedGeom.h, 0), selectedGeom.modelview);
 
-      System.out.println("in abs coords it's anchor is " + MatrixUtils.toString(p3d_a) +
-      " and other corner is " + MatrixUtils.toString(p3d_b));
+//      System.out.println("in abs coords it's anchor is " + MatrixUtils.toString(p3d_a) +
+//      " and other corner is " + MatrixUtils.toString(p3d_b));
 
       determineOffsetPointForDragging(ptWorld);
 
@@ -191,11 +196,13 @@ public class MouseHandler extends MouseAdapter
 
       //but also can be customized...
       /** temp **/
-      double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
+//      double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
+//      Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
 
-      Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
-      System.out.println("ptWorld = " + ptWorld);
-      debugWorldPoint = MatrixUtils.toPoint3f(ptWorld);
+      Point3f ptWorld = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
+
+      //System.out.println("ptWorld = " + ptWorld);
+      debugWorldPoint = ptWorld;
       mouseWorld.set(ptWorld);
 
       if (selectedGeom != null)
@@ -240,19 +247,19 @@ public class MouseHandler extends MouseAdapter
   {
     if (button == 1)
     {
-      System.out.println("HERE - button 1 drag...");
+      //System.out.println("HERE - button 1 drag...");
       selectedGeom.draggableObject.setTranslate(new Point3f(RenderUtils.rayIntersect(selectedGeom.draggableObject, mx, my, offsetPt)));
     }
     else if (button == 2)
     {
-      System.out.println("HERE - button 2 drag...");
+      //System.out.println("HERE - button 2 drag...");
       int yDif = my - pre_my;
       selectedGeom.draggableObject.scaleX(yDif * .02f);
       selectedGeom.draggableObject.scaleY(yDif * .02f);
     }
     else if (button == 3)
     {
-      System.out.println("HERE - button 3 drag...");
+      //System.out.println("HERE - button 3 drag...");
       int xDif = mx - pre_mx;
       int yDif = my - pre_my;
       selectedGeom.draggableObject.rotateX(yDif);
@@ -260,19 +267,20 @@ public class MouseHandler extends MouseAdapter
     }
   }
 
-  private /*static*/ void determineOffsetPointForDragging(Point3d ptWorld)
+  private /*static*/ void determineOffsetPointForDragging(Point3f ptWorld)
   {
     if (selectedGeom.draggableObject != null)
     {
       if (selectedGeom.draggableObject.parent == null)
       {
-        offsetPt = ptWorld;
+        offsetPt = MatrixUtils.toPoint3d(ptWorld);
       }
       else
       {
         //should use getWorldPointInGeomCoord???
         //offsetPt = MatrixUtils.getAbsolutePointInGeomCoordinates(ptWorld, selectedGeom.draggableObject.parent.modelview);
-        offsetPt = MatrixUtils.getWorldPointInGeomCoordinates(ptWorld, RenderUtils.getCamera().modelview, selectedGeom.draggableObject.parent.modelview);
+        offsetPt = MatrixUtils.getWorldPointInGeomCoordinates(
+          MatrixUtils.toPoint3d(ptWorld), RenderUtils.getCamera().modelview, selectedGeom.draggableObject.parent.modelview);
       }
 
       offsetPt = new Point3d(offsetPt.x - selectedGeom.draggableObject.translate.x,
@@ -528,17 +536,17 @@ public class MouseHandler extends MouseAdapter
   @Override
   public void mouseWheelMoved(MouseWheelEvent e)
   {
-    System.out.println("mouseWheelMoved...");
+    //System.out.println("mouseWheelMoved...");
     int notches = e.getWheelRotation();
 
     if (notches < 0) //moved up 
     {
-      System.out.println("up");
+      //System.out.println("up");
       BehaviorismDriver.renderer.getCamera().translateZ(notches * 0.05f);
     }
     else //moved down
     {
-      System.out.println("down");
+      //System.out.println("down");
       BehaviorismDriver.renderer.getCamera().translateZ(notches * 0.05f);
     }
   }

@@ -154,11 +154,14 @@ public class FontHandler
   {
     List<TextRenderer> renderers = getFontFamily(fontName, fontStyle);
 
+
+    /*
     if (renderers == null)
     {
-      System.out.println("couldn't find font <" + fontName + "," + fontStyle + ">, using default font");
+      System.out.println("in getFont() : couldn't find font <" + fontName + "," + fontStyle + ">, using default font");
       renderers = textRenderers;
     }
+    */
 
     for (TextRenderer renderer : renderers)
     {
@@ -168,13 +171,27 @@ public class FontHandler
       }
     }
 
-    System.out.println("couldn't find size <" + fontSize + ">, creating it...");
-    Font derive = new Font(fontName, fontStyle, 800);
+   System.out.println("in getFont() : couldn't find size <" + fontSize + ">, creating it...");
 
-    TextRenderer renderer = createTextRenderer(derive, fontStyle, fontSize);
+    String familyId = fontName + "," + fontStyle;
+    List<TextRenderer> test = fontFamilyMap.get(familyId);
+    TextRenderer renderer;
+
+    if (test == null)
+    {
+      System.out.println("in getFont() : we weren't able to load this font. using default.");
+      renderer = getDefaultFont(fontSize);
+    }
+    else
+    {
+      Font derive = new Font(fontName, fontStyle, 800);
+      System.out.println("in getFont() : derive font = " + derive);
+      renderer = createTextRenderer(derive, fontStyle, fontSize);
+    }
+
     renderers.add(renderer);
-
     return renderer;
+
   }
 
   public void setDefaultFont(String font, int fontStyle)
@@ -288,6 +305,8 @@ public class FontHandler
             familyTextRenderers = createTextRenderersForFamily(derive, fontStyle);
             System.out.println("in findFontFamily : we loaded the font family from a data file :" + familyId);
             System.out.println("familyTextRenderers size = " + familyTextRenderers.size());
+            fontFamilyMap.put(familyId, familyTextRenderers);
+            return familyTextRenderers;
           }
           catch (IOException e)
           {
@@ -299,10 +318,35 @@ public class FontHandler
           }
         }
 
-        fontFamilyMap.put(familyId, familyTextRenderers);
-        return familyTextRenderers;
+        if (defaultFontFamily != null)
+        {
+          System.out.println("in findFontFamily : We couldn't load your font, so returning default!");
+          return defaultFontFamily;
+        }
+        else
+        {
+          System.out.println("in findFontFamily : We couldn't load your font, and your default" +
+            "is broken, so creating a backup default and returning that!");
+          return loadBackupFontFamily();
+        }
       }
     }
+
+  }
+
+  /**
+   * If the user supplied default font does not load, then revert to the Java default font.
+   * @return
+   */
+  public List<TextRenderer> loadBackupFontFamily()
+  {
+    Font derive = new Font("default", Font.PLAIN, 800);
+    List<TextRenderer> backupTextRenderers = createTextRenderersForFamily(derive, Font.PLAIN);
+    String familyId = "default,0";
+    fontFamilyMap.put(familyId, backupTextRenderers);
+    defaultFontFamily = backupTextRenderers;
+    defaultFont = "default";
+    return backupTextRenderers;
   }
 
   public List<TextRenderer> createTextRenderersForFamily(Font font, int fontStyle)

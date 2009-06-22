@@ -13,6 +13,7 @@ import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import behaviors.geom.discrete.BehaviorIsActive;
+import renderers.Renderer;
 import textures.TextureImage;
 import utils.MatrixUtils;
 import utils.RenderUtils;
@@ -44,16 +45,17 @@ public abstract class Geom
    */
   public Data data = null; //new Data();
   public Point3f translate = new Point3f(0f, 0f, 0f);
-  public Point3f translateAnchor = new Point3f(0f, 0f, 0f);
+
+  //don't think it makes sense to have both (think about this...)
+  //public Point3f translateAnchor = new Point3f(0f, 0f, 0f);
+
   /**
    * The relative point (in parent's coordinates) around which the object is to rotate.
    * By default it is set to be the lower left corner of the object
    */
-  //tell me why this is a GeomPoint again???
-  //public GeomPoint rotateAnchor = null; //new GeomPoint(.5f, .5f, 0f);
   public Point3f rotateAnchor = new Point3f(0f, 0f, 0f); //new GeomPoint(.5f, .5f, 0f);
   /**
-   * getMatrixIndex point which describes the rotation around the x, y, and z axes. Rotations are in degrees, not radians.
+   * A point which describes the rotation around the x, y, and z axes. Rotations are in degrees, not radians.
    */
   public Point3d rotate = new Point3d(0, 0, 0);
   /**
@@ -66,7 +68,7 @@ public abstract class Geom
    * By default each dimension is set to a factor of 1.
    */
   public Point3d scale = new Point3d(1, 1, 1);
-   //thinking about this...
+  //thinking about this...
   //if rotateAnchor is relative to current Geom - Then -
   //  update modelview with translate
   //  then update modelview with rotateAnchor, rotate, then update modelview with -rotateAnchor
@@ -86,7 +88,6 @@ public abstract class Geom
   /** we are not really using this... should we be? Looks we are *always* using ScaleEnum.CENTER (in the transform) */
 //  @Deprecated
 //  public ScaleEnum scaleDirection = ScaleEnum.NE; //default
-
   public Colorf color = new Colorf();
 //
 //  public float r = (float) Math.random();
@@ -94,7 +95,6 @@ public abstract class Geom
 //  public float b = (float) Math.random();
 //  public float a = 1f;
 //
-
   @Deprecated
   public float area = 0f; //i think i was using this for an picking alogrithm. it was a dumb idea. this shouldn't be stored.
 
@@ -115,7 +115,7 @@ public abstract class Geom
   //public Texture texture = null;
   public List<TextureImage> textures = null;
   /**
-   * getMatrixIndex 4x4 double array representing the Geom's openGL modelview matrix within the scenegraph hierarchy.
+   * A 4x4 double array representing the Geom's openGL modelview matrix within the scenegraph hierarchy.
    */
   public double[] modelview = MatrixUtils.getIdentity();
   //public Matrix4d modelview2 = new Matrix4d(MatrixUtils.getIdentity());
@@ -143,6 +143,25 @@ public abstract class Geom
 
   public Geom()
   {
+  }
+
+  /**
+   * Constructs a new Geom initially placed at the world coordinates
+   * unprojected from pixel coordinates. The depth value
+   * is calculated based on the position of the World z value.
+   * @param x
+   * @param y
+   */
+  public Geom(int x, int y)
+  {
+    setTranslate(
+      MatrixUtils.toPoint3f(
+        RenderUtils.rayIntersect(
+          Renderer.getInstance().currentWorld, x, y)
+          //Renderer.getInstance().getCamera(), x, y)
+        )
+      );
+
   }
 
   public Geom(float x, float y, float z)
@@ -259,7 +278,6 @@ public abstract class Geom
   {
   }
 
- 
   public void transform()
   {
     if (!isTransformed)
@@ -298,18 +316,14 @@ public abstract class Geom
 
   private void transformTranslate()
   {
-    if (translateAnchor.x + translate.x == 0f &&
-      translateAnchor.y + translate.y == 0f &&
-      translateAnchor.z + translate.z == 0f)
+    if (translate.x == 0f &&
+      translate.y == 0f &&
+      translate.z == 0f)
     {
       return;
     }
 
-    //modelview = MatrixUtils.translate(modelview, translate.x, translate.y, translate.z);
-    modelview = MatrixUtils.translate(modelview,
-      translateAnchor.x + translate.x,
-      translateAnchor.y + translate.y,
-      translateAnchor.z + translate.z);
+    modelview = MatrixUtils.translate(modelview, translate.x, translate.y, translate.z);
   }
 
   private void transformRotate()
@@ -354,36 +368,36 @@ public abstract class Geom
   /*
   public void transform(GL gl, GLU glu)
   {
-    System.out.println("in transform() old-- WHY?");
-    // translate command
-    double[] temp = new double[16];
-    //gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, temp, 0);
-    //System.out.println("modelview was :");
-    //MatrixUtils.printDoubleArray(temp);
+  System.out.println("in transform() old-- WHY?");
+  // translate command
+  double[] temp = new double[16];
+  //gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, temp, 0);
+  //System.out.println("modelview was :");
+  //MatrixUtils.printDoubleArray(temp);
 
-    gl.glTranslatef(translate.x, translate.y, translate.z);
+  gl.glTranslatef(translate.x, translate.y, translate.z);
 
-    //gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, temp, 0);
-    //System.out.println("modelview is :");
-    //MatrixUtils.printDoubleArray(temp);
+  //gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, temp, 0);
+  //System.out.println("modelview is :");
+  //MatrixUtils.printDoubleArray(temp);
 
-    // rotate commands
-    if (rotateAnchor != null)
-    {
-      gl.glTranslatef(rotateAnchor.translate.x, rotateAnchor.translate.y, rotateAnchor.translate.z);
-      gl.glRotatef((float) rotate.x, 1.0f, 0.0f, 0.0f);
-      gl.glRotatef((float) rotate.y, 0.0f, 1.0f, 0.0f);
-      //System.out.println("rotate y = " + (float)rotate.y);
-      gl.glRotatef((float) rotate.z, 0.0f, 0.0f, 1.0f);
-      gl.glTranslatef(-rotateAnchor.translate.x, -rotateAnchor.translate.y, -rotateAnchor.translate.z);
-    }
-
-    // scale commands
-    gl.glTranslatef(scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
-    gl.glScalef((float) scale.x, (float) scale.y, (float) scale.z);
-    gl.glTranslatef(-scaleAnchor.x, -scaleAnchor.y, -scaleAnchor.z);
+  // rotate commands
+  if (rotateAnchor != null)
+  {
+  gl.glTranslatef(rotateAnchor.translate.x, rotateAnchor.translate.y, rotateAnchor.translate.z);
+  gl.glRotatef((float) rotate.x, 1.0f, 0.0f, 0.0f);
+  gl.glRotatef((float) rotate.y, 0.0f, 1.0f, 0.0f);
+  //System.out.println("rotate y = " + (float)rotate.y);
+  gl.glRotatef((float) rotate.z, 0.0f, 0.0f, 1.0f);
+  gl.glTranslatef(-rotateAnchor.translate.x, -rotateAnchor.translate.y, -rotateAnchor.translate.z);
   }
-  */
+
+  // scale commands
+  gl.glTranslatef(scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
+  gl.glScalef((float) scale.x, (float) scale.y, (float) scale.z);
+  gl.glTranslatef(-scaleAnchor.x, -scaleAnchor.y, -scaleAnchor.z);
+  }
+   */
 
   //MOVE THESE somewhere!!! only used in a couple of places...
   public void scale(GL gl)
@@ -396,16 +410,21 @@ public abstract class Geom
     gl.glScalef((float) scale.x, (float) scale.y, (float) scale.z);
     gl.glTranslatef(-scaleAnchor.x, -scaleAnchor.y, -scaleAnchor.z);
 
-    //gl.glScalef((float)scale.x, (float)scale.y, (float)scale.z);
-    //scaleDirection = se;
+  //gl.glScalef((float)scale.x, (float)scale.y, (float)scale.z);
+  //scaleDirection = se;
   }
 
   public void translate(GL gl, float tx, float ty, float tz)
   {
     gl.glTranslatef(tx, ty, tz);
   }
-  
-  
+
+  public Point3f getCenter()
+  {
+    //default behavior... obviously needs to be overwritten by almost every Geom.
+    return new Point3f(w * .5f, h * .5f, d * .5f);
+  }
+
   /**
    * This version of addGeom activates the Geom a specified number of milliseconds in the future.
    * It is simply a convience method to avoid having to define a BehaviorIsActive behavior since
@@ -699,12 +718,13 @@ public abstract class Geom
 
   public void setTranslate(float x, float y, float z)
   {
-    if (x != translate.x && y != translate.y && z != translate.z)
+    if (x != translate.x || y != translate.y || z != translate.z)
     {
       translate.set(x, y, z);
       isTransformed = true;
     }
   }
+ 
 
   public void scale(float x, float y, float z)
   {
@@ -810,7 +830,6 @@ public abstract class Geom
     }
   }
 
-  
   public Colorf getColor()
   {
     //return new Colorf(this.r, this.g, this.b, this.a);
@@ -1049,8 +1068,6 @@ public abstract class Geom
   //textureData = null;
   }
    */
-
-
   public void rotateAnchor(float x, float y, float z)
   {
     rotateAnchorX(x);
@@ -1087,7 +1104,7 @@ public abstract class Geom
 
   public void setRotateAnchor(float x, float y, float z)
   {
-    if (x != rotateAnchor.x && y != rotateAnchor.y && z != rotateAnchor.z)
+    if (x != rotateAnchor.x || y != rotateAnchor.y || z != rotateAnchor.z)
     {
       rotateAnchor.set(x, y, z);
       isTransformed = true;
@@ -1096,13 +1113,14 @@ public abstract class Geom
 
   public void setRotateAnchor(Point3f p3f)
   {
+    System.out.println("in setRotateAnchor : setting to " + p3f);
     if (!this.rotateAnchor.equals(p3f))
     {
       rotateAnchor.set(p3f);
+      System.out.println("so now rotateAnchor = " + rotateAnchor);
       isTransformed = true;
     }
   }
-
 
   public void scaleAnchor(float x, float y, float z)
   {
@@ -1156,10 +1174,7 @@ public abstract class Geom
     }
   }
 
-
-
-
-
+  /*
   public void translateAnchor(float x, float y, float z)
   {
     translateAnchorX(x);
@@ -1196,8 +1211,9 @@ public abstract class Geom
 
   public void setTranslateAnchor(float x, float y, float z)
   {
-    if (x != translateAnchor.x && y != translateAnchor.y && z != translateAnchor.z)
+    if (x != translateAnchor.x || y != translateAnchor.y || z != translateAnchor.z)
     {
+      System.out.println("setting translate anchor = " + x + "/" + y + "/" +z);
       translateAnchor.set(x, y, z);
       isTransformed = true;
     }
@@ -1211,18 +1227,18 @@ public abstract class Geom
       isTransformed = true;
     }
   }
-
+  */
   /*
   public void determineRotateAnchor(RotateEnum re)
   {
-    //should make these do something! prob make the default behave like GeomRect, and then have special subclasses override
+  //should make these do something! prob make the default behave like GeomRect, and then have special subclasses override
   }
 
   public void determineScaleAnchor(ScaleEnum re)
   {
-    //should make these do something! prob make the default behave like GeomRect, and then have special subclasses override
+  //should make these do something! prob make the default behave like GeomRect, and then have special subclasses override
   }
-  */
+   */
   /*
    * Sets an arbitrary point to be rotated around,
    * automatically takes care of centering based on scaleAnchor (which must already be defined).
@@ -1233,17 +1249,17 @@ public abstract class Geom
   /*
   public void determineRotateAnchor(Point3f ra)
   {
-    //this.rotateAnchor = new GeomPoint(ra.x - scaleAnchor.x, ra.y - scaleAnchor.y, ra.z - scaleAnchor.z);
-    this.rotateAnchor = new GeomPoint(ra.x, ra.y, ra.z);
-    //since we can attach behaviors to this point it needs to be added to scene graph!
-    addGeom(this.rotateAnchor);
+  //this.rotateAnchor = new GeomPoint(ra.x - scaleAnchor.x, ra.y - scaleAnchor.y, ra.z - scaleAnchor.z);
+  this.rotateAnchor = new GeomPoint(ra.x, ra.y, ra.z);
+  //since we can attach behaviors to this point it needs to be added to scene graph!
+  addGeom(this.rotateAnchor);
   }
 
   public void determineScaleAnchor(Point3f scaleAnchor)
   {
-    this.scaleAnchor = scaleAnchor;
+  this.scaleAnchor = scaleAnchor;
   }
-  */
+   */
 
   /* changes the coordinates of the Geom so that it center will be on a specified point */
   //this is silly. put it somwhere else. Maybe in GeomUtils?
@@ -1269,7 +1285,7 @@ public abstract class Geom
       str += "id=" + id + " : ";
     }
 
-    str += "anchor = " + translate;
+    str += "translate = " + translate;
     return str;
   }
 

@@ -53,7 +53,7 @@ public class GeomSimpleText extends GeomRect
     setFont(fontName, fontStyle, fontSize);
   }
 
-   public GeomSimpleText(Point3f p3f, String text, TextRenderer textRenderer)
+  public GeomSimpleText(Point3f p3f, String text, TextRenderer textRenderer)
   {
     super(p3f, 0f, 0f);
     this.text = text;

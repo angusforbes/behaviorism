@@ -26,6 +26,7 @@ public class GeomRect extends Geom
   //temporarily added to superclass Geom
   //public float w = 1f;
   //public float h = 1f;
+
   public Rectangle2D rectangle; //this is the *bounds* of the text
   //public Rectangle rectangle; //this is the *bounds* of the text
   //used for the packing algorithm...
@@ -41,37 +42,49 @@ public class GeomRect extends Geom
   {
     this.isSelectable = true;
   }
-  
 
   public GeomRect(Rectangle2D rect)
   {
-    super((float)rect.getX(), (float)rect.getY(), 0f);
+    super((float) rect.getX(), (float) rect.getY(), 0f);
 
-    this.w = (float)rect.getWidth();
-    this.h = (float)rect.getHeight();
+    this.w = (float) rect.getWidth();
+    this.h = (float) rect.getHeight();
 
     this.isSelectable = true;
   }
 
   /*
   public GeomRect(float x, float y, float z, float w, float h,
-    ScaleEnum scaleDirection, RotateEnum rotatePosition)
+  ScaleEnum scaleDirection, RotateEnum rotatePosition)
   {
-    super(x, y, z);
+  super(x, y, z);
 
-    this.w = w;
-    this.h = h;
+  this.w = w;
+  this.h = h;
+
+  this.isSelectable = true;
+  determineScaleAnchor(scaleDirection);
+  //determineRotateAnchor(rotatePosition);
+  //this.scaleDirection = scaleDirection;
+
+  this.scale.x = 1f;
+  this.scale.y = 1f;
+  this.scale.z = 1f;
+  }
+   */
+  public GeomRect(int x, int y, int w, int h)
+  {
+    super(x, y+h);
+
+    Point3f upperright = MatrixUtils.toPoint3f(
+      RenderUtils.rayIntersect(Renderer.getInstance().currentWorld,
+      x + w, y));
+
+    this.w = upperright.x - translate.x;
+    this.h = upperright.y - translate.y;
 
     this.isSelectable = true;
-    determineScaleAnchor(scaleDirection);
-    //determineRotateAnchor(rotatePosition);
-    //this.scaleDirection = scaleDirection;
-
-    this.scale.x = 1f;
-    this.scale.y = 1f;
-    this.scale.z = 1f;
   }
-  */
 
   public GeomRect(float x, float y, float z, float w, float h)
   {
@@ -79,27 +92,23 @@ public class GeomRect extends Geom
     this.isSelectable = true;
     this.w = w;
     this.h = h;
-    this.scale.x = 1f;
-    this.scale.y = 1f;
-    this.scale.z = 1f;
-
   }
 
   public GeomRect(Point3f p3f, float w, float h)
   {
-    super(p3f.x, p3f.y, p3f.z);
+    super(p3f);
     this.isSelectable = true;
     this.w = w;
     this.h = h;
-    //this.scale.x = 1f;
-    //this.scale.y = 1f;
-    //this.scale.z = 1f;
-    this.scale.x = 1;
-    this.scale.y = 1;
-    this.scale.z = 1;
-
   }
 
+  public void pixelToWorld(int x, int y, int w, int h)
+  {
+  }
+
+  public void pixelHeight(int h)
+  {
+  }
   /* Sets an translate point connected to the Geom to be rotated around.
    * This rotateAnchor point is not attached to the scene graph, so attaching behaviors will have
    * no effect. Use determineRotateAnchor(Point3f p) to set an arbitrary point.
@@ -110,75 +119,75 @@ public class GeomRect extends Geom
   @Override
   public void determineRotateAnchor(RotateEnum rotatePosition)
   {
-    switch (rotatePosition)
-    {
-      case CENTER:
-        this.rotateAnchor = new GeomPoint(w / 2f, h / 2f, 0f);
-        break;
-      case NE:
-        this.rotateAnchor = new GeomPoint(w, h, 0f);
-        break;
-      case NW:
-        this.rotateAnchor = new GeomPoint(0f, h, 0f);
-        break;
-      case SE:
-        this.rotateAnchor = new GeomPoint(w, 0f, 0f);
-        break;
-      case SW:
-        this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
-        break;
-      case S:
-        this.rotateAnchor = new GeomPoint(w / 2f, 0f, 0f);
-        break;
-      case N:
-        this.rotateAnchor = new GeomPoint(w / 2f, h, 0f);
-        break;
-      case E:
-        this.rotateAnchor = new GeomPoint(w, h / 2f, 0f);
-        break;
-      case W:
-        this.rotateAnchor = new GeomPoint(0f, h / 2f, 0f);
-        break;
-      default:
-        this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
-        break;
-    }
+  switch (rotatePosition)
+  {
+  case CENTER:
+  this.rotateAnchor = new GeomPoint(w / 2f, h / 2f, 0f);
+  break;
+  case NE:
+  this.rotateAnchor = new GeomPoint(w, h, 0f);
+  break;
+  case NW:
+  this.rotateAnchor = new GeomPoint(0f, h, 0f);
+  break;
+  case SE:
+  this.rotateAnchor = new GeomPoint(w, 0f, 0f);
+  break;
+  case SW:
+  this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
+  break;
+  case S:
+  this.rotateAnchor = new GeomPoint(w / 2f, 0f, 0f);
+  break;
+  case N:
+  this.rotateAnchor = new GeomPoint(w / 2f, h, 0f);
+  break;
+  case E:
+  this.rotateAnchor = new GeomPoint(w, h / 2f, 0f);
+  break;
+  case W:
+  this.rotateAnchor = new GeomPoint(0f, h / 2f, 0f);
+  break;
+  default:
+  this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
+  break;
+  }
   }
 
   public void determineScaleAnchor(ScaleEnum scaleDirection)
   {
-    switch (scaleDirection)
-    {
-      case CENTER:
-        scaleAnchor = new Point3f(w / 2f, h / 2f, 0f);
-        break;
-      case S:
-        scaleAnchor = new Point3f(-w / 2f, -h, 0f);
-        break;
-      case N:
-        scaleAnchor = new Point3f(-w / 2f, 0f, 0f);
-        break;
-      case E:
-        scaleAnchor = new Point3f(0f, -h / 2f, 0f);
-        break;
-      case W:
-        scaleAnchor = new Point3f(-w, -h / 2f, 0f);
-        break;
-      case SW:
-        scaleAnchor = new Point3f(-w, -h, 0f);
-        break;
-      case SE:
-        scaleAnchor = new Point3f(0f, -h, 0f);
-        break;
-      case NW:
-        scaleAnchor = new Point3f(-w, 0f, 0f);
-        break;
-      case NE:
-        scaleAnchor = new Point3f(0f, 0f, 0f);
-        break;
-    }
+  switch (scaleDirection)
+  {
+  case CENTER:
+  scaleAnchor = new Point3f(w / 2f, h / 2f, 0f);
+  break;
+  case S:
+  scaleAnchor = new Point3f(-w / 2f, -h, 0f);
+  break;
+  case N:
+  scaleAnchor = new Point3f(-w / 2f, 0f, 0f);
+  break;
+  case E:
+  scaleAnchor = new Point3f(0f, -h / 2f, 0f);
+  break;
+  case W:
+  scaleAnchor = new Point3f(-w, -h / 2f, 0f);
+  break;
+  case SW:
+  scaleAnchor = new Point3f(-w, -h, 0f);
+  break;
+  case SE:
+  scaleAnchor = new Point3f(0f, -h, 0f);
+  break;
+  case NW:
+  scaleAnchor = new Point3f(-w, 0f, 0f);
+  break;
+  case NE:
+  scaleAnchor = new Point3f(0f, 0f, 0f);
+  break;
   }
-  */
+  }
+   */
 
   public void debugPackingAlgorithm(GL gl)
   {
@@ -195,7 +204,7 @@ public class GeomRect extends Geom
           //Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(test, RenderUtils.getCamera().modelview, modelview);
           Point3d p3d = MatrixUtils.getWorldPointInGeomCoordinates(test, RenderUtils.getCamera().modelview, modelview);
           gl.glColor4f(1f, 0f, 0f, 1f);
-          //gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
+        //gl.glVertex3dv(MatrixUtils.toArray(p3d), 0);
         }
         gl.glEnd();
 
@@ -235,6 +244,8 @@ public class GeomRect extends Geom
   @Override
   public void draw(GL gl)
   {
+    //   RenderUtils.getWorldCoordsForScreenCoord(300, 200);
+
     boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
 
     
@@ -244,18 +255,19 @@ public class GeomRect extends Geom
 
       gl.glColor4f(0f, 0f, 0f, 0f);
       gl.glBegin(gl.GL_QUADS);
+
       gl.glVertex3f(0f, 0f, offset);
       gl.glVertex3f(w, 0f, offset);
       gl.glVertex3f(w, h, offset);
       gl.glVertex3f(0f, h, offset);
-      gl.glEnd();
 
       gl.glDisable(GL.GL_DEPTH_TEST);
     }
-    
-    
+
+
     gl.glColor4fv(color.array(), 0);
     gl.glBegin(gl.GL_QUADS);
+    
     gl.glVertex3f(0f, 0f, offset);
     gl.glVertex3f(w, 0f, offset);
     gl.glVertex3f(w, h, offset);
@@ -285,7 +297,7 @@ public class GeomRect extends Geom
     Rectangle2D.Float r2d = BehaviorismDriver.renderer.getScreenRectangleForWorldCoords(this);
     this.rectangle = r2d;
      */
-    
+
     this.rectangle = new Rectangle2D.Double(this.translate.x, this.translate.y, w, h);
     this.area = GeomUtils.area(this.rectangle);
 
@@ -301,13 +313,13 @@ public class GeomRect extends Geom
     }
     else
     {
-     // this.x = (float)this.rectangle.getX();
-     // this.y = (float)this.rectangle.getY();
-      this.translate.x = (float)this.rectangle.getX();
-      this.translate.y = (float)this.rectangle.getY();
-      this.w = (float)this.rectangle.getWidth();
-      this.h = (float)this.rectangle.getHeight();
-      
+      // this.x = (float)this.rectangle.getX();
+      // this.y = (float)this.rectangle.getY();
+      this.translate.x = (float) this.rectangle.getX();
+      this.translate.y = (float) this.rectangle.getY();
+      this.w = (float) this.rectangle.getWidth();
+      this.h = (float) this.rectangle.getHeight();
+
       /*
       List<Float> floats = BehaviorismDriver.renderer.getScreenRectInGeomCoordnates(this, this.rectangle);
       
@@ -315,17 +327,17 @@ public class GeomRect extends Geom
       this.translate.y = floats.get(1);
       this.w = floats.get(2);
       this.h = floats.get(3);
-      */
-      
+       */
+
       if (this.rectangle.isEmpty())
       {
         isActive = false;
-        //isActive = true;
+      //isActive = true;
       }
       else
       {
         isActive = true;
-        //isActive = false;
+      //isActive = false;
       }
     }
 
@@ -335,41 +347,45 @@ public class GeomRect extends Geom
   //public void setCoordFromRectangle(Rectangle2D.Float bounds)
   public void setCoordFromRectangle(Rectangle2D bounds)
   {
-    
+
     /*
-      List<Float> floats = BehaviorismDriver.renderer.getScreenRectInGeomCoordnates(this, this.rectangle);
-      
-      this.translate.x = floats.get(0);
-      this.translate.y = floats.get(1);
-      this.w = floats.get(2);
-      this.h = floats.get(3);
+    List<Float> floats = BehaviorismDriver.renderer.getScreenRectInGeomCoordnates(this, this.rectangle);
+
+    this.translate.x = floats.get(0);
+    this.translate.y = floats.get(1);
+    this.w = floats.get(2);
+    this.h = floats.get(3);
      */
-      
+
     //this.x = (float)bounds.getX();
     //this.y = (float)bounds.getY();
-    this.translate.x = (float)bounds.getX();
-    this.translate.y = (float)bounds.getY();
-    this.w = (float)bounds.getWidth();
-    this.h = (float)bounds.getHeight();
+    this.translate.x = (float) bounds.getX();
+    this.translate.y = (float) bounds.getY();
+    this.w = (float) bounds.getWidth();
+    this.h = (float) bounds.getHeight();
 //    this.translate.x = this.x;
 //   this.translate.y = this.y;
-    
+
     scaleAnchor = new Point3f(this.w * .5f, this.h * .5f, 0f);
     //EffectUtils.effectZoomIn(this, System.nanoTime(), 200L, true);
 
     this.rectangle = bounds;
   }
 
-
+  /*
   public Point3f getCenterAnchor()
   {
-    return new Point3f(translate.x + w * .5f, translate.y + h * .5f, translate.z + d * .5f);
-  }
 
+    return new Point3f(translate.x + w * .5f, translate.y + h * .5f, translate.z + d * .5f);
+   }
+   */
+
+  /*
   public Point3f getCenter()
   {
     return new Point3f(w * .5f, h * .5f, d * .5f);
   }
+   */
 
   public void setRect(Point3f p3f, float w, float h)
   {
@@ -380,189 +396,188 @@ public class GeomRect extends Geom
 
   /*
   public static Geom createBorderGeomWithExactInset(Geom geom, BorderEnum borderType, 
-    float exactInset, Colorf color)
+  float exactInset, Colorf color)
   {
-    Geom returnGeom = null;
-    Point3f p3f = new Point3f();
+  Geom returnGeom = null;
+  Point3f p3f = new Point3f();
   
-    Geom gc2;
+  Geom gc2;
 
-    switch (borderType)
-    {
-      case RECTANGLE:
+  switch (borderType)
+  {
+  case RECTANGLE:
 
-         returnGeom = new GeomRect(p3f.x + (-geom.w * .5f) - exactInset, p3f.y + (-geom.h * .5f) - exactInset, 0f,
-           geom.w + (exactInset * 2f), geom.h + (exactInset * 2f));
-      
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-        returnGeom.setColor(color);
+  returnGeom = new GeomRect(p3f.x + (-geom.w * .5f) - exactInset, p3f.y + (-geom.h * .5f) - exactInset, 0f,
+  geom.w + (exactInset * 2f), geom.h + (exactInset * 2f));
 
-        geom.setTranslate(exactInset, exactInset, 0f);
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+  returnGeom.setColor(color);
 
-        returnGeom.addGeom(geom, true);
-        returnGeom.isSelectable = true; //true;
+  geom.setTranslate(exactInset, exactInset, 0f);
 
-        break;
-    }
-     
-    geom.registerSelectableObject(returnGeom);
-    returnGeom.registerClickableObject(geom);
+  returnGeom.addGeom(geom, true);
+  returnGeom.isSelectable = true; //true;
 
-    geom.registerDraggableObject(returnGeom);
-    returnGeom.registerSelectableObject(geom);
-    return returnGeom;
+  break;
+  }
+
+  geom.registerSelectableObject(returnGeom);
+  returnGeom.registerClickableObject(geom);
+
+  geom.registerDraggableObject(returnGeom);
+  returnGeom.registerSelectableObject(geom);
+  return returnGeom;
   }
   public static Geom createBorderGeom(Geom geom, BorderEnum borderType, float insetPerc, Colorf color)
   {
-    Geom returnGeom = null;
-    Point3f p3f = new Point3f();
+  Geom returnGeom = null;
+  Point3f p3f = new Point3f();
   
-    Geom gc2;
-    float insetw, inseth;
+  Geom gc2;
+  float insetw, inseth;
 
-    switch (borderType)
-    {
-      case RECTANGLE:
+  switch (borderType)
+  {
+  case RECTANGLE:
 
-        insetw = (geom.w * insetPerc);
-        inseth = (geom.h * insetPerc);
+  insetw = (geom.w * insetPerc);
+  inseth = (geom.h * insetPerc);
 
-        //trying exact size, not percentage...
-        float exactInset = 0f;
-        if (insetw < inseth)
-        {
-          inseth = insetw;
-        }
-        else
-        {
-          insetw = inseth;
-        }
-         returnGeom = new GeomRect(p3f.x + (-geom.w * .5f) - insetw, p3f.y + (-geom.h * .5f) - inseth, 0f,
-           geom.w + (insetw * 2f), geom.h + (inseth * 2f));
-      
-        
-        //trying percentage, not exact size...
-//        if (insetw < inseth)
-//        {
-//          inseth = insetw;
-//        }
-//        else
-//        {
-//          insetw = inseth;
-//        }
-
-//        returnGeom = new GeomRect(p3f.x + (-origGeom.w * .5f) - insetw, p3f.y + (-origGeom.h * .5f) - inseth, 0f,
-//          origGeom.w + (insetw * 2f), origGeom.h + (inseth * 2f));
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-        returnGeom.setColor(color);
-
-        geom.setTranslate(insetw, inseth, 0f);
-
-        returnGeom.addGeom(geom, true);
-        returnGeom.isSelectable = true; //true;
-
-        //returnGeom = gc2;
-        break;
-
-      case ELLIPSE:
-        insetw = (geom.w * insetPerc);
-        inseth = (geom.h * insetPerc);
-        float useinset = inseth;
-        if (insetw < inseth)
-        {
-          useinset = insetw;
-        }
-
-        float radW = (float) (Math.hypot(geom.w, geom.w) * .5);
-        float radH = (float) (Math.hypot(geom.h, geom.h) * .5);
-
-        returnGeom = new GeomEllipse(p3f, radW, radH, 0f);
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-
-        //returnGeom.setColor(1f, 0f, 0f, 0f);
-        returnGeom.setColor(color);
-        geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
-        returnGeom.addGeom(geom, true);
-
-
-
-
-        //border is on the outside of the ellipse (could also make it the inside-- offer this option...)
-        GeomEllipse borderCircle2 = new GeomEllipse(0f, 0f, 0f, radW + useinset, radH + useinset, useinset);
-        returnGeom.addGeom(borderCircle2, true);
-        borderCircle2.setColor(color);
-
-
-
-        //gt2.backgroundColor = new Colorf(borderCircle.r, borderCircle.g, 
-        //        borderCircle.b, borderCircle.a); //background of entire bounds
-
-
-        returnGeom.isSelectable = true; //true;
-        borderCircle2.isSelectable = true; //true;
-        geom.isSelectable = true; //true;
-
-        geom.registerSelectableObject(returnGeom);
-        geom.registerDraggableObject(returnGeom);
-        borderCircle2.registerSelectableObject(returnGeom);
-        borderCircle2.registerDraggableObject(returnGeom);
-        returnGeom.registerClickableObject(geom);
-        return returnGeom;
-
-      case CIRCLE:
-        float rad = (float) (Math.hypot(geom.w, geom.h) * .5);
-
-        returnGeom = new GeomCircle(p3f, 0f, rad, 0f, 360f, 64);
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-
-        returnGeom.setColor(0f, 0f, 0f, 0f);
-        geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
-        returnGeom.addGeom(geom, true);
-
-
-
-
-        //putting border on outside boundary
-        GeomCircle borderCircle = new GeomCircle(0f, 0f, 0f, rad, rad + (rad * insetPerc), 0f, 360f, 64);
-        returnGeom.addGeom(borderCircle, true);
-        borderCircle.setColor(color);
-
-        //gt2.backgroundColor = new Colorf(borderCircle.r, borderCircle.g, 
-        //        borderCircle.b, borderCircle.a); //background of entire bounds
-
-
-        returnGeom.isSelectable = true; //true;
-        borderCircle.isSelectable = true; //true;
-        geom.isSelectable = true; //true;
-
-        geom.registerSelectableObject(returnGeom);
-        geom.registerDraggableObject(returnGeom);
-        borderCircle.registerSelectableObject(returnGeom);
-        borderCircle.registerDraggableObject(returnGeom);
-        returnGeom.registerClickableObject(geom);
-        return returnGeom;
-      //break;
-    }
-
-
-    geom.registerSelectableObject(returnGeom);
-    returnGeom.registerClickableObject(geom);
-    //gc2.registerClickableObject(gc2);
-
-    geom.registerDraggableObject(returnGeom);
-    returnGeom.registerSelectableObject(geom);
-    return returnGeom;
+  //trying exact size, not percentage...
+  float exactInset = 0f;
+  if (insetw < inseth)
+  {
+  inseth = insetw;
   }
-  */
-    
+  else
+  {
+  insetw = inseth;
+  }
+  returnGeom = new GeomRect(p3f.x + (-geom.w * .5f) - insetw, p3f.y + (-geom.h * .5f) - inseth, 0f,
+  geom.w + (insetw * 2f), geom.h + (inseth * 2f));
+
+
+  //trying percentage, not exact size...
+  //        if (insetw < inseth)
+  //        {
+  //          inseth = insetw;
+  //        }
+  //        else
+  //        {
+  //          insetw = inseth;
+  //        }
+
+  //        returnGeom = new GeomRect(p3f.x + (-origGeom.w * .5f) - insetw, p3f.y + (-origGeom.h * .5f) - inseth, 0f,
+  //          origGeom.w + (insetw * 2f), origGeom.h + (inseth * 2f));
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+  returnGeom.setColor(color);
+
+  geom.setTranslate(insetw, inseth, 0f);
+
+  returnGeom.addGeom(geom, true);
+  returnGeom.isSelectable = true; //true;
+
+  //returnGeom = gc2;
+  break;
+
+  case ELLIPSE:
+  insetw = (geom.w * insetPerc);
+  inseth = (geom.h * insetPerc);
+  float useinset = inseth;
+  if (insetw < inseth)
+  {
+  useinset = insetw;
+  }
+
+  float radW = (float) (Math.hypot(geom.w, geom.w) * .5);
+  float radH = (float) (Math.hypot(geom.h, geom.h) * .5);
+
+  returnGeom = new GeomEllipse(p3f, radW, radH, 0f);
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+
+  //returnGeom.setColor(1f, 0f, 0f, 0f);
+  returnGeom.setColor(color);
+  geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
+  returnGeom.addGeom(geom, true);
+
+
+
+
+  //border is on the outside of the ellipse (could also make it the inside-- offer this option...)
+  GeomEllipse borderCircle2 = new GeomEllipse(0f, 0f, 0f, radW + useinset, radH + useinset, useinset);
+  returnGeom.addGeom(borderCircle2, true);
+  borderCircle2.setColor(color);
+
+
+
+  //gt2.backgroundColor = new Colorf(borderCircle.r, borderCircle.g,
+  //        borderCircle.b, borderCircle.a); //background of entire bounds
+
+
+  returnGeom.isSelectable = true; //true;
+  borderCircle2.isSelectable = true; //true;
+  geom.isSelectable = true; //true;
+
+  geom.registerSelectableObject(returnGeom);
+  geom.registerDraggableObject(returnGeom);
+  borderCircle2.registerSelectableObject(returnGeom);
+  borderCircle2.registerDraggableObject(returnGeom);
+  returnGeom.registerClickableObject(geom);
+  return returnGeom;
+
+  case CIRCLE:
+  float rad = (float) (Math.hypot(geom.w, geom.h) * .5);
+
+  returnGeom = new GeomCircle(p3f, 0f, rad, 0f, 360f, 64);
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+
+  returnGeom.setColor(0f, 0f, 0f, 0f);
+  geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
+  returnGeom.addGeom(geom, true);
+
+
+
+
+  //putting border on outside boundary
+  GeomCircle borderCircle = new GeomCircle(0f, 0f, 0f, rad, rad + (rad * insetPerc), 0f, 360f, 64);
+  returnGeom.addGeom(borderCircle, true);
+  borderCircle.setColor(color);
+
+  //gt2.backgroundColor = new Colorf(borderCircle.r, borderCircle.g,
+  //        borderCircle.b, borderCircle.a); //background of entire bounds
+
+
+  returnGeom.isSelectable = true; //true;
+  borderCircle.isSelectable = true; //true;
+  geom.isSelectable = true; //true;
+
+  geom.registerSelectableObject(returnGeom);
+  geom.registerDraggableObject(returnGeom);
+  borderCircle.registerSelectableObject(returnGeom);
+  borderCircle.registerDraggableObject(returnGeom);
+  returnGeom.registerClickableObject(geom);
+  return returnGeom;
+  //break;
+  }
+
+
+  geom.registerSelectableObject(returnGeom);
+  returnGeom.registerClickableObject(geom);
+  //gc2.registerClickableObject(gc2);
+
+  geom.registerDraggableObject(returnGeom);
+  returnGeom.registerSelectableObject(geom);
+  return returnGeom;
+  }
+   */
   /** 
    * Creates a composite Geom by adding the origGeom on top of two GeomRects to build
    * a double inset around the origGeom. Generally used to pad text by setting the innerInsetColor
@@ -581,359 +596,358 @@ public class GeomRect extends Geom
 
   /*
   public static Geom createBorderGeomWithExactInset(Geom origGeom, BorderEnum borderType, 
-    float outerExactInset, Colorf outerInsetColor, float innerExactInset, Colorf innerInsetColor)
+  float outerExactInset, Colorf outerInsetColor, float innerExactInset, Colorf innerInsetColor)
   {
-    Geom returnGeom = null;
-    Point3f p3f = new Point3f();
-    float ox = origGeom.translate.x;
-    float oy = origGeom.translate.y;
-    
-    switch (borderType)
-    {
-        case RECTANGLE:
+  Geom returnGeom = null;
+  Point3f p3f = new Point3f();
+  float ox = origGeom.translate.x;
+  float oy = origGeom.translate.y;
 
-        returnGeom = new GeomRect(p3f.x + (-origGeom.w * .5f) - outerExactInset, p3f.y + (-origGeom.h * .5f) - outerExactInset, 0f,
-          origGeom.w + (outerExactInset * 2f), origGeom.h + (outerExactInset * 2f));
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-        returnGeom.setColor(outerInsetColor);
+  switch (borderType)
+  {
+  case RECTANGLE:
 
-        GeomRect borderRect2 = new GeomRect(-p3f.x + outerExactInset - innerExactInset, -p3f.y + outerExactInset - innerExactInset, 0f,
-          origGeom.w + (innerExactInset * 2f), origGeom.h + (innerExactInset * 2f));
-        returnGeom.addGeom(borderRect2, true);
-        borderRect2.setColor(innerInsetColor);
+  returnGeom = new GeomRect(p3f.x + (-origGeom.w * .5f) - outerExactInset, p3f.y + (-origGeom.h * .5f) - outerExactInset, 0f,
+  origGeom.w + (outerExactInset * 2f), origGeom.h + (outerExactInset * 2f));
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+  returnGeom.setColor(outerInsetColor);
 
-        origGeom.setTranslate(outerExactInset, outerExactInset, 0f);
+  GeomRect borderRect2 = new GeomRect(-p3f.x + outerExactInset - innerExactInset, -p3f.y + outerExactInset - innerExactInset, 0f,
+  origGeom.w + (innerExactInset * 2f), origGeom.h + (innerExactInset * 2f));
+  returnGeom.addGeom(borderRect2, true);
+  borderRect2.setColor(innerInsetColor);
 
-        returnGeom.addGeom(origGeom, true);
-        returnGeom.isSelectable = true;
+  origGeom.setTranslate(outerExactInset, outerExactInset, 0f);
 
-        origGeom.registerSelectableObject(returnGeom);
-        origGeom.registerClickableObject(returnGeom);
-        origGeom.registerDraggableObject(returnGeom);
+  returnGeom.addGeom(origGeom, true);
+  returnGeom.isSelectable = true;
 
-        borderRect2.registerSelectableObject(returnGeom);
-        borderRect2.registerClickableObject(returnGeom);
-        borderRect2.registerDraggableObject(returnGeom);
+  origGeom.registerSelectableObject(returnGeom);
+  origGeom.registerClickableObject(returnGeom);
+  origGeom.registerDraggableObject(returnGeom);
 
-      
-        //returnGeom.translate(ox, oy, origGeom.z);
-        returnGeom.setTranslate(ox, oy, origGeom.translate.z);
-        //returnGeom.translate(ox - returnGeom.translate.x, oy - returnGeom.translate.y, origGeom.z);
-      
-        return returnGeom;
+  borderRect2.registerSelectableObject(returnGeom);
+  borderRect2.registerClickableObject(returnGeom);
+  borderRect2.registerDraggableObject(returnGeom);
 
-    }
-    return null; //error
+
+  //returnGeom.translate(ox, oy, origGeom.z);
+  returnGeom.setTranslate(ox, oy, origGeom.translate.z);
+  //returnGeom.translate(ox - returnGeom.translate.x, oy - returnGeom.translate.y, origGeom.z);
+
+  return returnGeom;
+
   }
-  */
+  return null; //error
+  }
+   */
   /*
   public static GeomRect createBorderGeomWithExactWidthAndHeightInset(Geom origGeom, BorderEnum borderType,
-    float outerExactInsetW, float outerExactInsetH, Colorf outerInsetColor,
-    float innerExactInsetW, float innerExactInsetH, Colorf innerInsetColor)
+  float outerExactInsetW, float outerExactInsetH, Colorf outerInsetColor,
+  float innerExactInsetW, float innerExactInsetH, Colorf innerInsetColor)
   {
-    GeomRect returnGeom = null;
-    Point3f p3f = new Point3f();
-    float ox = origGeom.translate.x;
-    float oy = origGeom.translate.y;
+  GeomRect returnGeom = null;
+  Point3f p3f = new Point3f();
+  float ox = origGeom.translate.x;
+  float oy = origGeom.translate.y;
 
-    switch (borderType)
-    {
-        case RECTANGLE:
+  switch (borderType)
+  {
+  case RECTANGLE:
 
-        returnGeom = new GeomRect(p3f.x + (-origGeom.w * .5f) - outerExactInsetW, p3f.y + (-origGeom.h * .5f) - outerExactInsetH, 0f,
-          origGeom.w + (outerExactInsetW * 2f), origGeom.h + (outerExactInsetH * 2f));
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-        returnGeom.setColor(outerInsetColor);
+  returnGeom = new GeomRect(p3f.x + (-origGeom.w * .5f) - outerExactInsetW, p3f.y + (-origGeom.h * .5f) - outerExactInsetH, 0f,
+  origGeom.w + (outerExactInsetW * 2f), origGeom.h + (outerExactInsetH * 2f));
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+  returnGeom.setColor(outerInsetColor);
 
-        GeomRect borderRect2 = new GeomRect(-p3f.x + outerExactInsetW - innerExactInsetW, -p3f.y + outerExactInsetH - innerExactInsetH, 0f,
-          origGeom.w + (innerExactInsetW * 2f), origGeom.h + (innerExactInsetH * 2f));
-        returnGeom.addGeom(borderRect2, true);
-        borderRect2.setColor(innerInsetColor);
+  GeomRect borderRect2 = new GeomRect(-p3f.x + outerExactInsetW - innerExactInsetW, -p3f.y + outerExactInsetH - innerExactInsetH, 0f,
+  origGeom.w + (innerExactInsetW * 2f), origGeom.h + (innerExactInsetH * 2f));
+  returnGeom.addGeom(borderRect2, true);
+  borderRect2.setColor(innerInsetColor);
 
-        origGeom.setTranslate(outerExactInsetW, outerExactInsetH, 0f);
+  origGeom.setTranslate(outerExactInsetW, outerExactInsetH, 0f);
 
-        returnGeom.addGeom(origGeom, true);
-        returnGeom.isSelectable = true;
+  returnGeom.addGeom(origGeom, true);
+  returnGeom.isSelectable = true;
 
-        origGeom.registerSelectableObject(returnGeom);
-        origGeom.registerClickableObject(returnGeom);
-        origGeom.registerDraggableObject(returnGeom);
+  origGeom.registerSelectableObject(returnGeom);
+  origGeom.registerClickableObject(returnGeom);
+  origGeom.registerDraggableObject(returnGeom);
 
-        borderRect2.registerSelectableObject(returnGeom);
-        borderRect2.registerClickableObject(returnGeom);
-        borderRect2.registerDraggableObject(returnGeom);
+  borderRect2.registerSelectableObject(returnGeom);
+  borderRect2.registerClickableObject(returnGeom);
+  borderRect2.registerDraggableObject(returnGeom);
 
 
-        //returnGeom.translate(ox, oy, origGeom.z);
-        returnGeom.setTranslate(ox, oy, origGeom.translate.z);
-        //returnGeom.translate(ox - returnGeom.translate.x, oy - returnGeom.translate.y, origGeom.z);
+  //returnGeom.translate(ox, oy, origGeom.z);
+  returnGeom.setTranslate(ox, oy, origGeom.translate.z);
+  //returnGeom.translate(ox - returnGeom.translate.x, oy - returnGeom.translate.y, origGeom.z);
 
-        return returnGeom;
+  return returnGeom;
 
-    }
-    return null; //error
   }
-  */
+  return null; //error
+  }
+   */
   /*
   public static Geom createBorderGeom2_isActiveFalse(Geom geom, BorderEnum borderType, float insetPerc, Colorf color, float insetPerc2, Colorf color2)
   {
-    Geom returnGeom = null;
-    Point3f p3f = new Point3f();
+  Geom returnGeom = null;
+  Point3f p3f = new Point3f();
 
-    float ox = geom.translate.x;
-    float oy = geom.translate.y;
-    
-    float insetw, inseth;
-    float insetw2, inseth2;
+  float ox = geom.translate.x;
+  float oy = geom.translate.y;
 
-    switch (borderType)
-    {
-      case RECTANGLE:
+  float insetw, inseth;
+  float insetw2, inseth2;
 
-        insetw = (geom.w * insetPerc);
-        inseth = (geom.h * insetPerc);
+  switch (borderType)
+  {
+  case RECTANGLE:
 
-        if (insetw < inseth)
-        {
-          inseth = insetw;
-        }
-        else
-        {
-          insetw = inseth;
-        }
+  insetw = (geom.w * insetPerc);
+  inseth = (geom.h * insetPerc);
 
-        returnGeom = new GeomRect(p3f.x + (-geom.w * .5f) - insetw, p3f.y + (-geom.h * .5f) - inseth, 0f,
-          geom.w + (insetw * 2f), geom.h + (inseth * 2f));
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-        returnGeom.setColor(color);
-
-        insetw2 = (geom.w * insetPerc2);
-        inseth2 = (geom.h * insetPerc2);
-        if (insetw2 < inseth2)
-        {
-          inseth2 = insetw2;
-        }
-        else
-        {
-          insetw2 = inseth2;
-        }
-        GeomRect borderRect2 = new GeomRect(-p3f.x + insetw - insetw2, -p3f.y + inseth - inseth2, 0f,
-          geom.w + (insetw2 * 2f), geom.h + (inseth2 * 2f));
-        
-        returnGeom.addGeom(borderRect2, false);
-        borderRect2.setColor(color2);
-
-        geom.setTranslate(insetw, inseth, 0f);
-
-        returnGeom.addGeom(geom, false);
-        returnGeom.isSelectable = true; //true;
-
-        geom.registerSelectableObject(returnGeom);
-        geom.registerClickableObject(returnGeom);
-        geom.registerDraggableObject(returnGeom);
-
-        borderRect2.registerSelectableObject(returnGeom);
-        borderRect2.registerClickableObject(returnGeom);
-        borderRect2.registerDraggableObject(returnGeom);
-      
-        //returnGeom.translate(ox, oy, geom.z);
-        returnGeom.setTranslate(ox, oy, geom.translate.z);
-      
-        return returnGeom;
-    }
-    return geom;
+  if (insetw < inseth)
+  {
+  inseth = insetw;
   }
-    */
+  else
+  {
+  insetw = inseth;
+  }
+
+  returnGeom = new GeomRect(p3f.x + (-geom.w * .5f) - insetw, p3f.y + (-geom.h * .5f) - inseth, 0f,
+  geom.w + (insetw * 2f), geom.h + (inseth * 2f));
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+  returnGeom.setColor(color);
+
+  insetw2 = (geom.w * insetPerc2);
+  inseth2 = (geom.h * insetPerc2);
+  if (insetw2 < inseth2)
+  {
+  inseth2 = insetw2;
+  }
+  else
+  {
+  insetw2 = inseth2;
+  }
+  GeomRect borderRect2 = new GeomRect(-p3f.x + insetw - insetw2, -p3f.y + inseth - inseth2, 0f,
+  geom.w + (insetw2 * 2f), geom.h + (inseth2 * 2f));
+
+  returnGeom.addGeom(borderRect2, false);
+  borderRect2.setColor(color2);
+
+  geom.setTranslate(insetw, inseth, 0f);
+
+  returnGeom.addGeom(geom, false);
+  returnGeom.isSelectable = true; //true;
+
+  geom.registerSelectableObject(returnGeom);
+  geom.registerClickableObject(returnGeom);
+  geom.registerDraggableObject(returnGeom);
+
+  borderRect2.registerSelectableObject(returnGeom);
+  borderRect2.registerClickableObject(returnGeom);
+  borderRect2.registerDraggableObject(returnGeom);
+
+  //returnGeom.translate(ox, oy, geom.z);
+  returnGeom.setTranslate(ox, oy, geom.translate.z);
+
+  return returnGeom;
+  }
+  return geom;
+  }
+   */
   /*
   public static Geom createBorderGeom2(Geom geom, BorderEnum borderType, float insetPerc, Colorf color, float insetPerc2, Colorf color2)
   {
-    Geom returnGeom = null;
-    Point3f p3f = new Point3f();
+  Geom returnGeom = null;
+  Point3f p3f = new Point3f();
 
-    float ox = geom.translate.x;
-    float oy = geom.translate.y;
-    
-    float t_w,
-      t_h,
-      t_x,
-      t_y;
+  float ox = geom.translate.x;
+  float oy = geom.translate.y;
 
-    Geom gc2;
-    float insetw, inseth;
-    float insetw2, inseth2;
+  float t_w,
+  t_h,
+  t_x,
+  t_y;
 
-    switch (borderType)
-    {
-      case RECTANGLE:
+  Geom gc2;
+  float insetw, inseth;
+  float insetw2, inseth2;
 
-        insetw = (geom.w * insetPerc);
-        inseth = (geom.h * insetPerc);
+  switch (borderType)
+  {
+  case RECTANGLE:
 
-        if (insetw < inseth)
-        {
-          inseth = insetw;
-        }
-        else
-        {
-          insetw = inseth;
-        }
+  insetw = (geom.w * insetPerc);
+  inseth = (geom.h * insetPerc);
 
-        returnGeom = new GeomRect(p3f.x + (-geom.w * .5f) - insetw, p3f.y + (-geom.h * .5f) - inseth, 0f,
-          geom.w + (insetw * 2f), geom.h + (inseth * 2f));
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-        returnGeom.setColor(color);
-
-        insetw2 = (geom.w * insetPerc2);
-        inseth2 = (geom.h * insetPerc2);
-        if (insetw2 < inseth2)
-        {
-          inseth2 = insetw2;
-        }
-        else
-        {
-          insetw2 = inseth2;
-        }
-        GeomRect borderRect2 = new GeomRect(-p3f.x + insetw - insetw2, -p3f.y + inseth - inseth2, 0f,
-          geom.w + (insetw2 * 2f), geom.h + (inseth2 * 2f));
-        
-        returnGeom.addGeom(borderRect2, true);
-        borderRect2.setColor(color2);
-
-        geom.setTranslate(insetw, inseth, 0f);
-
-        returnGeom.addGeom(geom, true);
-        returnGeom.isSelectable = true; //true;
-
-        geom.registerSelectableObject(returnGeom);
-        geom.registerClickableObject(returnGeom);
-        geom.registerDraggableObject(returnGeom);
-
-        borderRect2.registerSelectableObject(returnGeom);
-        borderRect2.registerClickableObject(returnGeom);
-        borderRect2.registerDraggableObject(returnGeom);
-
-      
-        //returnGeom.translate(ox, oy, geom.z);
-        returnGeom.setTranslate(ox, oy, geom.translate.z);
-        //returnGeom.translate(ox - returnGeom.translate.x, oy - returnGeom.translate.y, origGeom.z);
-      
-        return returnGeom;
-
-      //break;
-
-      case ELLIPSE:
-        insetw = (geom.w * insetPerc);
-        inseth = (geom.h * insetPerc);
-        float useinset = inseth;
-        insetw2 = (geom.w * insetPerc2);
-        inseth2 = (geom.h * insetPerc2);
-        float useinset2 = inseth2;
-        if (insetw < inseth)
-        {
-          useinset = insetw;
-          useinset2 = insetw2;
-
-        }
-
-        float radW = (float) (Math.hypot(geom.w, geom.w) * .5);
-        float radH = (float) (Math.hypot(geom.h, geom.h) * .5);
-
-        returnGeom = new GeomEllipse(p3f, radW, radH, 0f);
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-
-        //returnGeom.setColor(1f, 0f, 0f, 0f);
-        returnGeom.setColor(color);
-        geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
-        returnGeom.addGeom(geom, true);
-
-
-
-
-        //border is on the outside of the ellipse (could also make it the inside-- offer this option...)
-        GeomEllipse borderCircle2 = new GeomEllipse(0f, 0f, 0f, radW + useinset, radH + useinset, useinset);
-        returnGeom.addGeom(borderCircle2, true);
-        borderCircle2.setColor(color);
-
-        //new 
-        GeomEllipse borderCircle3 = new GeomEllipse(0f, 0f, .001f, radW + useinset2, radH + useinset2, useinset2);
-        returnGeom.addGeom(borderCircle3, true);
-        borderCircle3.setColor(color2);
-
-        //gt2.backgroundColor = new Colorf(borderCircle.r, borderCircle.g, 
-        //        borderCircle.b, borderCircle.a); //background of entire bounds
-
-
-        returnGeom.isSelectable = true; //true;
-        borderCircle2.isSelectable = true; //true;
-        geom.isSelectable = true; //true;
-
-        geom.registerSelectableObject(returnGeom);
-        geom.registerDraggableObject(returnGeom);
-        geom.registerClickableObject(returnGeom);
-        borderCircle2.registerSelectableObject(returnGeom);
-        borderCircle2.registerDraggableObject(returnGeom);
-        borderCircle2.registerClickableObject(returnGeom);
-        //returnGeom.registerClickableObject(origGeom);
-        return returnGeom;
-
-      case CIRCLE:
-        float rad = (float) (Math.hypot(geom.w, geom.h) * .5);
-
-        returnGeom = new GeomCircle(p3f, 0f, rad, 0f, 360f, 64);
-        returnGeom.state = new State();
-        returnGeom.state.DEPTH_TEST = false;
-        returnGeom.state.BLEND = false;
-
-        returnGeom.setColor(0f, 0f, 0f, 0f);
-        geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
-        returnGeom.addGeom(geom, true);
-
-
-
-
-        //putting border on outside boundary
-        GeomCircle borderCircle = new GeomCircle(0f, 0f, 0f, rad, rad + (rad * insetPerc), 0f, 360f, 64);
-        returnGeom.addGeom(borderCircle, true);
-        borderCircle.setColor(color);
-
-        //gt2.backgroundColor = new Colorf(borderCircle.r, borderCircle.g, 
-        //        borderCircle.b, borderCircle.a); //background of entire bounds
-
-
-        returnGeom.isSelectable = true; //true;
-        borderCircle.isSelectable = true; //true;
-        geom.isSelectable = true; //true;
-
-        geom.registerSelectableObject(returnGeom);
-        geom.registerDraggableObject(returnGeom);
-        borderCircle.registerSelectableObject(returnGeom);
-        borderCircle.registerDraggableObject(returnGeom);
-        returnGeom.registerClickableObject(geom);
-        return returnGeom;
-
-    }
-
-
-    geom.registerSelectableObject(returnGeom);
-    returnGeom.registerClickableObject(geom);
-    //gc2.registerClickableObject(gc2);
-
-    geom.registerDraggableObject(returnGeom);
-    returnGeom.registerSelectableObject(geom);
-    return returnGeom;
+  if (insetw < inseth)
+  {
+  inseth = insetw;
   }
-  */
+  else
+  {
+  insetw = inseth;
+  }
 
+  returnGeom = new GeomRect(p3f.x + (-geom.w * .5f) - insetw, p3f.y + (-geom.h * .5f) - inseth, 0f,
+  geom.w + (insetw * 2f), geom.h + (inseth * 2f));
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+  returnGeom.setColor(color);
+
+  insetw2 = (geom.w * insetPerc2);
+  inseth2 = (geom.h * insetPerc2);
+  if (insetw2 < inseth2)
+  {
+  inseth2 = insetw2;
+  }
+  else
+  {
+  insetw2 = inseth2;
+  }
+  GeomRect borderRect2 = new GeomRect(-p3f.x + insetw - insetw2, -p3f.y + inseth - inseth2, 0f,
+  geom.w + (insetw2 * 2f), geom.h + (inseth2 * 2f));
+
+  returnGeom.addGeom(borderRect2, true);
+  borderRect2.setColor(color2);
+
+  geom.setTranslate(insetw, inseth, 0f);
+
+  returnGeom.addGeom(geom, true);
+  returnGeom.isSelectable = true; //true;
+
+  geom.registerSelectableObject(returnGeom);
+  geom.registerClickableObject(returnGeom);
+  geom.registerDraggableObject(returnGeom);
+
+  borderRect2.registerSelectableObject(returnGeom);
+  borderRect2.registerClickableObject(returnGeom);
+  borderRect2.registerDraggableObject(returnGeom);
+
+
+  //returnGeom.translate(ox, oy, geom.z);
+  returnGeom.setTranslate(ox, oy, geom.translate.z);
+  //returnGeom.translate(ox - returnGeom.translate.x, oy - returnGeom.translate.y, origGeom.z);
+
+  return returnGeom;
+
+  //break;
+
+  case ELLIPSE:
+  insetw = (geom.w * insetPerc);
+  inseth = (geom.h * insetPerc);
+  float useinset = inseth;
+  insetw2 = (geom.w * insetPerc2);
+  inseth2 = (geom.h * insetPerc2);
+  float useinset2 = inseth2;
+  if (insetw < inseth)
+  {
+  useinset = insetw;
+  useinset2 = insetw2;
+
+  }
+
+  float radW = (float) (Math.hypot(geom.w, geom.w) * .5);
+  float radH = (float) (Math.hypot(geom.h, geom.h) * .5);
+
+  returnGeom = new GeomEllipse(p3f, radW, radH, 0f);
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+
+  //returnGeom.setColor(1f, 0f, 0f, 0f);
+  returnGeom.setColor(color);
+  geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
+  returnGeom.addGeom(geom, true);
+
+
+
+
+  //border is on the outside of the ellipse (could also make it the inside-- offer this option...)
+  GeomEllipse borderCircle2 = new GeomEllipse(0f, 0f, 0f, radW + useinset, radH + useinset, useinset);
+  returnGeom.addGeom(borderCircle2, true);
+  borderCircle2.setColor(color);
+
+  //new
+  GeomEllipse borderCircle3 = new GeomEllipse(0f, 0f, .001f, radW + useinset2, radH + useinset2, useinset2);
+  returnGeom.addGeom(borderCircle3, true);
+  borderCircle3.setColor(color2);
+
+  //gt2.backgroundColor = new Colorf(borderCircle.r, borderCircle.g,
+  //        borderCircle.b, borderCircle.a); //background of entire bounds
+
+
+  returnGeom.isSelectable = true; //true;
+  borderCircle2.isSelectable = true; //true;
+  geom.isSelectable = true; //true;
+
+  geom.registerSelectableObject(returnGeom);
+  geom.registerDraggableObject(returnGeom);
+  geom.registerClickableObject(returnGeom);
+  borderCircle2.registerSelectableObject(returnGeom);
+  borderCircle2.registerDraggableObject(returnGeom);
+  borderCircle2.registerClickableObject(returnGeom);
+  //returnGeom.registerClickableObject(origGeom);
+  return returnGeom;
+
+  case CIRCLE:
+  float rad = (float) (Math.hypot(geom.w, geom.h) * .5);
+
+  returnGeom = new GeomCircle(p3f, 0f, rad, 0f, 360f, 64);
+  returnGeom.state = new State();
+  returnGeom.state.DEPTH_TEST = false;
+  returnGeom.state.BLEND = false;
+
+  returnGeom.setColor(0f, 0f, 0f, 0f);
+  geom.setTranslate(-geom.w * .5f, -geom.h * .5f, 0f);
+  returnGeom.addGeom(geom, true);
+
+
+
+
+  //putting border on outside boundary
+  GeomCircle borderCircle = new GeomCircle(0f, 0f, 0f, rad, rad + (rad * insetPerc), 0f, 360f, 64);
+  returnGeom.addGeom(borderCircle, true);
+  borderCircle.setColor(color);
+
+  //gt2.backgroundColor = new Colorf(borderCircle.r, borderCircle.g,
+  //        borderCircle.b, borderCircle.a); //background of entire bounds
+
+
+  returnGeom.isSelectable = true; //true;
+  borderCircle.isSelectable = true; //true;
+  geom.isSelectable = true; //true;
+
+  geom.registerSelectableObject(returnGeom);
+  geom.registerDraggableObject(returnGeom);
+  borderCircle.registerSelectableObject(returnGeom);
+  borderCircle.registerDraggableObject(returnGeom);
+  returnGeom.registerClickableObject(geom);
+  return returnGeom;
+
+  }
+
+
+  geom.registerSelectableObject(returnGeom);
+  returnGeom.registerClickableObject(geom);
+  //gc2.registerClickableObject(gc2);
+
+  geom.registerDraggableObject(returnGeom);
+  returnGeom.registerSelectableObject(geom);
+  return returnGeom;
+  }
+   */
   @Override
   public boolean checkIsCompletelyVisible()
   {

@@ -4,11 +4,12 @@ package utils;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3f;
 import geometry.Geom;
+import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import javax.media.opengl.GL;
 import javax.vecmath.Point3d;
 import javax.vecmath.SingularMatrixException;
-import renderers.Renderer;
 
 /** 
  * This class contains static utility methods having to do with matrix manipulations. 
@@ -465,6 +466,88 @@ public class MatrixUtils
     return windowVec;
   }
 
+  public static double[] unproject(double[] pixelPt, double[] modelview, double[] projection, int[] viewport)
+  {
+    double[] deviceVec = windowCoordsToDeviceCoords(pixelPt, viewport);
+    double[] clipVec = deviceCoordsToClipCoords(deviceVec);
+    double[] eyeVec = clipCoordsToEyeCoords(clipVec, projection);
+    double[] objectVec = eyeCoordsToObjectCoords(eyeVec, modelview);
+    return normalizeHomogeneousVector(objectVec);
+  }
+
+  public static double[] unprojectOld(double[] pixelPt, double[] modelview, double[] projection, int[] viewport)
+  {
+    double[] mvp = multiplyMatrixByMatrix(projection, modelview);
+    mvp = invertMatrix(mvp);
+
+    double y = (viewport[3] - pixelPt[1]);
+
+    FloatBuffer zBuf = FloatBuffer.allocate(1);
+    RenderUtils.getRenderer().gl.glReadPixels(
+      (int) pixelPt[0], (int) y, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, zBuf);
+    float z = zBuf.get();
+    double in[] = new double[]
+    {
+      pixelPt[0], y, z, 1.0
+    };
+
+    in[0] = (in[0] - (double) viewport[0]) / (double) viewport[2];
+    in[1] = (in[1] - (double) viewport[1]) / (double) viewport[3];
+
+    in[0] = in[0] * 2 - 1;
+    in[1] = in[1] * 2 - 1;
+    in[2] = in[2] * 2 - 1;
+
+    double[] out = multiplyMatrixByVector(mvp, in);
+    out[0] /= out[3];
+    out[1] /= out[3];
+    out[2] /= out[3];
+    return out;
+  }
+
+  /**
+   * From mesa GLU. only works on 4x4 matrices. Might be faster to use vecmath or apache version.
+   * @param m
+   * @return
+   */public static double[] invertMatrix(double[] m)
+  {
+    double[] invOut = new double[16];
+    double[] inv = new double[16];
+    double det;
+    int i;
+
+    inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] + m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
+    inv[4] = -m[4] * m[10] * m[15] + m[4] * m[11] * m[14] + m[8] * m[6] * m[15] - m[8] * m[7] * m[14] - m[12] * m[6] * m[11] + m[12] * m[7] * m[10];
+    inv[8] = m[4] * m[9] * m[15] - m[4] * m[11] * m[13] - m[8] * m[5] * m[15] + m[8] * m[7] * m[13] + m[12] * m[5] * m[11] - m[12] * m[7] * m[9];
+    inv[12] = -m[4] * m[9] * m[14] + m[4] * m[10] * m[13] + m[8] * m[5] * m[14] - m[8] * m[6] * m[13] - m[12] * m[5] * m[10] + m[12] * m[6] * m[9];
+    inv[1] = -m[1] * m[10] * m[15] + m[1] * m[11] * m[14] + m[9] * m[2] * m[15] - m[9] * m[3] * m[14] - m[13] * m[2] * m[11] + m[13] * m[3] * m[10];
+    inv[5] = m[0] * m[10] * m[15] - m[0] * m[11] * m[14] - m[8] * m[2] * m[15] + m[8] * m[3] * m[14] + m[12] * m[2] * m[11] - m[12] * m[3] * m[10];
+    inv[9] = -m[0] * m[9] * m[15] + m[0] * m[11] * m[13] + m[8] * m[1] * m[15] - m[8] * m[3] * m[13] - m[12] * m[1] * m[11] + m[12] * m[3] * m[9];
+    inv[13] = m[0] * m[9] * m[14] - m[0] * m[10] * m[13] - m[8] * m[1] * m[14] + m[8] * m[2] * m[13] + m[12] * m[1] * m[10] - m[12] * m[2] * m[9];
+    inv[2] = m[1] * m[6] * m[15] - m[1] * m[7] * m[14] - m[5] * m[2] * m[15] + m[5] * m[3] * m[14] + m[13] * m[2] * m[7] - m[13] * m[3] * m[6];
+    inv[6] = -m[0] * m[6] * m[15] + m[0] * m[7] * m[14] + m[4] * m[2] * m[15] - m[4] * m[3] * m[14] - m[12] * m[2] * m[7] + m[12] * m[3] * m[6];
+    inv[10] = m[0] * m[5] * m[15] - m[0] * m[7] * m[13] - m[4] * m[1] * m[15] + m[4] * m[3] * m[13] + m[12] * m[1] * m[7] - m[12] * m[3] * m[5];
+    inv[14] = -m[0] * m[5] * m[14] + m[0] * m[6] * m[13] + m[4] * m[1] * m[14] - m[4] * m[2] * m[13] - m[12] * m[1] * m[6] + m[12] * m[2] * m[5];
+    inv[3] = -m[1] * m[6] * m[11] + m[1] * m[7] * m[10] + m[5] * m[2] * m[11] - m[5] * m[3] * m[10] - m[9] * m[2] * m[7] + m[9] * m[3] * m[6];
+    inv[7] = m[0] * m[6] * m[11] - m[0] * m[7] * m[10] - m[4] * m[2] * m[11] + m[4] * m[3] * m[10] + m[8] * m[2] * m[7] - m[8] * m[3] * m[6];
+    inv[11] = -m[0] * m[5] * m[11] + m[0] * m[7] * m[9] + m[4] * m[1] * m[11] - m[4] * m[3] * m[9] - m[8] * m[1] * m[7] + m[8] * m[3] * m[5];
+    inv[15] = m[0] * m[5] * m[10] - m[0] * m[6] * m[9] - m[4] * m[1] * m[10] + m[4] * m[2] * m[9] + m[8] * m[1] * m[6] - m[8] * m[2] * m[5];
+
+    det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+    //if (det == 0)
+    //    return GL_FALSE;
+
+    det = 1.0 / det;
+
+    for (i = 0; i < 16; i++)
+    {
+      invOut[i] = inv[i] * det;
+    }
+
+    return invOut;
+  //return GL_TRUE;
+  }
+
   public static double[] pointToHomogenousCoords(Point3f p3f)
   {
     float[] point = MatrixUtils.toArray(p3f);
@@ -516,6 +599,19 @@ public class MatrixUtils
   }
 
   /**
+   * Transforms a point in homogenous eye coordinates into homogenous object coordinates.
+   * The method itself handles inverting the modelview matrix, so just
+   * pass in the normal modelview.
+   * @param eyeVec A vector of length 4.
+   * @param modelview The 4x4 modelview matrix
+   * @return The point in object coordinates.
+   */
+  public static double[] eyeCoordsToObjectCoords(double[] eyeVec, double[] modelview)
+  {
+    return multiplyMatrixByVector(invertMatrix(modelview), eyeVec);
+  }
+
+  /**
    * Transforms a point in homogeneous eye coordinates into homogeneous clip coordinates.
    * @param eyeVec A vector of length 4.
    * @param projection The 4x4 projection matrix.
@@ -527,6 +623,19 @@ public class MatrixUtils
   }
 
   /**
+   * Transforms a point in homogenous clip coordinates into homogenous eye coordinates.
+   * The method itself handles inverting the projection matrix, so just
+   * pass in the normal projection.
+   * @param clipVec A vector of length 4.
+   * @param modelview The 4x4 projection matrix
+   * @return The point in eye coordinates.
+   */
+  public static double[] clipCoordsToEyeCoords(double[] clipVec, double[] projection)
+  {
+    return multiplyMatrixByVector(invertMatrix(projection), clipVec);
+  }
+
+  /**
    * Transforms the point in homogeneous clip coordinates to normalized device coordinates. This
    * is done by taking the x, y, and z coords and dividing by w. The w is then discarded.
    * @param clipVec A vector of length 4.
@@ -535,6 +644,21 @@ public class MatrixUtils
   public static double[] clipCoordsToDeviceCoords(double[] clipVec)
   {
     return normalizeHomogeneousVector(clipVec);
+  }
+
+  /**
+   * Transforms the point in normalized device coordinates into homogenous clip coordinates.
+   * @param deviceVec
+   * @return The point in homogenous clip coordinates.
+   */
+  public static double[] deviceCoordsToClipCoords(double[] deviceVec)
+  {
+    return pointToHomogenousCoords(new double[]
+      {
+        deviceVec[0] * 2 - 1,
+        deviceVec[1] * 2 - 1,
+        deviceVec[2] * 2 - 1,
+      });
   }
 
   /**
@@ -554,6 +678,44 @@ public class MatrixUtils
   }
 
   /**
+   * Transforms the point in window coordinates into normalized device coordinates.
+   * If the window z value is not given, we calculate it from the depth buffer
+   * by calling glReadPixels.
+   * @param pixels
+   * @param viewport
+   * @return The point in normalized device coordinates.
+   */
+  public static double[] windowCoordsToDeviceCoords(double[] pixels, int[] viewport)
+  {
+    double x, y, z;
+    
+    x = pixels[0];
+
+    if (pixels.length == 2) //then we calculate the depth oursleves
+    {
+      y = (viewport[3] - pixels[1]);
+
+      FloatBuffer zBuf = FloatBuffer.allocate(1);
+      RenderUtils.getRenderer().gl.glReadPixels(
+        (int) pixels[0], (int) y, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, zBuf);
+      z = zBuf.get();
+    }
+    else //we assume you know what you are doing
+    {
+      y = pixels[1]; //might need to reverse as well?
+      z = pixels[2];
+    }
+
+    return (new double[]
+      {
+        (x - (double) viewport[0]) / (double) viewport[2],
+        (y - (double) viewport[1]) / (double) viewport[3],
+        z
+      });
+
+  }
+
+  /**
    * Multiply A * vec.
    * @param A A 4x4 matrix.
    * @param vec A vector of length 4.
@@ -565,11 +727,7 @@ public class MatrixUtils
 
     for (int i = 0; i < 4; i++)
     {
-      final double 
-        ai0 = A[getMatrixIndex(i, 0)],
-        ai1 = A[getMatrixIndex(i, 1)],
-        ai2 = A[getMatrixIndex(i, 2)],
-        ai3 = A[getMatrixIndex(i, 3)];
+      final double ai0 = A[getMatrixIndex(i, 0)],  ai1 = A[getMatrixIndex(i, 1)],  ai2 = A[getMatrixIndex(i, 2)],  ai3 = A[getMatrixIndex(i, 3)];
 
       product[getMatrixIndex(i, 0)] =
         ai0 * vec[getMatrixIndex(0, 0)] +
@@ -830,6 +988,11 @@ public class MatrixUtils
     m[11] *= z;
 
     return m;
+  }
+
+  public static double[] translate(double[] m, Point3f p3f)
+  {
+    return translate(m, p3f.x, p3f.y, p3f.z);
   }
 
   public static double[] translate(double[] m, double x, double y, double z)
