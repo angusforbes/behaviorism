@@ -82,9 +82,9 @@ public class BehaviorScale extends BehaviorGeomContinuous
   {
     if (isActive == true)
     {
-      g.scale.x += offsets[0];
-      g.scale.y += offsets[1];
-      g.scale.z += offsets[2];
+      g.scaleX(offsets[0]);
+      g.scaleY(offsets[1]);
+      g.scaleZ(offsets[2]);
     }
   }
 //  float range_x, range_y, range_z;

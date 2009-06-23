@@ -8,23 +8,27 @@ import javax.vecmath.Point3f;
  *
  * @author angus
  */
-public class GeomGluSphere extends GeomGluQuadric
+public class GeomGluCylinder extends GeomGluQuadric
 {
 
-  public float radius = 1f;
+  public float base = 1f;
+  public float top = 1f;
+  public float height = 1f;
   public int slices = 32;
   public int stacks = 32;
 
-  public GeomGluSphere(Point3f centerPt)
+  public GeomGluCylinder(Point3f centerPt)
   {
     super(centerPt);
   }
 
-  public GeomGluSphere(Point3f centerPt, float radius, int slices, int stacks)
+  public GeomGluCylinder(Point3f centerPt, float base, float top, float height, int slices, int stacks)
   {
     super(centerPt);
 
-    this.radius = radius;
+    this.base = base;
+    this.top = top;
+    this.height = height;
     this.slices = slices;
     this.stacks = stacks;
   }
@@ -34,8 +38,8 @@ public class GeomGluSphere extends GeomGluQuadric
     super.draw(gl);
     gl.glColor4fv(color.array(), 0);
 
-    glu.gluSphere(quadric,
-      radius, slices, stacks);
+    glu.gluCylinder(quadric,
+      base, top, height, slices, stacks);
   }
 
   /*

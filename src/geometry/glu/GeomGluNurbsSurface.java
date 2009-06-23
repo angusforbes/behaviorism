@@ -9,6 +9,7 @@ import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUnurbs;
 import javax.vecmath.Point3f;
 import renderers.Renderer;
+import utils.RenderUtils;
 
 /**
  *
@@ -150,7 +151,7 @@ public class GeomGluNurbsSurface extends Geom
 
   public void draw(GL gl)
   {
-      GLU glu = Renderer.getInstance().glu;
+    GLU glu = RenderUtils.getGLU();
 
     if (dynamicControlPoints != null) //and there has been a change
     {
@@ -160,11 +161,11 @@ public class GeomGluNurbsSurface extends Geom
 //    gl.glEnable(GL.GL_AUTO_NORMAL);
 //    gl.glDisable(GL.GL_BLEND);
 
-      gl.glColor4fv(color.array(), 0);
+    gl.glColor4fv(color.array(), 0);
     //gl.glColor4f(r, g, b, a);
     gl.glLineWidth(1);
 
-    GLUnurbs nurbs = Renderer.getInstance().nurbsRenderer;
+    GLUnurbs nurbs = RenderUtils.getNurbs();
 
 
     glu.gluBeginSurface(nurbs);

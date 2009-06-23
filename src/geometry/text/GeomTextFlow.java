@@ -26,7 +26,7 @@ import javax.vecmath.Point3f;
 import handlers.FontHandler;
 import utils.Utils;
 
-public class GeomTextFlow extends GeomTextOutset
+public class GeomTextFlow extends GeomText
 {
   //actually only used in GeomTextFlowForcedFontSize...
   public List<CharLine> charLines = new ArrayList<CharLine>();

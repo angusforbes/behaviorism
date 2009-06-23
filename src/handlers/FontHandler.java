@@ -226,6 +226,17 @@ public class FontHandler
     return renderer;
   }
 
+  public List<TextRenderer> getDefaultFontFamily()
+  {
+    if (defaultFontFamily == null)
+    {
+      defaultFontFamily = getFontFamily(this.defaultFont, this.defaultStyle);
+    }
+
+    return defaultFontFamily;
+  }
+
+
   /**
    * Creates a single TextRenderer for a specified font and style with a particular size.
    * @param font

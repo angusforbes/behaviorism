@@ -5,13 +5,13 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUtessellatorCallback;
 
-public class TessellationCallBack implements GLUtessellatorCallback
+public class TessellationCallback implements GLUtessellatorCallback
 {
 
   private GL gl;
   private GLU glu;
 
-  public TessellationCallBack(GL gl, GLU glu)
+  public TessellationCallback(GL gl, GLU glu)
   {
     this.gl = gl;
     this.glu = glu;
@@ -65,13 +65,14 @@ public class TessellationCallBack implements GLUtessellatorCallback
     vertex[1] = coords[1];
     vertex[2] = coords[2];
 
-
-    //for (i = 3; i < 7OutOfBounds from C!; i++)
-
+    //colors
     for (i = 3; i < 6; i++)
     {
-      vertex[i] = weight[0] //
-        * ((double[]) data[0])[i] + weight[1] * ((double[]) data[1])[i] + weight[2] * ((double[]) data[2])[i] + weight[3] * ((double[]) data[3])[i];
+      vertex[i] = weight[0] 
+        * ((double[]) data[0])[i] + weight[1]
+        * ((double[]) data[1])[i] + weight[2]
+        * ((double[]) data[2])[i] + weight[3]
+        * ((double[]) data[3])[i];
     }
     outData[0] = vertex;
   }
@@ -110,5 +111,5 @@ public class TessellationCallBack implements GLUtessellatorCallback
   public void errorData(int errnum, Object polygonData)
   {
   }
-}//end TessellationCallBack class
+}//end TessellationCallback class
 

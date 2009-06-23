@@ -278,6 +278,11 @@ public abstract class Geom
       return;
     }
 
+    if (parent.modelview == null)
+    {
+      System.err.println("is transform() : WHY IS TRANSFORM NULL??????");
+      return;
+    }
     /* System.arrayCopy is slightly faster that Arrays.copyOf, allegedly. */
     System.arraycopy(parent.modelview, 0, modelview, 0, 16);
 

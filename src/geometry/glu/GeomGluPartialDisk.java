@@ -9,19 +9,22 @@ import javax.vecmath.Point3f;
  *
  * @author angus
  */
-public class GeomGluDisk extends GeomGluQuadric
+public class GeomGluPartialDisk extends GeomGluQuadric
 {
   public float innerRadius = 0f;
   public float outerRadius = 1f;
   public int slices = 32;
   public int loops = 32;
+  public float startAngle = 0f;
+  public float sweepAngle = 360f;
 
-  public GeomGluDisk(Point3f centerPt)
+  public GeomGluPartialDisk(Point3f centerPt)
   {
     super(centerPt);
   }
 
-  public GeomGluDisk(Point3f centerPt, float innerRadius, float outerRadius, int slices, int loops)
+  public GeomGluPartialDisk(Point3f centerPt, float innerRadius, float outerRadius, 
+   int slices, int loops, float startAngle, float sweepAngle)
   {
     super(centerPt);
   
@@ -29,8 +32,8 @@ public class GeomGluDisk extends GeomGluQuadric
     this.outerRadius = outerRadius;
     this.slices = slices;
     this.loops = loops;
-    //setVerts();
- 
+    this.startAngle = startAngle;
+    this.sweepAngle = sweepAngle;
   }
 
   public void draw(GL gl)
@@ -39,9 +42,10 @@ public class GeomGluDisk extends GeomGluQuadric
 
     gl.glColor4fv(color.array(), 0);
 
-    glu.gluDisk(quadric,
+    glu.gluPartialDisk(quadric,
       this.innerRadius, this.outerRadius,
-      this.slices, this.loops);
+      this.slices, this.loops,
+      this.startAngle, this.sweepAngle);
   }
 
   /*

@@ -24,7 +24,7 @@ import utils.Utils;
  *
  * @author angus
  */
-public class GeomTextFlow2 extends GeomTextOutset
+public class GeomTextFlow2 extends GeomText
 {
   public boolean debugDrawBackground = false; //true
   public List<String> lines = new ArrayList<String>();

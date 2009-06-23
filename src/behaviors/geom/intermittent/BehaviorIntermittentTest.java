@@ -3,7 +3,7 @@
 package behaviors.geom.intermittent;
 
 import geometry.Geom;
-import geometry.text.GeomTextOutset;
+import geometry.text.GeomText;
 
 /**
  *
@@ -21,6 +21,6 @@ public class BehaviorIntermittentTest extends BehaviorGeomIntermittent
   {
     System.out.println("yes updating at... " + System.currentTimeMillis() );
   
-    ((GeomTextOutset)geom).text = "" + System.currentTimeMillis();
+    ((GeomText)geom).text = "" + System.currentTimeMillis();
   }
 }

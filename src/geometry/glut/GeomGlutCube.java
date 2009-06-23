@@ -5,7 +5,7 @@ package geometry.glut;
 import geometry.Geom;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
-import renderers.Renderer;
+import utils.RenderUtils;
 
 /**
  *
@@ -29,11 +29,11 @@ public class GeomGlutCube extends Geom
     //gl.glColor4f(r, g, b, a);
     if (isSolid == true)
     {
-      Renderer.getInstance().glut.glutSolidCube(length);
+      RenderUtils.getGLUT().glutSolidCube(length);
     }
     else
     {
-      Renderer.getInstance().glut.glutWireCube(length);
+      RenderUtils.getGLUT().glutWireCube(length);
     }
   }
 }

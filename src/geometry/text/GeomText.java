@@ -1,4 +1,4 @@
-/* GeomTextOutset.java ~ Oct 6, 2008 */
+/* GeomText.java ~ Oct 6, 2008 */
 package geometry.text;
 
 import com.sun.opengl.util.j2d.TextRenderer;
@@ -8,23 +8,21 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
-import behaviorism.Behaviorism;
 import geometry.Colorf;
+import geometry.Geom;
 import geometry.GeomRect;
 import handlers.FontHandler;
 import java.util.Arrays;
 import java.util.List;
 import javax.vecmath.Vector3f;
-import renderers.cameras.Cam;
 import utils.MatrixUtils;
 import utils.RenderUtils;
 
-public class GeomTextOutset extends GeomRect
+public class GeomText extends GeomRect
 {
-  //public String useFont=null;
-
-  public List<TextRenderer> textRenderers = FontHandler.getInstance().textRenderers;
   public String text = "";
+  public List<TextRenderer> textRenderers = FontHandler.getInstance().textRenderers;
+
   protected Rectangle2D stringBounds = null;
   protected TextRenderer textRenderer = null;
   protected Font font = null;
@@ -38,16 +36,12 @@ public class GeomTextOutset extends GeomRect
   protected int pxHeight = 0;
   protected float prevW = 0f;
   protected float prevH = 0f;
-  //protected Rectangle2D stringBoundsX = null;
-  //protected Rectangle2D stringBoundsY = null;
-  //protected TextRenderer textRendererX = null;
-  //protected TextRenderer textRendererY = null;
-  //protected Rectangle2D.Float boundsInsets = new Rectangle2D.Float();
-  //protected Rectangle2D.Float boundsTextBackground = new Rectangle2D.Float();
-  //public float maxw = 1f;
-  //public float maxh = 1f;
-  //protected float scaleValX = 1f;
-  //protected float scaleValY = 1f;
+  protected float tempypos = 0f;
+  protected float tty = 0f;
+  protected float tth = 0f;
+  protected float useY = 0f;
+  protected float useX = 0f;
+
   public int justifyX = 0; //0 center, -1 left, +1 right
   public int justifyY = 0; //0 center, -1 bottom, +1 top
   public float insetX = 0f;
@@ -57,27 +51,14 @@ public class GeomTextOutset extends GeomRect
   public Colorf insetColor = null; //background of insets
   public Colorf backgroundColor = null; //background of entire bounds
   public Colorf textBackgroundColor = null; //background of exact text bounds
-  //public TextRenderer nonDynamicTextRenderer = null;
-  public boolean isFirstTime = true;
+
   public boolean exactPixelBounds = false;
   public boolean useNonDynamicTextRenderer = false;
   public float paddingX = 0f;
   public float paddingY = 0f;
 
-  /*
-  things we have to worry about:
-  
-  font-family
-  
-  background color / text color
-  padding --> exact or percentage
-  
-  tight bounds or regualr bounds
-  
-  constrain by height/width
-  
-  justify x/y
-   */
+  //public boolean isFirstTime = true;
+
   public static class GeomTextBuilder
   {
 
@@ -98,8 +79,9 @@ public class GeomTextOutset extends GeomRect
     private float boxWidth = -1f;
     private float boxHeight = -1f;
     private boolean fitInBox = false;
-    private String fontString = null;
-    private int fontStyle = -1;
+    //private String fontString = null;
+    //private int fontStyle = -1;
+    private List<TextRenderer> textRenderers = null;
 
     public GeomTextBuilder(String text)
     {
@@ -108,25 +90,30 @@ public class GeomTextOutset extends GeomRect
 
     public GeomTextBuilder font(String font, int fontStyle)
     {
-      this.fontString = font;
-      this.fontStyle = fontStyle;
+      this.textRenderers = FontHandler.getInstance().getFontFamily(font, fontStyle);
       return this;
     }
 
     public GeomTextBuilder font(String font)
     {
-      this.fontString = font;
-      this.fontStyle = Font.PLAIN;
+      this.textRenderers = FontHandler.getInstance().getFontFamily(font, Font.PLAIN);
+      return this;
+    }
+
+    public GeomTextBuilder font(List<TextRenderer> textRenderers)
+    {
+      this.textRenderers = textRenderers;
       return this;
     }
 
     /**
-     * getMatrixIndex convenience method which positions the text within the given box area.
+     * A convenience method that positions the text within the given box area.
      * Justifications are based on the
      * boundaries of the box, as opposed to the translate point (as with the "contstrain" methods).
      * The box's x and y coordinates are the translate of this object.
      * Note that this box is simply for the initial placement. The bounds of the box
-     * are not preserved once the GeomText object is created.
+     * are not preserved once the GeomText object is created. If you want the box, you should
+     * make it with a GeomRect or something.
      * @param bw
      * @param bh
      * @return The GeomTextBuilder we are building.
@@ -145,6 +132,11 @@ public class GeomTextOutset extends GeomRect
     {
       this.anchorPt = anchorPt;
       return this;
+    }
+
+    public GeomTextBuilder anchor(int x, int y)
+    {
+      return anchor(MatrixUtils.pixelToWorld(x, y));
     }
 
     public GeomTextBuilder nonDynamicTextRenderer(TextRenderer nonDynamicTextRenderer)
@@ -218,51 +210,27 @@ public class GeomTextOutset extends GeomRect
       return this;
     }
 
-    public GeomTextOutset build()
+    public GeomText build()
     {
-      GeomTextOutset gto = new GeomTextOutset(this);
-      /*
-      if (usePadding == true)
-      {
-      GeomRect gr;
-      if (this.exactPadding == true)
-      {
-      gr = new GeomRect(-paddingX, -paddingY, -.01f, gto.w + (paddingX * 2f), gto.h + (paddingY * 2f));
-      }
-      else //percentange padding
-      {
-      float padX = gto.w * paddingX;
-      float padY = gto.h * paddingY;
-      gr = new GeomRect(-padX, -padY, -.01f, gto.w + (padX * 2f), gto.h + (padY * 2f));
-      }
-      
-      
-      gr.setColor(gto.backgroundColor);
-      gr.state = new State();
-      gr.state.DEPTH_TEST = false;
-      gr.state.BLEND = false;
-      
-      //gto.state = new State();
-      //gto.state.DEPTH_TEST = false;
-      
-      gr.registerObject(gto);
-      gto.addGeom(gr);
-      
-      
-      }
-       */
-      return gto;
+      return new GeomText(this);
     }
   }
 
   public void setFont(String fontString, int fontStyle)
   {
     this.textRenderers = FontHandler.getInstance().getFontFamily(fontString, fontStyle);
-  //FontHandler.getInstance().fontsReady.set(true);
   }
 
-  public GeomTextOutset() {} //temp while we are cleaning stuff up... remove this soon! TODO
-  public GeomTextOutset(GeomTextBuilder builder)
+  public void setFont(List<TextRenderer> trs)
+  {
+    this.textRenderers = trs;
+  }
+
+  public GeomText()
+  {
+  } //temp while we are cleaning stuff up... remove this soon! TODO
+
+  public GeomText(GeomTextBuilder builder)
   {
     super(builder.anchorPt, builder.width, builder.height);
 
@@ -283,9 +251,13 @@ public class GeomTextOutset extends GeomRect
     this.justifyX = builder.justifyX;
     this.justifyY = builder.justifyY;
 
-    if (builder.fontString != null)
+    if (builder.textRenderers != null)
     {
-      setFont(builder.fontString, builder.fontStyle);
+      setFont(builder.textRenderers);
+    }
+    else
+    {
+      setFont(FontHandler.getInstance().getDefaultFontFamily());
     }
     //constraints-- give a better name, width and height are confusing!
     if (builder.width <= 0f && builder.height <= 0f)
@@ -381,16 +353,9 @@ public class GeomTextOutset extends GeomRect
         case -1:
           break;
       }
-
     }
-
-
   }
-  //ANGUS-- need to handle quotes properly
-  //they are children of the main GT2 and their
-  //rotate point is actually the dist to the center of their parent.
-  //show some rect to see what is going on...
-
+ 
   /** This method calucaltes the pixel width and height without taking into
    * consideration any rotations. Looks good, except the scale part might be a bit funny.
    * Should investigate later!
@@ -503,45 +468,56 @@ public class GeomTextOutset extends GeomRect
     this.pxX = (int) (RenderUtils.getXOfObjectInPixels(this, temp_mv, temp_pj, temp_vp));
     this.pxY = (int) (RenderUtils.getYOfObjectInPixels(this, temp_mv, temp_pj, temp_vp));
 
-    System.out.println("pxX / pxY = " + pxX + "/" + pxY);
+    //System.out.println("pxX / pxY = " + pxX + "/" + pxY);
 
   }
 
   protected void calculateUnrotatedPixelWidthAndHeight(GL gl)
   {
+
+    Point3f lowerleft = MatrixUtils.toPoint3f(
+      MatrixUtils.getGeomPointInWorldCoordinates(
+      MatrixUtils.toPoint3d(new Point3f(0f, 0f, 0f)), modelview,
+      RenderUtils.getCamera().modelview));
+    Point3f upperright = MatrixUtils.toPoint3f(
+      MatrixUtils.getGeomPointInWorldCoordinates(
+      MatrixUtils.toPoint3d(new Point3f(w, h, 0f)), modelview,
+      RenderUtils.getCamera().modelview));
+
+    float avgdist = (lowerleft.z + upperright.z) / 2f;
+
+    //double[] temp_mv = new double[16];
+    //System.arraycopy(RenderUtils.getCamera().modelview, 0, temp_mv, 0, 16);
+    double[] temp_mv = RenderUtils.getCamera().modelview;
+
+    Geom upp = this;
+    while (upp.parent != null)
+    {
+      temp_mv = MatrixUtils.scale(temp_mv, upp.scale.x, upp.scale.y, upp.scale.z);
+      upp = upp.parent;
+    }
+
+    temp_mv = MatrixUtils.translate(temp_mv, 0f, 0f, (float) avgdist);
+
     double[] temp_pj = RenderUtils.getCamera().projection;
     int[] temp_vp = RenderUtils.getCamera().viewport;
-
-    //Cam cam = Behaviorism.renderer.cam;
-
-    float dist = RenderUtils.getCamera().translate.distance(new Point3f(translate.x + (w * .5f), translate.y + (h * .5f), translate.z));
-//    System.out.println("camera at " + cam.translate);
-//    System.out.println("object at " + (new Point3f(translate.x + (w * .5f), translate.y + (h * .5f), translate.z)));
-//    System.out.println("dist = " + dist);
-
-    double[] temp_mv = MatrixUtils.getIdentity();
-    //double[] temp_mv = cam.perspective();
-    temp_mv = MatrixUtils.scale(temp_mv, scale.x, scale.y, scale.z);
-    temp_mv = MatrixUtils.translate(temp_mv, -w / 2f, -h / 2f, (float) (-dist));
 
     this.pxWidth = (int) (RenderUtils.getWidthOfObjectInPixels(this, this.paddingX * 2f, temp_mv, temp_pj, temp_vp));
     this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(this, this.paddingY * 2f, temp_mv, temp_pj, temp_vp));
 
-  //for debugging...
-//
-//  gl.glPushMatrix();
-//  gl.glLoadMatrixd(temp_mv, 0);
-//  gl.glColor4f(0f,0f,1f,1f);
-//  drawRect(gl, 0f);
-//  gl.glPopMatrix();
-//
+    boolean debug = false;
+    if (debug)
+    {
+      System.out.println("pxW/pxH = " + pxWidth + "/" + pxHeight);
+      gl.glPushMatrix();
+      temp_mv = MatrixUtils.translate(temp_mv, -w / 2f, -h / 2f, 0f);
+      gl.glLoadMatrixd(temp_mv, 0);
+      gl.glColor4f(0f, 0f, 1f, 1f);
+      drawRect(gl, 0f);
+      gl.glPopMatrix();
+    }
   }
 
-  float tempypos = 0f;
-  float tty = 0f;
-  float tth = 0f;
-  float useY = 0f;
-  float useX = 0f;
 
   //DebugTimer timer = new DebugTimer();
   @Override
@@ -551,8 +527,7 @@ public class GeomTextOutset extends GeomRect
     calculateUnrotatedPixelWidthAndHeight(gl);
     //System.out.println("time to calc = " + timer.resetTime());
     {
-      if (FontHandler.getInstance().fontsReady.get() == true || this.pxWidth != this.prevPxWidth || this.pxHeight != this.prevPxHeight ||
-        this.textRenderer == null)
+      if (this.pxWidth != this.prevPxWidth || this.pxHeight != this.prevPxHeight || this.textRenderer == null)
       {
         //System.out.println("pxWidth/pxHeight = " + pxWidth + "/" + pxHeight);
 
@@ -591,8 +566,8 @@ public class GeomTextOutset extends GeomRect
     textRenderer.draw3D(this.text, useX, useY, offset, this.scaleVal);
     textRenderer.end3DRendering();
 
-    //textRenderer.flush();
-    //System.out.println("time to draw = " + timer.resetTime());
+  //textRenderer.flush();
+  //System.out.println("time to draw = " + timer.resetTime());
 
   }
 
@@ -634,23 +609,22 @@ public class GeomTextOutset extends GeomRect
 
   public Rectangle2D getStringWidthUsingTextRenderer(TextRenderer tr)
   {
-    FontRenderContext frc = tr.getFontRenderContext();
-      Font font = tr.getFont();
+    frc = tr.getFontRenderContext();
+    font = tr.getFont();
 
-      if (exactPixelBounds == true)
-      {
-        GlyphVector gv = font.createGlyphVector(frc, this.text);
-        return gv.getPixelBounds(null, 0f, 0f);
-      }
-      else
-      {
-        return font.getStringBounds(this.text, frc);
-      }
+    if (exactPixelBounds == true)
+    {
+      GlyphVector gv = font.createGlyphVector(frc, this.text);
+      return gv.getPixelBounds(null, 0f, 0f);
+    }
+    else
+    {
+      return font.getStringBounds(this.text, frc);
+    }
   }
 
   public void chooseFont()
   {
-    //TextRenderer prevTextRenderer = textRenderers.get(0);
     this.textRenderer = textRenderers.get(0);
     this.stringBounds = getStringWidthUsingTextRenderer(this.textRenderer);
     float curWidth = (float) stringBounds.getWidth();
@@ -690,10 +664,10 @@ public class GeomTextOutset extends GeomRect
 
   public void setWidthAndHeight(float maxw, float maxh)
   {
-    TextRenderer fi = FontHandler.getInstance().getLargestTextRenderer();
+    TextRenderer fi = textRenderers.get(textRenderers.size() - 1); //** TO DO: these aren't necessarily sorted?? !*/
 
-    FontRenderContext frc = fi.getFontRenderContext();
-    Font font = fi.getFont();
+    frc = fi.getFontRenderContext();
+    font = fi.getFont();
 
     Rectangle2D bounds;
     if (exactPixelBounds == true)
@@ -724,10 +698,10 @@ public class GeomTextOutset extends GeomRect
   {
     this.h = h;
 
-    TextRenderer fi = FontHandler.getInstance().getLargestTextRenderer();
+    TextRenderer fi = textRenderers.get(textRenderers.size() - 1); //** TO DO: these aren't necessarily sorted?? !*/
 
-    FontRenderContext frc = fi.getFontRenderContext();
-    Font font = fi.getFont();
+    frc = fi.getFontRenderContext();
+    font = fi.getFont();
 
     Rectangle2D bounds;
     if (exactPixelBounds == true)
@@ -745,9 +719,11 @@ public class GeomTextOutset extends GeomRect
   public void setHeightByWidth(float w)
   {
     this.w = w;
-    TextRenderer fi = textRenderers.get(FontHandler.getInstance().textRenderers.size() - 1); //ie largest one
-    FontRenderContext frc = fi.getFontRenderContext();
-    Font font = fi.getFont();
+
+    TextRenderer fi = textRenderers.get(textRenderers.size() - 1); //** TO DO: these aren't necessarily sorted?? !*/
+
+    frc = fi.getFontRenderContext();
+    font = fi.getFont();
 
     Rectangle2D bounds;
 
@@ -768,42 +744,42 @@ public class GeomTextOutset extends GeomRect
   /*
   public static GeomText2 createGeomTextWithQuotes(String text)
   {
-    return createGeomTextWithQuotes(0f, 0f, 0f, 2f, 1f, text);
+  return createGeomTextWithQuotes(0f, 0f, 0f, 2f, 1f, text);
   }
 
   public static GeomText2 createGeomTextWithQuotes(
-    float x, float y, float z, float w, float h,
-    String text)
+  float x, float y, float z, float w, float h,
+  String text)
   {
-    GeomText2 gtf = new GeomText2(x, y, z, w, h, text);
-    gtf.setColor(1f, 1f, 1f, 1f);
-    //gtf.backgroundColor= new Colorf();
-    gtf.determineRotateAnchor(RotateEnum.CENTER);
-    gtf.determineScaleAnchor(ScaleEnum.CENTER);
+  GeomText2 gtf = new GeomText2(x, y, z, w, h, text);
+  gtf.setColor(1f, 1f, 1f, 1f);
+  //gtf.backgroundColor= new Colorf();
+  gtf.determineRotateAnchor(RotateEnum.CENTER);
+  gtf.determineScaleAnchor(ScaleEnum.CENTER);
 
-    GeomText2 gtf2 = new GeomText2(-.4f, .4f, 0f, .36f, .5f, "\u201C");
-    gtf2.setColor(1f, 1f, 1f, 1f);
-    //gtf2.backgroundColor= new Colorf();
-    gtf.addGeom(gtf2, true);
+  GeomText2 gtf2 = new GeomText2(-.4f, .4f, 0f, .36f, .5f, "\u201C");
+  gtf2.setColor(1f, 1f, 1f, 1f);
+  //gtf2.backgroundColor= new Colorf();
+  gtf.addGeom(gtf2, true);
 
-    GeomText2 gtf3 = new GeomText2(gtf.w + .05f, .4f, 0f, .36f, .5f, "\u201D");
-    gtf3.setColor(1f, 1f, 1f, 1f);
-    gtf.addGeom(gtf3, true);
+  GeomText2 gtf3 = new GeomText2(gtf.w + .05f, .4f, 0f, .36f, .5f, "\u201D");
+  gtf3.setColor(1f, 1f, 1f, 1f);
+  gtf.addGeom(gtf3, true);
 
-    //gtf2.registerDraggableObject(gtf);
-    //gtf3.registerDraggableObject(gtf);
-    gtf2.registerSelectableObject(gtf);
-    gtf3.registerSelectableObject(gtf);
-    return gtf;
+  //gtf2.registerDraggableObject(gtf);
+  //gtf3.registerDraggableObject(gtf);
+  gtf2.registerSelectableObject(gtf);
+  gtf3.registerSelectableObject(gtf);
+  return gtf;
   }
-  */
+   */
   @Override
   public void dispose()
   {
     super.dispose();
-    if (textRenderer != null)
-    {
-      textRenderer = null;
-    }
+//    if (textRenderer != null)
+//    {
+//      textRenderer = null;
+//    }
   }
 }

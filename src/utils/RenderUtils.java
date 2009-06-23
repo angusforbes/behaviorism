@@ -2,6 +2,7 @@
 package utils;
 
 import behaviorism.Behaviorism;
+import com.sun.opengl.util.GLUT;
 import geometry.Geom;
 import geometry.GeomPoint;
 import geometry.GeomPoly;
@@ -13,9 +14,14 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import javax.media.opengl.GL;
+import javax.media.opengl.glu.GLU;
+import javax.media.opengl.glu.GLUnurbs;
+import javax.media.opengl.glu.GLUquadric;
+import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import renderers.Renderer;
+import renderers.TessellationCallback;
 import renderers.cameras.Cam;
 import worlds.World;
 
@@ -43,44 +49,47 @@ public class RenderUtils
   {
     Renderer rj = getRenderer();
 
-    double[] pt = MatrixUtils.unproject(new double[]{x, y},
+    double[] pt = MatrixUtils.unproject(new double[]
+      {
+        x, y
+      },
       rj.getCamera().modelview,
       rj.getCamera().projection,
       rj.getCamera().viewport);
 
     return MatrixUtils.toPoint3f(new Point3d(pt[0], pt[1], pt[2]));
-    /*
-    double modelview[] = new double[16];
-    double projection[] = new double[16];
-    int viewport[] = new int[4];
-    double worldCoords[] = new double[3];
+  /*
+  double modelview[] = new double[16];
+  double projection[] = new double[16];
+  int viewport[] = new int[4];
+  double worldCoords[] = new double[3];
 
-    //projection = MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, Renderer.nearPlane, Renderer.farPlane);
-    projection = rj.cam.projection; //MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, Renderer.nearPlane, Renderer.farPlane);
-    //modelview = rj.cam.perspective();
-    modelview = rj.cam.modelview;
-    viewport = RenderUtils.getCamera().viewport;
+  //projection = MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, Renderer.nearPlane, Renderer.farPlane);
+  projection = rj.cam.projection; //MatrixUtils.perspective(rj.cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, Renderer.nearPlane, Renderer.farPlane);
+  //modelview = rj.cam.perspective();
+  modelview = rj.cam.modelview;
+  viewport = RenderUtils.getCamera().viewport;
 
-    //invert y value properly
-    y = (int) ((float) viewport[3] - (float) y);
+  //invert y value properly
+  y = (int) ((float) viewport[3] - (float) y);
 
-    //get z value from scene
-    FloatBuffer zBuf = FloatBuffer.allocate(1);
+  //get z value from scene
+  FloatBuffer zBuf = FloatBuffer.allocate(1);
 
-    rj.gl.glReadPixels(x, (int) y, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, zBuf);
-    float z = zBuf.get();
-//    float z = 0f;
-// System.out.println("in RenderUtils.getWorldCoordsForScreenCoord() : z depth value = " + z);
-    //unproject mouse coords into world coords!
-    rj.glu.gluUnProject((double) x, (double) y, (double) z,
-      modelview, 0,
-      projection, 0,
-      viewport, 0,
-      worldCoords, 0);
+  rj.gl.glReadPixels(x, (int) y, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, zBuf);
+  float z = zBuf.get();
+  //    float z = 0f;
+  // System.out.println("in RenderUtils.getWorldCoordsForScreenCoord() : z depth value = " + z);
+  //unproject mouse coords into world coords!
+  rj.glu.gluUnProject((double) x, (double) y, (double) z,
+  modelview, 0,
+  projection, 0,
+  viewport, 0,
+  worldCoords, 0);
 
-//    System.out.println("in RenderUtils.getWorldCoordsForScreenCoord() : "+ Arrays.toString(worldCoords));
-    return worldCoords;
-     */
+  //    System.out.println("in RenderUtils.getWorldCoordsForScreenCoord() : "+ Arrays.toString(worldCoords));
+  return worldCoords;
+   */
   }
 
   /**
@@ -89,34 +98,33 @@ public class RenderUtils
   /*
   public static Point3f getWorldCoordsForScreenCoord(int x, int y, double z, double[] modelview)
   {
-//    Renderer rj = getRenderer();
-//
-//    return MatrixUtils.unproject(new double[]{x, y},
-//      rj.getCamera().modelview,
-//      rj.getCamera().projection,
-//      rj.getCamera().viewport);
+  //    Renderer rj = getRenderer();
+  //
+  //    return MatrixUtils.unproject(new double[]{x, y},
+  //      rj.getCamera().modelview,
+  //      rj.getCamera().projection,
+  //      rj.getCamera().viewport);
 
 
-    Renderer rj = getRenderer();
+  Renderer rj = getRenderer();
 
-    double projection[] = new double[16];
-    int viewport[] = new int[4];
-    double worldCoords[] = new double[3];
+  double projection[] = new double[16];
+  int viewport[] = new int[4];
+  double worldCoords[] = new double[3];
 
-    rj.gl.glGetDoublev(rj.gl.GL_PROJECTION_MATRIX, projection, 0);
-    rj.gl.glGetIntegerv(rj.gl.GL_VIEWPORT, viewport, 0);
+  rj.gl.glGetDoublev(rj.gl.GL_PROJECTION_MATRIX, projection, 0);
+  rj.gl.glGetIntegerv(rj.gl.GL_VIEWPORT, viewport, 0);
 
-    //unproject mouse coords into world coords!
-    rj.glu.gluUnProject((double) x, (double) y, (double) z,
-      modelview, 0,
-      projection, 0,
-      viewport, 0,
-      worldCoords, 0);
+  //unproject mouse coords into world coords!
+  rj.glu.gluUnProject((double) x, (double) y, (double) z,
+  modelview, 0,
+  projection, 0,
+  viewport, 0,
+  worldCoords, 0);
 
-    return new Point3f((float) worldCoords[0], (float) worldCoords[1], (float) worldCoords[2]);
+  return new Point3f((float) worldCoords[0], (float) worldCoords[1], (float) worldCoords[2]);
   }
-  */
-  
+   */
   public static Rectangle2D.Float getScreenRectangleForWorldCoords(GeomRect gr)
   {
     Path2D.Float p2d = getScreenShapeForWorldCoords(gr);
@@ -153,26 +161,85 @@ public class RenderUtils
   {
     return Renderer.getInstance();
   }
+
   public static World getWorld()
   {
     return getRenderer().currentWorld;
   }
+
   public static Cam getCamera()
   {
     return getWorld().cam;
   }
+
   public static double[] getModelview()
   {
     return getCamera().modelview;
   }
+
   public static double[] getProjection()
   {
     return getCamera().projection;
   }
+
   public static int[] getViewport()
   {
     return getCamera().viewport;
   }
+
+  public static GLUT getGLUT()
+  {
+    return getRenderer().glut;
+  }
+
+  public static GLU getGLU()
+  {
+    return getRenderer().glu;
+  }
+
+  public static GL getGL()
+  {
+    return getRenderer().gl;
+  }
+
+  public static GLUtessellator getTesselator()
+  {
+
+    if (getRenderer().tessellationObject == null)
+    {
+      GLU glu = getGLU();
+      TessellationCallback tessellationCallback = new TessellationCallback(getGL(), glu);
+      getRenderer().tessellationObject = glu.gluNewTess();
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_VERTEX, tessellationCallback);// vertexCallback);
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_BEGIN, tessellationCallback);// beginCallback);
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_END, tessellationCallback);// endCallback);
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_ERROR, tessellationCallback);// errorCallback);
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_COMBINE, tessellationCallback);// combineCallback);
+    }
+
+    return getRenderer().tessellationObject;
+  }
+
+  public static GLUnurbs getNurbs()
+  {
+    if (getRenderer().nurbsRenderer == null)
+    {
+      getRenderer().nurbsRenderer = getGLU().gluNewNurbsRenderer();
+    }
+
+    return getRenderer().nurbsRenderer;
+  }
+
+  public static GLUquadric getQuadric()
+  {
+    if (getRenderer().quadricRenderer == null)
+    {
+      getRenderer().quadricRenderer = getGLU().gluNewQuadric();
+    }
+
+    return getRenderer().quadricRenderer;
+  }
+
 
   public static List<Float> getScreenRectInGeomCoordnates(Geom g, Rectangle2D.Float r2f)
   {
@@ -240,30 +307,36 @@ public class RenderUtils
     y = (int) ((float) viewport[3] - (float) y);
 
     wcsN = MatrixUtils.unproject(
-      new double[]{x, y, 0},
+      new double[]
+      {
+        x, y, 0
+      },
       modelview,
       projection,
       viewport);
 
     wcsF = MatrixUtils.unproject(
-      new double[]{x, y, 1},
+      new double[]
+      {
+        x, y, 1
+      },
       modelview,
       projection,
       viewport);
 
     /*
     rj.glu.gluUnProject((double) x, (double) y, 0.0, //-1?
-      RenderUtils.getCamera().modelview, 0,
-      projection, 0,
-      viewport, 0,
-      wcsN, 0);
+    RenderUtils.getCamera().modelview, 0,
+    projection, 0,
+    viewport, 0,
+    wcsN, 0);
 
     rj.glu.gluUnProject((double) x, (double) y, 1.0,
-      RenderUtils.getCamera().modelview, 0,
-      projection, 0,
-      viewport, 0,
-      wcsF, 0);
-    */
+    RenderUtils.getCamera().modelview, 0,
+    projection, 0,
+    viewport, 0,
+    wcsF, 0);
+     */
 
     Point3d nearPt = new Point3d(wcsN[0], wcsN[1], wcsN[2]);
     Point3d farPt = new Point3d(wcsF[0], wcsF[1], wcsF[2]);

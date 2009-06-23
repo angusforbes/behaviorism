@@ -9,6 +9,7 @@ import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUnurbs;
 import javax.vecmath.Point3f;
 import renderers.Renderer;
+import utils.RenderUtils;
 
 /**
  *
@@ -16,9 +17,9 @@ import renderers.Renderer;
  */
 public class GeomGluNurbsCurve extends Geom
 {
+
   boolean drawControlPoints = true; //false;
   boolean drawControlLines = false; //true; //false;
-
   int numKnots;
   public List<GeomPoint> dynamicControlPoints = null;
   float[] knotArray;
@@ -67,13 +68,13 @@ public class GeomGluNurbsCurve extends Geom
     super(p3f);
 
     this.dynamicControlPoints = controlPoints;
-    for(GeomPoint gp : this.dynamicControlPoints)
+    for (GeomPoint gp : this.dynamicControlPoints)
     {
       addGeom(gp);
       gp.isVisible = false; //drawControlPoints;
     }
 
-    this.numKnots = controlPoints.size() + order; 
+    this.numKnots = controlPoints.size() + order;
     this.knotArray = knotArray;
     this.order = order;
     this.stride = 3;
@@ -94,19 +95,18 @@ public class GeomGluNurbsCurve extends Geom
 
   public void draw(GL gl)
   {
-      GLU glu = Renderer.getInstance().glu;
+    GLU glu = RenderUtils.getGLU();
 
     if (dynamicControlPoints != null) //and there has been a change
     {
       updateControlArray();
     }
 
-      gl.glColor4fv(color.array(), 0);
+    gl.glColor4fv(color.array(), 0);
 
-    //gl.glColor4f(r, g, b, a);
     gl.glLineWidth(1);
 
-    GLUnurbs nurbs = Renderer.getInstance().nurbsRenderer;
+    GLUnurbs nurbs = RenderUtils.getNurbs();
 
     glu.gluBeginCurve(nurbs);
 //    glu.gluNurbsCurve(nurbs,
