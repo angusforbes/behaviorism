@@ -24,28 +24,36 @@ public class GeomPoint extends Geom
 {
   public Point2D.Float texCoord = new Point2D.Float();
   public float pointSize = 8f;
-  
-  public GeomPoint()
+
+
+  public GeomPoint(){}
+
+  public GeomPoint(int x, int y)
   {
+   super(x, y);
+  }
+  public GeomPoint(boolean upperLeft, int x, int y)
+  {
+   super(upperLeft, x, y);
   }
   
   public GeomPoint(Point3f anchor)
   {
-    this.translate = anchor;
+    super(anchor);
   }
   public GeomPoint(Point3f anchor, float pointSize)
   {
-    this.translate = anchor;
+    super(anchor);
     this.pointSize = pointSize;
   }
   
   public GeomPoint(float x, float y, float z)
   {
-    translate.set(x, y, z);
+    super(x, y, z);
   }
   public GeomPoint(float x, float y, float z, float pointSize)
   {
-    translate.set(x, y, z);
+    super(x, y, z);
     this.pointSize = pointSize;
   }
   

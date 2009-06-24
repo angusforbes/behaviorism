@@ -57,7 +57,7 @@ public class GeomRect extends Geom
     this.isSelectable = true;
   }
 
-  public void adjustWidth(boolean upperLeft, float x, float y, float w, float h)
+  public void adjustPixelSize(boolean upperLeft, float x, float y, float w, float h)
   {
     Point3f upperright;
     if (upperLeft == true)
@@ -85,7 +85,7 @@ public class GeomRect extends Geom
   {
     super(x, y);
 
-    adjustWidth(true, x, y, w, h);
+    adjustPixelSize(true, x, y, w, h);
 
     this.isSelectable = true;
   }
@@ -94,7 +94,7 @@ public class GeomRect extends Geom
   {
     super(upperLeft, x, y);
 
-    adjustWidth(upperLeft, x, y, w, h);
+    adjustPixelSize(upperLeft, x, y, w, h);
 
     this.isSelectable = true;
   }
