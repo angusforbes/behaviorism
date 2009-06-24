@@ -64,6 +64,10 @@ public class GeomText extends GeomRect
 
     private String text;
     private Point3f anchorPt = new Point3f();
+    private int anchorPxX = 0;
+    private int anchorPxY = 0;
+    private boolean usePixelAnchor = false;
+    private boolean pixelAnchorUpperLeft = false;
     private float width = 1f;
     private float height = 1f;
     private int justifyX = 0;
@@ -131,14 +135,27 @@ public class GeomText extends GeomRect
     public GeomTextBuilder anchor(Point3f anchorPt)
     {
       this.anchorPt = anchorPt;
+      this.usePixelAnchor = false;
       return this;
     }
 
     public GeomTextBuilder anchor(int x, int y)
     {
-      return anchor(MatrixUtils.pixelToWorld(x, y));
+      this.anchorPxX = x;
+      this.anchorPxY = y;
+      this.pixelAnchorUpperLeft = false;
+      this.usePixelAnchor = true;
+      return this;
     }
 
+    public GeomTextBuilder anchor(int x, int y, boolean upperLeft)
+    {
+      this.anchorPxX = x;
+      this.anchorPxY = y;
+      this.pixelAnchorUpperLeft = upperLeft;
+      this.usePixelAnchor = true;
+      return this;
+    }
     public GeomTextBuilder nonDynamicTextRenderer(TextRenderer nonDynamicTextRenderer)
     {
       this.nonDynamicTextRenderer = nonDynamicTextRenderer;
@@ -212,7 +229,15 @@ public class GeomText extends GeomRect
 
     public GeomText build()
     {
-      return new GeomText(this);
+      if (this.usePixelAnchor == true)
+      {
+        System.out.println("HERE");
+        return new GeomText(anchorPxX, anchorPxY, pixelAnchorUpperLeft, this);
+      }
+      else
+      {
+        return new GeomText(anchorPt, this);
+      }
     }
   }
 
@@ -230,36 +255,27 @@ public class GeomText extends GeomRect
   {
   } //temp while we are cleaning stuff up... remove this soon! TODO
 
-  public GeomText(GeomTextBuilder builder)
+  public GeomText(Point3f anchorPt, GeomTextBuilder builder)
   {
-    super(builder.anchorPt, builder.width, builder.height);
+    super(anchorPt, builder.width, builder.height);
 
-    setColor(builder.textColor);
-    this.backgroundColor = builder.backgroundColor;
+    initializeConstraints(builder);
+  }
 
-    this.text = builder.text;
-    this.exactPixelBounds = builder.exactPixelBounds;
+  //this is broken-- need to think about width and height...
+  public GeomText(int pxX, int pxY, boolean pixelAnchorUpperLeft, GeomTextBuilder builder)
+  {
+    super(pixelAnchorUpperLeft, pxX, pxY, (int)builder.width, (int)builder.height);
 
-    if (builder.nonDynamicTextRenderer != null)
-    {
-      this.useNonDynamicTextRenderer = true;
-      this.textRenderer = builder.nonDynamicTextRenderer;
-      System.out.println("here nonDynamicTextRenderer = " + builder.nonDynamicTextRenderer);
-      System.out.println("so textRenderer = " + textRenderer);
-    }
+    name = "TEST";
+    initializePixelConstraints(builder);
+  }
 
-    this.justifyX = builder.justifyX;
-    this.justifyY = builder.justifyY;
+  private void initializeConstraints(GeomTextBuilder builder)
+  {
+    initialize(builder);
 
-    if (builder.textRenderers != null)
-    {
-      setFont(builder.textRenderers);
-    }
-    else
-    {
-      setFont(FontHandler.getInstance().getDefaultFontFamily());
-    }
-    //constraints-- give a better name, width and height are confusing!
+  //constraints-- give a better name, width and height are confusing!
     if (builder.width <= 0f && builder.height <= 0f)
     {
       //this is illegal, default to a width and height of 1f
@@ -279,7 +295,8 @@ public class GeomText extends GeomRect
       setWidthAndHeight(builder.width, builder.height);
     }
 
-
+   
+    
     if (builder.usePadding == true)
     {
       if (builder.exactPadding == true)
@@ -354,6 +371,142 @@ public class GeomText extends GeomRect
           break;
       }
     }
+     
+  }
+
+
+  private void initializePixelConstraints(GeomTextBuilder builder)
+  {
+    initialize(builder);
+
+    if (builder.width <= 0f && builder.height <= 0f)
+    {
+      //this is illegal, default to a width and height of 1f
+      this.w = 1f;
+      this.h = 1f;
+    }
+    else if (builder.width <= 0f && builder.height > 0f)
+    {
+      setWidthByHeight(builder.height);
+    }
+    else if (builder.width > 0f && builder.height <= 0f)
+    {
+      setHeightByWidth(builder.width);
+    }
+    else if (builder.width > 0f && builder.height > 0f)
+    {
+      setWidthAndHeight(builder.width, builder.height);
+    }
+
+    adjustWidth(false, builder.anchorPxX, builder.anchorPxY, w, h);
+
+ /*
+    if (builder.usePadding == true)
+    {
+      if (builder.exactPadding == true)
+      {
+        //System.out.println("exactPadding = true");
+        this.paddingX = builder.paddingX;
+        this.paddingY = builder.paddingY;
+      }
+      else //percentage padding
+      {
+        //System.out.println("exactPadding = false");
+        this.paddingX = this.w * builder.paddingX;
+        this.paddingY = this.h * builder.paddingY;
+      }
+
+      //System.out.println("orig w/h = " + this.w + "/" + this.h);
+      this.w += this.paddingX * 2f;
+      this.h += this.paddingY * 2f;
+
+    // System.out.println("w/h = " + this.w + "/" + this.h);
+    // System.out.println("padx/y = " + this.paddingX + "/" + this.paddingY);
+
+    }
+
+    if (builder.fitInBox == true)
+    {
+      switch (justifyX)
+      {
+        case 0:
+          this.translate.x += (builder.boxWidth * .5f) - (this.w * .5f);
+          break;
+        case 1:
+          this.translate.x += (builder.boxWidth) -= this.w;
+          break;
+        case -1:
+          break;
+      }
+      switch (justifyY)
+      {
+        case 0:
+          this.translate.y += (builder.boxHeight * .5f) - (this.h * .5f);
+          break;
+        case 1:
+          this.translate.y += (builder.boxHeight) -= this.h;
+          break;
+        case -1:
+          break;
+      }
+    }
+    else
+    {
+      switch (justifyX)
+      {
+        case 0:
+          this.translate.x -= this.w * .5f;
+          break;
+        case 1:
+          this.translate.x -= this.w;
+          break;
+        case -1:
+          break;
+      }
+      switch (justifyY)
+      {
+        case 0:
+          this.translate.y -= this.h * .5f;
+          break;
+        case 1:
+          this.translate.y -= this.h;
+          break;
+        case -1:
+          break;
+      }
+    }
+  */
+  }
+
+
+  private void initialize(GeomTextBuilder builder)
+  {
+    setColor(builder.textColor);
+    this.backgroundColor = builder.backgroundColor;
+
+    this.text = builder.text;
+    this.exactPixelBounds = builder.exactPixelBounds;
+
+    if (builder.nonDynamicTextRenderer != null)
+    {
+      this.useNonDynamicTextRenderer = true;
+      this.textRenderer = builder.nonDynamicTextRenderer;
+      System.out.println("here nonDynamicTextRenderer = " + builder.nonDynamicTextRenderer);
+      System.out.println("so textRenderer = " + textRenderer);
+    }
+
+    this.justifyX = builder.justifyX;
+    this.justifyY = builder.justifyY;
+
+    if (builder.textRenderers != null)
+    {
+      setFont(builder.textRenderers);
+    }
+    else
+    {
+      setFont(FontHandler.getInstance().getDefaultFontFamily());
+    }
+    
   }
  
   /** This method calucaltes the pixel width and height without taking into
@@ -659,7 +812,7 @@ public class GeomText extends GeomRect
 
   public String toString()
   {
-    return "GeomText2 [" + text + "] : x/y/z/w = " + translate.x + "/" + translate.y + "/" + translate.z + "/" + scale.x + ", justify = " + justifyY;
+    return super.toString() + ", [" + text + "]";
   }
 
   public void setWidthAndHeight(float maxw, float maxh)

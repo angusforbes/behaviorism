@@ -1,6 +1,7 @@
 /* Geom.java - Created on July 12, 2007, 7:52 PM */
 package geometry;
 
+import behaviorism.Behaviorism;
 import renderers.State;
 import behaviors.Behavior;
 import data.Data;
@@ -13,7 +14,6 @@ import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import behaviors.geom.discrete.BehaviorIsActive;
-import renderers.Renderer;
 import textures.TextureImage;
 import utils.MatrixUtils;
 import utils.RenderUtils;
@@ -48,9 +48,8 @@ public abstract class Geom
 
   //don't think it makes sense to have both (think about this...)
   //public Point3f translateAnchor = new Point3f(0f, 0f, 0f);
-
   /**
-   * The relative point (in parent's coordinates) around which the object is to rotate.
+   * The relative point (in referenceGeom's coordinates) around which the object is to rotate.
    * By default it is set to be the lower left corner of the object
    */
   public Point3f rotateAnchor = new Point3f(0f, 0f, 0f); //new GeomPoint(.5f, .5f, 0f);
@@ -59,7 +58,7 @@ public abstract class Geom
    */
   public Point3d rotate = new Point3d(0, 0, 0);
   /**
-   * The relative point (in parent's coordinates) around which the object is to scale.
+   * The relative point (in referenceGeom's coordinates) around which the object is to scale.
    * By default it is set to be the lower left corner of the object
    */
   public Point3f scaleAnchor = new Point3f(0f, 0f, 0f);
@@ -72,7 +71,7 @@ public abstract class Geom
   //if rotateAnchor is relative to current Geom - Then -
   //  update modelview with translate
   //  then update modelview with rotateAnchor, rotate, then update modelview with -rotateAnchor
-  //if rotateAnchor is relative to parent Geom - Then -
+  //if rotateAnchor is relative to referenceGeom Geom - Then -
   //  put the translation AFTER the rotation
   //
   //same with scale setTranslate...
@@ -123,8 +122,8 @@ public abstract class Geom
   //.setIdentity();
   /**
    * An object representing the current set of openGL states of this Geom.
-   * If null, the renderer will automatically inheret it's parent's states
-   * (ie, either the parent Geom, or the current world iteself).
+   * If null, the renderer will automatically inheret it's referenceGeom's states
+   * (ie, either the referenceGeom Geom, or the current world iteself).
    */
   public State state = null;
   public int layerNum = 0;
@@ -136,7 +135,7 @@ public abstract class Geom
   public Geom releasableObject = this;
   public Geom mouseoverableObject = this;
   /**
-   * The parent of this Geom. Is either the Geom it is attached to, or null if the Geom is attached directly to the current world.
+   * The referenceGeom of this Geom. Is either the Geom it is attached to, or null if the Geom is attached directly to the current world.
    * This is used by the MouseHandler to determine object selection, etc.
    */
   public Geom parent = null;
@@ -147,14 +146,42 @@ public abstract class Geom
 
   /**
    * Constructs a new Geom initially placed at the world coordinates
-   * unprojected from pixel coordinates. The depth value
+   * unprojected from pixel coordinates where (0,0) is the top left corner.
+   * The depth value
    * is calculated based on the position of the World z value.
    * @param x
    * @param y
    */
   public Geom(int x, int y)
   {
-    setTranslate(MatrixUtils.pixelToWorld(x,y));
+    setTranslate(MatrixUtils.pixelToWorld(x, y));
+  }
+
+  /**
+   * Constructs a new Geom initially placed at the Geom coordinates
+   * unprojected from pixel coordinates where (0,0) is the bottom left corner
+   * of the reference Geom. The depth value is calculated based on the (0,0)
+   * position of this reference Geom. Note that we don't actually have to
+   * attach this Geom to the indicated reference, we are just using it
+   * as a reference to position the Geom.
+   * @param referenceGeom
+   * @param x
+   * @param y
+   */
+  public Geom(boolean upperLeft, int x, int y)
+  {
+    if (upperLeft == true)
+    {
+      setTranslate(MatrixUtils.pixelToWorld(x, y));
+    }
+    else
+    {
+      int pxX = x + Behaviorism.getInstance().canvasWidth / 2;
+      int pxY = y + Behaviorism.getInstance().canvasHeight / 2;
+
+      setTranslate(
+        MatrixUtils.pixelToWorld(pxX, pxY));
+    }
   }
 
   public Geom(float x, float y, float z)
@@ -561,7 +588,7 @@ public abstract class Geom
 //  public void addGeom(Geom g, long baseNano, long millisInFuture)
 //  {
 //    g.isActive = false;
-//    g.parent = this;
+//    g.referenceGeom = this;
 //    geoms.add(g);
 //      
 //	  BehaviorIsActive bia = BehaviorIsActive.activateAtMillis(g, baseNano, millisInFuture);
@@ -605,7 +632,7 @@ public abstract class Geom
 //					List<Long> timesMSs)
 //  {
 //      g.isActive = false;
-//			g.parent = this;
+//			g.referenceGeom = this;
 //			geoms.add(g);
 //
 //	  BehaviorIsActive bia = BehaviorIsActive.activateBetweenMillis(g, baseNano, timesMSs);
@@ -613,30 +640,30 @@ public abstract class Geom
 //  }
 //	
   /**
-   * Adds a child Geom to this parent Geom. By default the Geom is immediately activated.
+   * Adds a child Geom to this referenceGeom Geom. By default the Geom is immediately activated.
    * @param g The child Geom being added.
    */
 //  public void addGeom(Geom g)
 //  {
 //      geoms.add(g);
-//      g.parent = this;
+//      g.referenceGeom = this;
 //			g.isActive = true;
 //  }
 //  
   /**
-   * adds a child Geom to this parent Geom object, and optionally flagging it to be immediately activated.
+   * adds a child Geom to this referenceGeom Geom object, and optionally flagging it to be immediately activated.
    * @param g
    * @param isActive
    */
 //  public void addGeom(Geom g, boolean isActive)
 //  {
 //      geoms.add(g);
-//      g.parent = this;
+//      g.referenceGeom = this;
 //      g.isActive = isActive;
 //  }
 //	
   /**
-   * removeGeom flags the Geom to be deactivated and removed from its parent during the next display loop.
+   * removeGeom flags the Geom to be deactivated and removed from its referenceGeom during the next display loop.
    * @param g
    */
   public void removeGeom(Geom g)
@@ -722,7 +749,6 @@ public abstract class Geom
       isTransformed = true;
     }
   }
- 
 
   public void scale(float x, float y, float z)
   {
@@ -1175,57 +1201,57 @@ public abstract class Geom
   /*
   public void translateAnchor(float x, float y, float z)
   {
-    translateAnchorX(x);
-    translateAnchorY(y);
-    translateAnchorZ(z);
+  translateAnchorX(x);
+  translateAnchorY(y);
+  translateAnchorZ(z);
   }
 
   public void translateAnchorX(float x)
   {
-    if (x != 0f)
-    {
-      translateAnchor.setX(translateAnchor.x + x);
-      isTransformed = true;
-    }
+  if (x != 0f)
+  {
+  translateAnchor.setX(translateAnchor.x + x);
+  isTransformed = true;
+  }
   }
 
   public void translateAnchorY(float y)
   {
-    if (y != 0f)
-    {
-      translateAnchor.setY(translateAnchor.y + y);
-      isTransformed = true;
-    }
+  if (y != 0f)
+  {
+  translateAnchor.setY(translateAnchor.y + y);
+  isTransformed = true;
+  }
   }
 
   public void translateAnchorZ(float z)
   {
-    if (z != 0f)
-    {
-      translateAnchor.setZ(translateAnchor.z + z);
-      isTransformed = true;
-    }
+  if (z != 0f)
+  {
+  translateAnchor.setZ(translateAnchor.z + z);
+  isTransformed = true;
+  }
   }
 
   public void setTranslateAnchor(float x, float y, float z)
   {
-    if (x != translateAnchor.x || y != translateAnchor.y || z != translateAnchor.z)
-    {
-      System.out.println("setting translate anchor = " + x + "/" + y + "/" +z);
-      translateAnchor.set(x, y, z);
-      isTransformed = true;
-    }
+  if (x != translateAnchor.x || y != translateAnchor.y || z != translateAnchor.z)
+  {
+  System.out.println("setting translate anchor = " + x + "/" + y + "/" +z);
+  translateAnchor.set(x, y, z);
+  isTransformed = true;
+  }
   }
 
   public void setTranslateAnchor(Point3f p3f)
   {
-    if (!this.translateAnchor.equals(p3f))
-    {
-      translateAnchor.set(p3f);
-      isTransformed = true;
-    }
+  if (!this.translateAnchor.equals(p3f))
+  {
+  translateAnchor.set(p3f);
+  isTransformed = true;
   }
-  */
+  }
+   */
   /*
   public void determineRotateAnchor(RotateEnum re)
   {
@@ -1273,7 +1299,7 @@ public abstract class Geom
   public String toString()
   {
 
-    String str = "" + getClass() + " : ";
+    String str = "" + getClass().getSimpleName() + " : ";
     if (name != null)
     {
       str += "name=" + name + " : ";

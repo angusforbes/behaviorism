@@ -57,6 +57,7 @@ public class RenderUtils
       rj.getCamera().projection,
       rj.getCamera().viewport);
 
+    //System.out.println("in getWorldCoordsForScreenCoord() : x/y/z = " + pt[0] + "/" +pt[1] + "/" +pt[2] );
     return MatrixUtils.toPoint3f(new Point3d(pt[0], pt[1], pt[2]));
   /*
   double modelview[] = new double[16];
@@ -276,12 +277,12 @@ public class RenderUtils
     return geomPts;
   }
 
-  public static Point3d rayIntersect(Geom g, int x, int y)
+  public static Point3d rayIntersect(Geom g, float x, float y) //int x, int y)
   {
     return rayIntersect(g, x, y, new Point3d());
   }
 
-  public static Point3d rayIntersect(Geom g, int x, int y, Point3d offsetPt)
+  public static Point3d rayIntersect(Geom g, float x, float y /*int x, int y*/, Point3d offsetPt)
   {
     Renderer rj = getRenderer();
 
@@ -360,6 +361,7 @@ public class RenderUtils
     double tryz = GeomUtils.euclidianDistance(nearPt.z, geomPt_wc.z);
     double perc = tryz / maxz;
 
+    //System.out.println("in rayIntersect() : perc = " + perc);
     double rangex = GeomUtils.euclidianDistance(nearPt.x, farPt.x);
     double addx = rangex * perc;
     double finalx;
@@ -392,6 +394,7 @@ public class RenderUtils
       returnPt = MatrixUtils.getWorldPointInGeomCoordinates(returnPt, RenderUtils.getCamera().modelview, g.parent.modelview);
     }
 
+    //System.out.println("in rayIntersect() : returnPoint = " + returnPt);
     return new Point3d(returnPt.x - offsetPt.x, returnPt.y - offsetPt.y, returnPt.z - offsetPt.z);
   }
 

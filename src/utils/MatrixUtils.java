@@ -297,6 +297,21 @@ public class MatrixUtils
           RenderUtils.getWorld(), x, y)
       );
   }
+  public static Point3f pixelToWorld(float x, float y)
+  {
+    return MatrixUtils.toPoint3f(
+        RenderUtils.rayIntersect(
+          RenderUtils.getWorld(), x, y)
+      );
+  }
+
+  public static Point3f pixelToGeom(float x, float y, Geom g)
+  {
+    return MatrixUtils.toPoint3f(
+        RenderUtils.rayIntersect(
+          g, x, y)
+      );
+  }
   public static double[] getIdentity()
   {
     Matrix4d m4d = new Matrix4d();

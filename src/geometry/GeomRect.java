@@ -9,6 +9,7 @@
 package geometry;
 
 import algorithms.Corner;
+import behaviorism.Behaviorism;
 import java.awt.geom.Rectangle2D;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
@@ -27,13 +28,16 @@ public class GeomRect extends Geom
   //public float w = 1f;
   //public float h = 1f;
 
+  //Don't think I need this...
+  @Deprecated
   public Rectangle2D rectangle; //this is the *bounds* of the text
-  //public Rectangle rectangle; //this is the *bounds* of the text
   //used for the packing algorithm...
   //maybe this class should extend from GeomRect or a Geom2D
   //since any 2d shape could conceivably be "packed"
-  float offsetFactor = Utils.randomFloat(5f, 15f);
+  //float offsetFactor = Utils.randomFloat(5f, 15f);
   //public java.util.List<Corner> corners = Collections.synchronizedList(new ArrayList<Corner>());
+  //GET RID OF THIS!
+  @Deprecated
   public java.util.List<Corner> corners = new Vector<Corner>();
 
 
@@ -53,33 +57,44 @@ public class GeomRect extends Geom
     this.isSelectable = true;
   }
 
-  /*
-  public GeomRect(float x, float y, float z, float w, float h,
-  ScaleEnum scaleDirection, RotateEnum rotatePosition)
+  public void adjustWidth(boolean upperLeft, float x, float y, float w, float h)
   {
-  super(x, y, z);
-
-  this.w = w;
-  this.h = h;
-
-  this.isSelectable = true;
-  determineScaleAnchor(scaleDirection);
-  //determineRotateAnchor(rotatePosition);
-  //this.scaleDirection = scaleDirection;
-
-  this.scale.x = 1f;
-  this.scale.y = 1f;
-  this.scale.z = 1f;
-  }
-   */
-  public GeomRect(int x, int y, int w, int h)
-  {
-    super(x, y+h);
-
-    Point3f upperright = MatrixUtils.pixelToWorld(x+w, y);
-      
+    Point3f upperright;
+    if (upperLeft == true)
+    {
+      upperright = MatrixUtils.pixelToWorld(x + w, y + h);
+    }
+    else
+    {
+      upperright = MatrixUtils.pixelToWorld(
+        x + Behaviorism.getInstance().canvasWidth / 2 + w,
+        y + Behaviorism.getInstance().canvasHeight / 2 + h);
+    }
     this.w = upperright.x - translate.x;
     this.h = upperright.y - translate.y;
+
+    translate.y += this.h;
+    this.h = -this.h;
+    translate.z = 0f;
+
+    System.out.println("in adjustWidth A : x/y/w/h = " + x + "/"+ y + "/" + w + "/" + h + " name: " + name);
+    System.out.println("in adjustWidth B : this.w/this.h = " + translate.x + "/"+ translate.y + "/" + this.w + "/" + this.h + " name: " + name);
+  }
+
+  public GeomRect(int x, int y, int w, int h)
+  {
+    super(x, y);
+
+    adjustWidth(true, x, y, w, h);
+
+    this.isSelectable = true;
+  }
+
+  public GeomRect(boolean upperLeft, int x, int y, int w, int h)
+  {
+    super(upperLeft, x, y);
+
+    adjustWidth(upperLeft, x, y, w, h);
 
     this.isSelectable = true;
   }
@@ -238,7 +253,7 @@ public class GeomRect extends Geom
 
     boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
 
-    
+
     if (depthTest == false && isSelectable == true)
     {
       gl.glEnable(GL.GL_DEPTH_TEST);
@@ -257,7 +272,7 @@ public class GeomRect extends Geom
 
     gl.glColor4fv(color.array(), 0);
     gl.glBegin(gl.GL_QUADS);
-    
+
     gl.glVertex3f(0f, 0f, offset);
     gl.glVertex3f(w, 0f, offset);
     gl.glVertex3f(w, h, offset);
@@ -366,17 +381,16 @@ public class GeomRect extends Geom
   public Point3f getCenterAnchor()
   {
 
-    return new Point3f(translate.x + w * .5f, translate.y + h * .5f, translate.z + d * .5f);
-   }
+  return new Point3f(translate.x + w * .5f, translate.y + h * .5f, translate.z + d * .5f);
+  }
    */
 
   /*
   public Point3f getCenter()
   {
-    return new Point3f(w * .5f, h * .5f, d * .5f);
+  return new Point3f(w * .5f, h * .5f, d * .5f);
   }
    */
-
   public void setRect(Point3f p3f, float w, float h)
   {
     setTranslate(p3f);
