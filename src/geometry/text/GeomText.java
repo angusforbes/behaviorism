@@ -13,9 +13,9 @@ import geometry.Colorf;
 import geometry.Geom;
 import geometry.GeomRect;
 import handlers.FontHandler;
-import java.util.Arrays;
+import java.awt.font.LineMetrics;
 import java.util.List;
-import javax.vecmath.Vector3f;
+import renderers.Renderer;
 import utils.MatrixUtils;
 import utils.RenderUtils;
 
@@ -33,9 +33,10 @@ public class GeomText extends GeomRect
   public Colorf backgroundColor = null; //background of entire bounds
   public boolean exactPixelBounds = false;
   public boolean useNonDynamicTextRenderer = false;
-  public float paddingX = 0f;
-  public float paddingY = 0f;
-
+  public float paddingLeft = 0f;
+  public float paddingRight = 0f;
+  public float paddingBottom = 0f;
+  public float paddingTop = 0f;
   protected Rectangle2D stringBounds = null;
   protected TextRenderer textRenderer = null;
   protected Font font = null;
@@ -50,339 +51,313 @@ public class GeomText extends GeomRect
   protected float prevW = 0f;
   protected float prevH = 0f;
   protected float tempypos = 0f;
-  //protected float tty = 0f;
-  //protected float tth = 0f;
   protected float useY = 0f;
   protected float useX = 0f;
-  
-  public static class GeomTextBuilder
-  {
-
-    private String text;
-    private Point3f anchorPt = new Point3f();
-    private int anchorPxX = 0;
-    private int anchorPxY = 0;
-    private boolean usePixelAnchor = false;
-    private boolean pixelAnchorUpperLeft = false;
-    private float width = 1f;
-    private float height = 1f;
-    private int justifyX = 0;
-    private int justifyY = 0;
-    private boolean usePadding = false;
-    private boolean exactPadding = false;
-    private float paddingX = 0f;
-    private float paddingY = 0f;
-    private Colorf backgroundColor = null; //new Colorf();
-    private Colorf textColor = new Colorf();
-    private TextRenderer nonDynamicTextRenderer = null;
-    private boolean exactPixelBounds = false;
-    private float boxWidth = -1f;
-    private float boxHeight = -1f;
-    private boolean fitInBox = false;
-    private List<TextRenderer> textRenderers = null;
-
-    public GeomTextBuilder(String text)
-    {
-      this.text = text;
-    }
-
-    public GeomTextBuilder font(String font, int fontStyle)
-    {
-      this.textRenderers = FontHandler.getInstance().getFontFamily(font, fontStyle);
-      return this;
-    }
-
-    public GeomTextBuilder font(String font)
-    {
-      this.textRenderers = FontHandler.getInstance().getFontFamily(font, Font.PLAIN);
-      return this;
-    }
-
-    public GeomTextBuilder font(List<TextRenderer> textRenderers)
-    {
-      this.textRenderers = textRenderers;
-      return this;
-    }
-
-    /**
-     * A convenience method that positions the text within the given box area.
-     * Justifications are based on the
-     * boundaries of the box, as opposed to the translate point (as with the "contstrain" methods).
-     * The box's x and y coordinates are the translate of this object.
-     * Note that this box is simply for the initial placement. The bounds of the box
-     * are not preserved once the GeomText object is created. If you want the box, you should
-     * make it with a GeomRect or something.
-     * @param bw
-     * @param bh
-     * @return The GeomTextBuilder we are building.
-     */
-    public GeomTextBuilder fitInBox(float width, float height)
-    {
-      this.boxWidth = width;
-      this.boxHeight = height;
-      this.width = width;
-      this.height = height;
-      this.fitInBox = true;
-      return this;
-    }
-
-    public GeomTextBuilder anchor(Point3f anchorPt)
-    {
-      this.anchorPt = anchorPt;
-      this.usePixelAnchor = false;
-      return this;
-    }
-
-    public GeomTextBuilder anchor(int x, int y)
-    {
-      this.anchorPxX = x;
-      this.anchorPxY = y;
-      this.pixelAnchorUpperLeft = false;
-      this.usePixelAnchor = true;
-      return this;
-    }
-
-    public GeomTextBuilder anchor(int x, int y, boolean upperLeft)
-    {
-      this.anchorPxX = x;
-      this.anchorPxY = y;
-      this.pixelAnchorUpperLeft = upperLeft;
-      this.usePixelAnchor = true;
-      return this;
-    }
-
-    public GeomTextBuilder nonDynamicTextRenderer(TextRenderer nonDynamicTextRenderer)
-    {
-      this.nonDynamicTextRenderer = nonDynamicTextRenderer;
-      return this;
-    }
-
-    public GeomTextBuilder justify(int justifyX, int justifyY)
-    {
-      this.justifyX = justifyX;
-      this.justifyY = justifyY;
-      return this;
-    }
-
-    public GeomTextBuilder exactBounds(boolean exactPixelBounds)
-    {
-      this.exactPixelBounds = exactPixelBounds;
-      return this;
-    }
-
-    public GeomTextBuilder exactPadding(float paddingX, float paddingY)
-    {
-      return padding(paddingX, paddingY, true);
-    }
-
-    public GeomTextBuilder percentagePadding(float paddingX, float paddingY)
-    {
-      return padding(paddingX, paddingY, false);
-    }
-
-    public GeomTextBuilder padding(float paddingX, float paddingY, boolean exactPadding)
-    {
-      this.paddingX = paddingX;
-      this.paddingY = paddingY;
-      this.exactPadding = exactPadding;
-      this.usePadding = true;
-      return this;
-    }
-
-    public GeomTextBuilder backgroundColor(Colorf backgroundColor)
-    {
-      this.backgroundColor = backgroundColor;
-      return this;
-    }
-
-    public GeomTextBuilder textColor(Colorf textColor)
-    {
-      this.textColor = textColor;
-      return this;
-    }
-
-    public GeomTextBuilder constrainByHeight(float height)
-    {
-      this.height = height;
-      this.width = -1f;
-      return this;
-    }
-
-    public GeomTextBuilder constrainByWidth(float width)
-    {
-      this.height = -1f;
-      this.width = width;
-      return this;
-    }
-
-    public GeomTextBuilder constrain(float width, float height)
-    {
-      this.height = height;
-      this.width = width;
-      return this;
-    }
-
-    public GeomText build()
-    {
-      if (this.usePixelAnchor == true)
-      {
-        return new GeomText(anchorPxX, anchorPxY, pixelAnchorUpperLeft, this);
-      }
-      else
-      {
-        return new GeomText(anchorPt, this);
-      }
-    }
-  }
-
-  public void setFont(String fontString, int fontStyle)
-  {
-    this.textRenderers = FontHandler.getInstance().getFontFamily(fontString, fontStyle);
-  }
-
-  public void setFont(List<TextRenderer> trs)
-  {
-    this.textRenderers = trs;
-  }
+  protected float transX = 0f;
+  protected float transY = 0f;
+  protected LineMetrics metrics;
+  public TextBuilder builder = null;
+  public boolean isRecalculated = false;
 
   public GeomText()
   {
   } //temp while we are cleaning stuff up... remove this soon! TODO
 
-  public GeomText(Point3f anchorPt, GeomTextBuilder builder)
+  public GeomText(Point3f anchorPt, TextBuilder builder)
   {
-    super(anchorPt, builder.width, builder.height);
-
+    super(anchorPt, 0, 0); //we calculate the width/height ourselves
     initialize(builder);
-    initializeConstraints(builder);
-    initializePadding(builder);
-    initializeJustification(builder);
+    calculateWorld();
   }
 
-  public GeomText(int pxX, int pxY, boolean pixelAnchorUpperLeft, GeomTextBuilder builder)
+  public GeomText(int pxX, int pxY, boolean pixelAnchorUpperLeft, TextBuilder builder)
   {
-    super(pixelAnchorUpperLeft, pxX, pxY, (int) builder.width, (int) builder.height);
-
+    super(pixelAnchorUpperLeft, pxX, pxY, 0, 0);  //we calculate the width/height ourselves
     initialize(builder);
-    initializeConstraints(builder);
-    initializePixelPadding(builder); //this also transforms pixel to world coords
-    initializePixelJustification(builder);
+    calculatePixel();
   }
 
-  private void initializePadding(GeomTextBuilder builder)
+  public void recalculate()
   {
-    if (builder.usePadding == true)
+    this.w = 0;
+    this.h = 0;
+    useX = 0;
+    useY = 0;
+    transX = 0;
+    transY = 0;
+    paddingLeft = 0f;
+    paddingRight = 0f;
+    paddingBottom = 0f;
+    paddingTop = 0f;
+
+    if (builder.usePixelAnchor == true)
     {
-      if (builder.exactPadding == true)
-      {
-        this.paddingX = builder.paddingX;
-        this.paddingY = builder.paddingY;
-      }
-      else //percentage padding
-      {
-        this.paddingX = this.w * builder.paddingX;
-        this.paddingY = this.h * builder.paddingY;
-      }
-
-      this.w += this.paddingX * 2f;
-      this.h += this.paddingY * 2f;
-    }
-
-  }
-
-  private void initializeJustification(GeomTextBuilder builder)
-  {
-    if (builder.fitInBox == true)
-    {
-
-      switch (justifyX)
-      {
-        case 0:
-          this.translate.x += (builder.boxWidth * .5f) - (this.w * .5f);
-          break;
-        case 1:
-          this.translate.x += (builder.boxWidth) -= this.w;
-          break;
-        case -1:
-          break;
-      }
-      switch (justifyY)
-      {
-        case 0:
-          this.translate.y += (builder.boxHeight * .5f) - (this.h * .5f);
-          break;
-        case 1:
-          this.translate.y += (builder.boxHeight) -= this.h;
-          break;
-        case -1:
-          break;
-      }
-
+      calculatePixel();
     }
     else
     {
-      switch (justifyX)
-      {
-        case 0:
-          this.translate.x -= this.w * .5f;
-          break;
-        case 1:
-          this.translate.x -= this.w;
-          break;
-        case -1:
-          break;
-      }
-      switch (justifyY)
-      {
-        case 0:
-          this.translate.y -= this.h * .5f;
-          break;
-        case 1:
-          this.translate.y -= this.h;
-          break;
-        case -1:
-          break;
-      }
+      calculateWorld();
     }
   }
 
-  private void initializePixelPadding(GeomTextBuilder builder)
+  public void calculateWorld()
   {
-    //determine padding and adjust pixels accordingly
-    if (builder.usePadding == true)
+    if (useNonDynamicTextRenderer == true)
     {
-      this.paddingX = builder.paddingX;
-      this.paddingY = builder.paddingY;
+      initializeNonDynamic(false);
+    }
+    else
+    {
+      initializeConstraints();
+      initializePadding(builder.paddingLeft, builder.paddingRight, builder.paddingBottom, builder.paddingTop);
+      initializeJustification();
+    }
+    isTransformed = true;
+  }
 
-      if (builder.exactPadding == false)
-      {
-        this.paddingX *= this.w;
-        this.paddingY *= this.h;
-      }
+  public void calculatePixel()
+  {
+    if (useNonDynamicTextRenderer == true)
+    {
+      initializeNonDynamic(true);
+    }
+    else
+    {
+      initializeConstraints();
+      initializePixelPadding(); //this also transforms pixel to world coords
+      initializePixelJustification();
+    }
+    isTransformed = true;
+  }
 
-      //w and h are still in pixels here
-      this.w += this.paddingX * 2f;
-      this.h += this.paddingY * 2f;
+  private void initializeNonDynamic(boolean pixelPadding)
+  {
+    //return w/h in world coords
+    calculateBoundsIgnoringLOD();
+
+    if (builder.exactPadding == true && pixelPadding == true)
+    {
+      //since padding is in pixels, we need to make it in world
+      Point3f worldPaddingLL = MatrixUtils.pixelToWorld(
+        Behaviorism.getInstance().canvasWidth / 2 + builder.paddingLeft,
+        Behaviorism.getInstance().canvasHeight / 2 - builder.paddingBottom);
+      Point3f worldPaddingUR = MatrixUtils.pixelToWorld(
+        Behaviorism.getInstance().canvasWidth / 2 + builder.paddingRight,
+        Behaviorism.getInstance().canvasHeight / 2 - builder.paddingTop);
+
+      initializePadding(worldPaddingLL.x, worldPaddingLL.y, worldPaddingUR.x, worldPaddingUR.y);
+    }
+    else
+    {
+      initializePadding(builder.paddingLeft, builder.paddingRight, builder.paddingBottom, builder.paddingTop);
     }
 
+    useX = this.paddingLeft;
+    useY = this.paddingBottom;
+
+    if (builder.adjustDescent == true)
+    {
+      useY += (metrics.getDescent() * scaleVal);
+    }
+
+    if (pixelPadding == true)
+    {
+      Point3f worldBox = MatrixUtils.pixelToWorld(
+        Behaviorism.getInstance().canvasWidth / 2 + builder.boxWidth,
+        Behaviorism.getInstance().canvasHeight / 2 - builder.boxHeight);
+
+      builder.boxWidth = worldBox.x;
+      builder.boxHeight = worldBox.y;
+    }
+
+    initializeJustification();
+
+    useX -= transX;
+    useY += transY;
+  }
+
+  private void initializePixelPadding()
+  {
+    //determine padding
+    initializePadding(builder.paddingLeft, builder.paddingRight, builder.paddingBottom, builder.paddingTop);
+
     //transform pixels to world coordinates & update translate point
-    adjustPixelSize(false, builder.anchorPxX, builder.anchorPxY, this.w, this.h);
+     Point3f upperright = MatrixUtils.pixelToWorld(
+        Behaviorism.getInstance().canvasWidth / 2 + this.w,
+        Behaviorism.getInstance().canvasHeight / 2 + this.h);
+
+     this.w = upperright.x;
+     this.h = -upperright.y;
 
     if (builder.usePadding == true)
     {
       //this works if the GeomText is directly attached to world...
       //Test when attached to other things, especially when parents are scaled/rotated, etc.
-      Point3f worldPadding = MatrixUtils.pixelToWorld(
+      Point3f worldPaddingLL = MatrixUtils.pixelToWorld(
         Behaviorism.getInstance().canvasWidth / 2 +
-        this.paddingX,
+        this.paddingLeft,
         Behaviorism.getInstance().canvasHeight / 2 -
-        this.paddingY);
-      this.paddingX = worldPadding.x;
-      this.paddingY = worldPadding.y;
+        this.paddingBottom);
+      this.paddingLeft = worldPaddingLL.x;
+      this.paddingBottom = worldPaddingLL.y;
+
+      Point3f worldPaddingUR = MatrixUtils.pixelToWorld(
+        Behaviorism.getInstance().canvasWidth / 2 +
+        this.paddingRight,
+        Behaviorism.getInstance().canvasHeight / 2 -
+        this.paddingTop);
+      this.paddingRight = worldPaddingUR.x;
+      this.paddingTop = worldPaddingUR.y;
     }
   }
 
-  private void initializePixelJustification(GeomTextBuilder builder)
+  public void setFont(String fontString, int fontStyle, int fontSize)
+  {
+    this.textRenderer = FontHandler.getInstance().getFont(fontString, fontStyle, fontSize);
+    useNonDynamicTextRenderer = true;
+    isRecalculated = true;
+  }
+
+  public void setFont(String fontString, int fontStyle)
+  {
+    this.textRenderers = FontHandler.getInstance().getFontFamily(fontString, fontStyle);
+    useNonDynamicTextRenderer = false;
+    isRecalculated = true;
+  }
+
+  public void setFont(List<TextRenderer> trs)
+  {
+    this.textRenderers = trs;
+    useNonDynamicTextRenderer = false;
+    isRecalculated = true;
+  }
+
+  private void calculateBoundsIgnoringLOD()
+  {
+    frc = textRenderer.getFontRenderContext();
+    font = textRenderer.getFont();
+
+    Rectangle2D bounds;
+
+    if (exactPixelBounds == true)
+    {
+      GlyphVector gv1 = font.createGlyphVector(frc, this.text);
+      this.stringBounds = gv1.getPixelBounds(null, 0f, 0f);
+    }
+    else
+    {
+      this.stringBounds = font.getStringBounds(this.text, frc);
+    }
+
+    bounds = this.stringBounds;
+
+    float worldHeight = Renderer.screenBoundsInWorldCoords.height; //Behaviorism.world.getWorldRect().h;
+    this.scaleVal = ((worldHeight / (float) Behaviorism.getInstance().canvasHeight));
+
+    this.metrics = font.getLineMetrics(text, frc);
+
+    //initialize width
+    this.w = (float) bounds.getWidth() * scaleVal;
+    this.h = (float) bounds.getHeight() * scaleVal;
+  }
+
+  private void initializePadding(float left, float right, float bottom, float top)
+  {
+    if (builder.usePadding == true)
+    {
+      if (builder.exactPadding == true)
+      {
+        this.paddingLeft = left; //builder.paddingLeft;
+        this.paddingRight = right; //builder.paddingRight;
+        this.paddingBottom = bottom; //builder.paddingBottom;
+        this.paddingTop = top; //builder.paddingTop;
+      }
+      else //percentage padding
+      {
+        this.paddingLeft = this.w * left; //builder.paddingLeft;
+        this.paddingRight = this.w * right; //builder.paddingRight;
+        this.paddingBottom = this.h * bottom; //builder.paddingBottom;
+        this.paddingTop = this.h * top; //builder.paddingTop;
+      }
+
+      this.w += (this.paddingLeft + this.paddingRight);
+      this.h += (this.paddingBottom + this.paddingTop);
+    }
+  }
+
+  private float calculateWorldJustificationBoxX()
+  {
+    switch (justifyX)
+    {
+      case 0:
+        return ((builder.boxWidth * .5f) + (this.w * .5f));
+      case 1:
+        return this.w;
+      case -1:
+        return (builder.boxWidth);
+      default:
+        return 0f;
+    }
+  }
+
+  private float calculateWorldJustificationBoxY()
+  {
+    switch (justifyY)
+    {
+      case 0:
+        return -(builder.boxHeight * .5f) - (this.h * .5f);
+      case 1:
+        return -this.h;
+      case -1:
+        return -(builder.boxHeight);
+      default:
+        return 0f;
+    }
+  }
+
+  private float calculateWorldJustificationX()
+  {
+    switch (justifyX)
+    {
+      case 0:
+        return this.w * .5f;
+      case 1:
+        return this.w;
+      case -1:
+      default:
+        return 0f;
+    }
+  }
+
+  private float calculateWorldJustificationY()
+  {
+    switch (justifyY)
+    {
+      case 0:
+        return -(this.h * .5f);
+      case 1:
+        return -this.h;
+      case -1:
+      default:
+        return 0f;
+    }
+  }
+
+  private void initializeJustification()
+  {
+    if (builder.fitInBox == true)
+    {
+      transX = (calculateWorldJustificationBoxX());
+      transY = (calculateWorldJustificationBoxY());
+    }
+    else
+    {
+      transX = (calculateWorldJustificationX());
+      transY = (calculateWorldJustificationY());
+    }
+  }
+
+  private void initializePixelJustification()
   {
     if (builder.fitInBox == true)
     {
@@ -397,10 +372,10 @@ public class GeomText extends GeomRect
       switch (justifyX)
       {
         case 0:
-          this.translate.x += (worldBox.x * .5f) - (this.w * .5f);
+          this.transX -= ((worldBox.x * .5f) - (this.w * .5f));
           break;
         case 1:
-          this.translate.x += (worldBox.x) -= this.w;
+          this.transX -= ((worldBox.x) - this.w);
           break;
         case -1:
           break;
@@ -408,7 +383,7 @@ public class GeomText extends GeomRect
       switch (justifyY)
       {
         case 0:
-          this.translate.y -= (worldBox.y * .5f) - (this.h * .5f);
+          this.transY -= (worldBox.y * .5f) - (this.h * .5f);
           break;
         case 1:
           this.translate.y -= (worldBox.y) - this.h;
@@ -422,10 +397,10 @@ public class GeomText extends GeomRect
       switch (justifyX)
       {
         case 0:
-          this.translate.x -= this.w * .5f;
+          transX += this.w * .5f;
           break;
         case 1:
-          this.translate.x -= this.w;
+          transX += this.w;
           break;
         case -1:
           break;
@@ -433,10 +408,10 @@ public class GeomText extends GeomRect
       switch (justifyY)
       {
         case 0:
-          this.translate.y += this.h * .5f;
+          transY -= (this.h * .5f);
           break;
         case 1:
-          this.translate.y += this.h;
+          transY -= this.h;
           break;
         case -1:
           break;
@@ -444,62 +419,65 @@ public class GeomText extends GeomRect
     }
   }
 
-  private void initialize(GeomTextBuilder builder)
+  private void initialize(TextBuilder builder)
   {
+    this.builder = builder;
+
     setColor(builder.textColor);
     this.backgroundColor = builder.backgroundColor;
 
     this.text = builder.text;
     this.exactPixelBounds = builder.exactPixelBounds;
 
+    this.justifyX = builder.justifyX;
+    this.justifyY = builder.justifyY;
+
     if (builder.nonDynamicTextRenderer != null)
     {
       this.useNonDynamicTextRenderer = true;
       this.textRenderer = builder.nonDynamicTextRenderer;
     }
-
-    this.justifyX = builder.justifyX;
-    this.justifyY = builder.justifyY;
-
-    if (builder.textRenderers != null)
-    {
-      setFont(builder.textRenderers);
-    }
     else
     {
-      setFont(FontHandler.getInstance().getDefaultFontFamily());
-    }
-
-  }
-
-  public void initializeConstraints(GeomTextBuilder builder)
-  {
-    if (builder.width <= 0f && builder.height <= 0f)
-    {
-      //this is illegal, default to a width and height of 1f, or 100 if using pixels
-      if (builder.usePixelAnchor = true)
+      if (builder.textRenderers != null)
       {
-        this.w = 100;
-        this.h = 50;
+        this.textRenderers = builder.textRenderers;
       }
       else
       {
-        this.w = 2f;
-        this.h = 1f;
+        this.textRenderers = FontHandler.getInstance().getDefaultFontFamily();
       }
     }
-    else if (builder.width <= 0f && builder.height > 0f)
-    {
-      setWidthByHeight(builder.height);
-    }
-    else if (builder.width > 0f && builder.height <= 0f)
-    {
-      setHeightByWidth(builder.width);
-    }
-    else if (builder.width > 0f && builder.height > 0f)
-    {
-      setWidthAndHeight(builder.width, builder.height);
-    }
+  }
+
+  public void initializeConstraints()
+  {
+      if (builder.width <= 0f && builder.height <= 0f)
+      {
+        //this is illegal, default to a width and height of 2fx1f, or 100x50 if using pixels
+        if (builder.usePixelAnchor == true)
+        {
+          this.w = 100;
+          this.h = 50;
+        }
+        else
+        {
+          this.w = 2f;
+          this.h = 1f;
+        }
+      }
+      else if (builder.width <= 0f && builder.height > 0f)
+      {
+        setWidthByHeight(builder.height);
+      }
+      else if (builder.width > 0f && builder.height <= 0f)
+      {
+        setHeightByWidth(builder.width);
+      }
+      else if (builder.width > 0f && builder.height > 0f)
+      {
+        setWidthAndHeight(builder.width, builder.height);
+      }
   }
 
   protected void calculateUnrotatedPixelWidthAndHeight(GL gl)
@@ -519,6 +497,7 @@ public class GeomText extends GeomRect
     //System.arraycopy(RenderUtils.getCamera().modelview, 0, temp_mv, 0, 16);
     double[] temp_mv = RenderUtils.getCamera().modelview;
 
+    //add up scale from root of tree to this Geom
     Geom upp = this;
     while (upp.parent != null)
     {
@@ -531,8 +510,10 @@ public class GeomText extends GeomRect
     double[] temp_pj = RenderUtils.getCamera().projection;
     int[] temp_vp = RenderUtils.getCamera().viewport;
 
-    this.pxWidth = (int) (RenderUtils.getWidthOfObjectInPixels(this, this.paddingX * 2f, temp_mv, temp_pj, temp_vp));
-    this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(this, this.paddingY * 2f, temp_mv, temp_pj, temp_vp));
+    this.pxWidth = (int) (RenderUtils.getWidthOfObjectInPixels(
+      this, this.paddingLeft + this.paddingRight, temp_mv, temp_pj, temp_vp));
+    this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(
+      this, this.paddingBottom + this.paddingTop, temp_mv, temp_pj, temp_vp));
 
     boolean debug = false;
     if (debug)
@@ -552,61 +533,72 @@ public class GeomText extends GeomRect
   @Override
   public void draw(GL gl)
   {
-    //timer.resetTime();
-    calculateUnrotatedPixelWidthAndHeight(gl);
-    //System.out.println("time to calc = " + timer.resetTime());
+    if (isRecalculated)
     {
-      if (this.pxWidth != this.prevPxWidth || this.pxHeight != this.prevPxHeight || this.textRenderer == null)
-      {
-        //System.out.println("pxWidth/pxHeight = " + pxWidth + "/" + pxHeight);
-
-        this.prevPxWidth = this.pxWidth;
-        this.prevPxHeight = this.pxHeight;
-
-        if (useNonDynamicTextRenderer == true)
-        {
-          calculateBoundsUsingSpecficTextRenderer(this.textRenderer);
-        }
-        else
-        {
-          //timer.resetTime();
-          chooseFont();
-          //System.out.println("time to chooseFont = " + timer.resetTime());
-        }
-        //tty = (float) stringBounds.getY() * scaleVal;
-        //tth = (float) (stringBounds.getHeight()) * scaleVal;
-
-        //useY = paddingY + tth + tty;
-        useY = (float) (paddingY + ((stringBounds.getHeight() + stringBounds.getY()) * scaleVal));
-        useX = paddingX;
-      }
+      recalculate();
     }
 
     if (this.backgroundColor != null)
     {
-      gl.glColor4f(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
-
+      gl.glColor4fv(backgroundColor.array(), 0);
       drawRect(gl, offset);
     }
 
-    //System.out.println("using textRenderer: " + this.textRenderer.getFont());
+    if (useNonDynamicTextRenderer == true)
+    {
+      drawText();
+    }
+    else
+    {
+      //timer.resetTime();
+      calculateUnrotatedPixelWidthAndHeight(gl);
+      //System.out.println("time to calc = " + timer.resetTime());
+      {
+        if (isRecalculated || this.pxWidth != this.prevPxWidth || this.pxHeight != this.prevPxHeight || this.textRenderer == null)
+        {
+          //System.out.println("pxWidth/pxHeight = " + pxWidth + "/" + pxHeight);
+
+          this.prevPxWidth = this.pxWidth;
+          this.prevPxHeight = this.pxHeight;
+
+          //timer.resetTime();
+          chooseFontSize();
+
+          useX = paddingLeft - (transX);
+          useY = transY + (float) (paddingBottom + ((stringBounds.getHeight() + stringBounds.getY()) * scaleVal));
+        }
+      }
+
+      drawText();
+    }
+  //System.out.println("time to draw = " + timer.resetTime());
+
+    isRecalculated = false;
+  }
+
+  private void drawText()
+  {
     textRenderer.begin3DRendering();
     textRenderer.setColor(color.toJavaColor());
-    textRenderer.draw3D(this.text, useX, useY, offset, this.scaleVal);
+    textRenderer.draw3D(text,
+      useX,
+      useY,
+      offset,
+      scaleVal);
     textRenderer.end3DRendering();
 
   //textRenderer.flush();
-  //System.out.println("time to draw = " + timer.resetTime());
-
   }
 
   private void drawRect(GL gl, float offset)
   {
+    float x = -transX;
+    float y = transY;
     gl.glBegin(gl.GL_QUADS);
-    gl.glVertex3f(0f, 0f, offset);
-    gl.glVertex3f(w, 0f, offset);
-    gl.glVertex3f(w, 0f + h, offset);
-    gl.glVertex3f(0f, 0f + h, offset);
+    gl.glVertex3f(x, y, offset);
+    gl.glVertex3f(x + w, y, offset);
+    gl.glVertex3f(x + w, y + h, offset);
+    gl.glVertex3f(x, y + h, offset);
     gl.glEnd();
   }
 
@@ -617,25 +609,26 @@ public class GeomText extends GeomRect
     drawRect(gl, 0f);
   }
 
+  /*
   public void calculateBoundsUsingSpecficTextRenderer(TextRenderer textRenderer)
   {
-    //System.out.println("in calculateBoundsUsingSpecficTextRenderer()");
-    FontRenderContext frc = textRenderer.getFontRenderContext();
-    Font font = textRenderer.getFont();
+  //System.out.println("in calculateBoundsUsingSpecficTextRenderer()");
+  FontRenderContext frc = textRenderer.getFontRenderContext();
+  Font font = textRenderer.getFont();
 
-    if (exactPixelBounds == true)
-    {
-      GlyphVector gv1 = font.createGlyphVector(frc, this.text);
-      this.stringBounds = gv1.getPixelBounds(null, 0f, 0f);
-    }
-    else
-    {
-      this.stringBounds = font.getStringBounds(this.text, frc);
-    }
-
-    this.scaleVal = (this.w - (paddingX * 2f)) / (float) this.stringBounds.getWidth();
+  if (exactPixelBounds == true)
+  {
+  GlyphVector gv1 = font.createGlyphVector(frc, this.text);
+  this.stringBounds = gv1.getPixelBounds(null, 0f, 0f);
+  }
+  else
+  {
+  this.stringBounds = font.getStringBounds(this.text, frc);
   }
 
+  this.scaleVal = (this.w - (paddingX * 2f)) / (float) this.stringBounds.getWidth();
+  }
+   */
   public Rectangle2D getStringWidthUsingTextRenderer(TextRenderer tr)
   {
     frc = tr.getFontRenderContext();
@@ -652,7 +645,10 @@ public class GeomText extends GeomRect
     }
   }
 
-  public void chooseFont()
+  /**
+   * Chooses the font size appropriate to the pixel size of this Geom.
+   */
+  public void chooseFontSize()
   {
     this.textRenderer = textRenderers.get(0);
     this.stringBounds = getStringWidthUsingTextRenderer(this.textRenderer);
@@ -665,7 +661,7 @@ public class GeomText extends GeomRect
 
       if (pxWidth < (curWidth + nextWidth) / 2f)
       {
-        this.scaleVal = (this.w - (paddingX * 2f)) / curWidth;
+        this.scaleVal = (this.w - (paddingLeft + paddingRight)) / curWidth;
         return;
       }
 
@@ -676,16 +672,19 @@ public class GeomText extends GeomRect
     }
 
     //use biggest one
-    this.scaleVal = (this.w - (paddingX * 2f)) / curWidth;
+    this.scaleVal = (this.w - (paddingLeft + paddingRight)) / curWidth;
     return;
 
   }
 
   public void setText(String text)
   {
+    //builder.text = text;
     this.text = text; //and should we recalculate everything here too?
+    isRecalculated = true;
   }
 
+  @Override
   public String toString()
   {
     return super.toString() + ", [" + text + "]";
@@ -767,7 +766,6 @@ public class GeomText extends GeomRect
     }
 
     this.h = ((float) ((bounds.getHeight()) * this.w) / (float) bounds.getWidth());
-
   }
 
   /*

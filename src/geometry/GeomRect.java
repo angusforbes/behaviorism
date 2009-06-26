@@ -57,6 +57,11 @@ public class GeomRect extends Geom
     this.isSelectable = true;
   }
 
+  //turn pixel width and height into world width and height,
+  //it also adds h to the y position, and then makes sure that the h is postive.
+  //(this is so that specifying (0,0,100,100) will turn into something like
+  //(0f, -1f, 1f, 1f). That is, so that the height will still be positive.
+  //otherwise we would have (0f, 0f, 1f, -1f)
   public void adjustPixelSize(boolean upperLeft, float x, float y, float w, float h)
   {
     Point3f upperright;
