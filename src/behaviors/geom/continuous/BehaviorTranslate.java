@@ -59,8 +59,6 @@ public class BehaviorTranslate extends BehaviorGeomContinuous
     return bt;
   }
 
-
-
   public static BehaviorTranslate translateFromTo(
     long startTime, 
     long lengthMS, 

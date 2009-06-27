@@ -1,9 +1,9 @@
 package behaviors;
 
-import behaviorism.Behaviorism;
 import behaviors.Behavior.LoopEnum;
 import behaviors.BehaviorGeom.BehaviorBuilder;
 import java.util.List;
+import utils.Utils;
 
 /**
  *
@@ -17,8 +17,7 @@ abstract public class BehaviorContinuous extends Behavior
   public float[] offsets;
 
   public BehaviorContinuous()
-  {
-  }
+  {}
   
   public BehaviorContinuous(ContinuousBehaviorBuilder builder)
   {
@@ -72,6 +71,9 @@ abstract public class BehaviorContinuous extends Behavior
     }
   }
 
+  //probably should be protected.
+  //or better yet should be final protected. who else would need to call him?
+  //maybe when being paused... look into...
   @Override
   public void tick(long currentNano)
   {
@@ -98,7 +100,6 @@ abstract public class BehaviorContinuous extends Behavior
       //call disposals?
       return;
     }
-
 
     isActive = true;
 
@@ -221,21 +222,35 @@ abstract public class BehaviorContinuous extends Behavior
 
   public static class ContinuousBehaviorBuilder extends BehaviorBuilder
   {
-    /*
-    private float startPercent = 0f;
-    private long lengthNano = 0L;
-    private long startTime = 0L;
-    private LoopEnum loopBehavior = LoopEnum.ONCE;
-     */
-
     private float minvals[] = null;
     private float ranges[] = null;
     private float offsets[] = null;
     private List<AccelerationPoint> accelerationPoints = null;
 
+    public ContinuousBehaviorBuilder(long lengthMS)
+    {
+      super(lengthMS);
+    }
+
     public ContinuousBehaviorBuilder(long startTime, long lengthMS)
     {
       super(startTime, lengthMS);
+    }
+
+    //i think the two above are the only ones i really want to keep!
+
+
+
+    public ContinuousBehaviorBuilder(long lengthMS, float[] ranges)
+    {
+      super(lengthMS);
+      ranges(ranges);
+    }
+
+    public ContinuousBehaviorBuilder(long lengthMS, float range)
+    {
+      super(lengthMS);
+      range(range);
     }
 
     public ContinuousBehaviorBuilder(long startTime, long lengthMS, float[] ranges)
@@ -247,11 +262,10 @@ abstract public class BehaviorContinuous extends Behavior
     public ContinuousBehaviorBuilder(long startTime, long lengthMS, float range)
     {
       super(startTime, lengthMS);
-      ranges(new float[]
-        {
-          range
-        });
+      range(range);
     }
+    //let's get rid of these above constructors-- kind of overkill...
+
 
     public ContinuousBehaviorBuilder loop(LoopEnum loopBehavior)
     {
@@ -276,15 +290,11 @@ abstract public class BehaviorContinuous extends Behavior
 
     public ContinuousBehaviorBuilder range(float range)
     {
-      this.ranges = new float[]
+      return ranges( new float[]
         {
           range
-        };
-      this.offsets = new float[1];
-      this.minvals = new float[1];
-      return this;
+        });
     }
-
        
     public ContinuousBehaviorBuilder range(float min, float max)
     {

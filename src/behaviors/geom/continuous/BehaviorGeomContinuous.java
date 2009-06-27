@@ -4,12 +4,13 @@ package behaviors.geom.continuous;
 
 import behaviors.geom.*;
 import behaviors.BehaviorContinuous;
+import geometry.Geom;
 
 /**
  *
  * @author angus
  */
-public abstract class BehaviorGeomContinuous extends BehaviorContinuous implements GeomUpdater
+public class BehaviorGeomContinuous extends BehaviorContinuous implements GeomUpdater
 {
   
   public BehaviorGeomContinuous()
@@ -20,4 +21,7 @@ public abstract class BehaviorGeomContinuous extends BehaviorContinuous implemen
   {
     super(builder);
   }
+
+  public void updateGeom(Geom g)
+  {};
 }

@@ -2,7 +2,6 @@
 package behaviors;
 
 import geometry.Geom;
-import utils.RenderUtils;
 import utils.Utils;
 
 abstract public class BehaviorGeom extends Behavior
@@ -22,6 +21,13 @@ abstract public class BehaviorGeom extends Behavior
     //public  float ranges[] = null;
     //public  float offsets[] = null;
     //public  List<AccelerationPoint> accelerationPoints = null;
+
+    public BehaviorBuilder(long lengthMS)
+    {
+      this.startTime = Utils.now();
+      this.lengthNano = Utils.millisToNanos(lengthMS);
+    }
+
     public BehaviorBuilder(long startTime, long lengthMS)
     {
       this.startTime = startTime;
@@ -54,6 +60,7 @@ abstract public class BehaviorGeom extends Behavior
     relativeStartNano = 0L;
     relativeEndNano = lengthNano;
   }
+
 
   protected void initRange()
   {
