@@ -3,8 +3,9 @@ package renderers;
 import behaviorism.Behaviorism;
 import renderers.layers.RendererLayer;
 import behaviors.Behavior;
-import handlers.MouseHandler;
+import behaviors.geom.BehaviorUpdater;
 import behaviors.geom.GeomUpdater;
+import handlers.MouseHandler;
 import com.sun.opengl.util.j2d.TextRenderer;
 import geometry.Geom;
 import java.util.ArrayList;
@@ -13,8 +14,8 @@ import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
 import handlers.FontHandler;
 import java.util.Map;
-import sequences.Sequence;
 import utils.RenderUtils;
+import static utils.RenderUtils.*;
 import utils.Utils;
 
 public class SceneGraph
@@ -57,7 +58,7 @@ public class SceneGraph
     return instance;
   }
 
-  private void SceneGraph()
+  private SceneGraph()
   {
   }
 
@@ -71,6 +72,7 @@ public class SceneGraph
 
       if (b.isActive == true && b.isPaused == false)
       {
+         // b.updateGeom(g);
         if (b instanceof GeomUpdater)
         {
           ((GeomUpdater) b).updateGeom(g);
@@ -121,6 +123,59 @@ public class SceneGraph
     }
   }
 
+
+  public void processScheduledBehaviors()
+  {
+    /////testing new scheduler////////////
+    System.out.println(" global behaviors size : " + RenderUtils.getWorld().behaviors2.size() );
+    for (Behavior b : RenderUtils.getWorld().behaviors2)
+    {
+      b.tick(currentNano);
+
+      System.out.println("attached geoms size : " + b.attachedGeoms);
+      for (Geom g : b.attachedGeoms)
+      {
+        System.out.println("updating Geom " + g);
+        System.out.println("is g done? " + g.isDone);
+        if (g.isDone == true)
+        {
+          b.attachedGeoms.remove(g);
+        }
+        else if (b.isActive)
+        {
+          ((GeomUpdater)b).updateGeom(g);
+        }
+      }
+
+      System.out.println("attached behaviors size : " + b.attachedGeoms);
+      for (Behavior b2: b.attachedBehaviors)
+      {
+        if (b2.isDone == true)
+        {
+          b2.attachedBehaviors.remove(b2);
+        }
+        else if (b2.isActive)
+        {
+          ((BehaviorUpdater)b).updateBehavior(b2);
+        }
+      }
+
+      if (b.attachedBehaviors.size() == 0 && b.attachedGeoms.size() == 0)
+      {
+        b.isDone = true;
+      }
+
+      if (b.isDone == true)
+      {
+        System.out.println("REMOVING behavior from scheduler");
+        RenderUtils.getWorld().behaviors2.remove(b);
+        b.isActive = false;
+        b.dispose();
+      }
+    }
+    /////end testing new scheduler////////////
+  }
+
   /**
    * Draws each element in the scene graph. The steps to render these elements includes the following:
    * 1. Set up the camera; 2. Update any high-level sequences; 3. Determine the modelview matrix of each
@@ -134,14 +189,17 @@ public class SceneGraph
     this.currentNano = System.nanoTime();
     this.offset = 0f; //reset offset
 
+    processScheduledBehaviors();
+
     // update camera & set up projectionMatrix & basic modelview using camera
     updateCameraBehavior();
 
     // execute high=level sequences
-    Sequence.executeSequences(RenderUtils.getWorld().sequences, this.currentNano);
+    //Sequence.executeSequences(RenderUtils.getWorld().sequences, this.currentNano);
+    //getWorld().sequence.execute(currentNano);
 
     // clear layers -- bleh (think about...)
-    for (Map.Entry<Integer, RendererLayer> entry : RenderUtils.getWorld().layers.entrySet())
+    for (Map.Entry<Integer, RendererLayer> entry : getWorld().layers.entrySet())
     {
       RendererLayer layer = entry.getValue();
       layer.attachedGeoms.clear(); //can we do this only if there is an actual change?
@@ -152,12 +210,12 @@ public class SceneGraph
 //      BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed,
 //      offset);
     List worldGeom = new ArrayList();
-    worldGeom.add(RenderUtils.getWorld());
+    worldGeom.add(getWorld());
     traverseGeoms(gl, worldGeom,
-      RenderUtils.getWorld().isTransformed || RenderUtils.getCamera().isTransformed,
+      getWorld().isTransformed || getCamera().isTransformed,
       offset);
-    RenderUtils.getWorld().isTransformed = false;
-    RenderUtils.getCamera().isTransformed = false;
+    getWorld().isTransformed = false;
+    getCamera().isTransformed = false;
 
     //iterate through layers and render each element to screen.
     drawGeoms(gl);
@@ -165,18 +223,20 @@ public class SceneGraph
 
   private void updateCameraBehavior()
   {
-    Geom cam = RenderUtils.getCamera();
+    Geom cam = getCamera();
 
     if (cam == null)
     {
       return;
     }
 
-    if (RenderUtils.getWorld().isPaused != true)
+    if (getWorld().isPaused != true)
     {
       for (int i = cam.behaviors.size() - 1; i >= 0; i--)
       {
         Behavior b = cam.behaviors.get(i);
+
+//        b.updateGeom(cam);
 
         if (b instanceof GeomUpdater)
         {
@@ -193,7 +253,7 @@ public class SceneGraph
       }
     }
 
-    RenderUtils.getRenderer().setPerspective3D();
+    getRenderer().setPerspective3D();
   }
 
   private void traverseGeoms(GL gl, List<Geom> geoms, boolean parentTransformed, float prevOffset) //, long currentNano, int level, float prevOffset)
@@ -212,7 +272,7 @@ public class SceneGraph
       }
 
       g.transform();
-      RenderUtils.getWorld().layers.get(g.layerNum).attachedGeoms.add(g);
+      getWorld().layers.get(g.layerNum).attachedGeoms.add(g);
       traverseGeoms(gl, g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
 
       g.isTransformed = false;
@@ -236,14 +296,14 @@ public class SceneGraph
   public void drawGeoms(GL gl)
   {
     gl.glMatrixMode(gl.GL_PROJECTION);
-    gl.glLoadMatrixd(RenderUtils.getCamera().projection, 0);
+    gl.glLoadMatrixd(getCamera().projection, 0);
     gl.glMatrixMode(gl.GL_MODELVIEW);
 
     //gl.glPushMatrix();
 
 
     invisiblePickingGeoms.clear();
-    for (Map.Entry<Integer, RendererLayer> entry : RenderUtils.getWorld().layers.entrySet())
+    for (Map.Entry<Integer, RendererLayer> entry : getWorld().layers.entrySet())
     {
       //System.out.println("layer at pos " + entry.getKey() + " has " + entry.getValue().attachedGeoms.size() + " entries.");
       RendererLayer layer = entry.getValue();
@@ -423,7 +483,7 @@ public class SceneGraph
   {
     gl.glPushMatrix();
     {
-      gl.glLoadMatrixd(RenderUtils.getCamera().modelview, 0);
+      gl.glLoadMatrixd(getCamera().modelview, 0);
 
       float minx = -5f,
         miny = -5f;
@@ -478,12 +538,12 @@ public class SceneGraph
     }
 
     //Set to orthographic projectionMatrix
-    RenderUtils.getRenderer().setPerspective2D();
+    getRenderer().setPerspective2D();
 
     //draw selected debugging info
     if (drawDebugFrameRate == true)
     {
-      drawFrameRate(gl);
+      drawFrameRate();
     }
 
     if (drawDebugMouseDraggedPoint == true)
@@ -536,7 +596,7 @@ public class SceneGraph
     }
   }
 
-  private void drawFrameRate(GL gl)
+  private void drawFrameRate()
   {
     this.frames++;
     this.nowTime = Utils.nanosToMillis(currentNano);

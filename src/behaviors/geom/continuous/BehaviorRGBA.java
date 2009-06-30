@@ -5,7 +5,6 @@
 package behaviors.geom.continuous;
 
 import geometry.Geom;
-import behaviors.Behavior.LoopEnum;
 import geometry.Colorf;
 
 public class BehaviorRGBA extends BehaviorGeomContinuous

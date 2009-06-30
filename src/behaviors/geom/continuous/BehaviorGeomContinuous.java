@@ -10,7 +10,7 @@ import geometry.Geom;
  *
  * @author angus
  */
-public class BehaviorGeomContinuous extends BehaviorContinuous implements GeomUpdater
+abstract public class BehaviorGeomContinuous extends BehaviorContinuous implements GeomUpdater
 {
   
   public BehaviorGeomContinuous()
@@ -22,6 +22,6 @@ public class BehaviorGeomContinuous extends BehaviorContinuous implements GeomUp
     super(builder);
   }
 
-  public void updateGeom(Geom g)
-  {};
+//  public void updateGeom(Geom g)
+//  {};
 }

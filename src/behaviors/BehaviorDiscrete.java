@@ -12,7 +12,7 @@ import utils.Utils;
  *
  * @author angus
  */
-abstract public class BehaviorDiscrete extends Behavior
+abstract public class BehaviorDiscrete extends BehaviorTimed
 {
 
   public boolean isTimeToChange = false;
@@ -58,6 +58,7 @@ abstract public class BehaviorDiscrete extends Behavior
   @Override
   public void tick(long currentNano)
   {
+    System.out.println("ticking....");
     isActive = false;
 
     if (currentNano < startTime)
@@ -68,29 +69,29 @@ abstract public class BehaviorDiscrete extends Behavior
     if (isInterrupted == true && interruptNano <= currentNano)
     {
       this.isDone = true;
-    //call disposals?
+      //call disposals?
     }
 
-
     now = currentNano - startNano;
-    //System.out.println("" + isGeomActive + " : now(" + Utils.nanosToMillis(now) + ") ... len(" + Utils.nanosToMillis(lengthNano) + ")");
+    System.out.println(" : now(" + Utils.nanosToMillis(now) + ") ... len(" + Utils.nanosToMillis(lengthNano) + ")");
 
     //System.out.println("now = " + now + ", lengthNano = " + lengthNano);
     //System.out.println("lengthsNanos are... " + Arrays.toString(lengthNanos.toArray() ));
     int nextIndex = getIndexAtNano(lengthNanos, now);
 
+    System.out.println("nextIndex = " + nextIndex);
     //if we are at a different step in time, then we need to update the Geom
     //Otherwise, it is the same as before and nothing needs to be done...
     if (nextIndex != curIndex)
     {
-      //System.out.println("nextIndex = " + nextIndex + ", currentIndex = " + curIndex);
+      System.out.println("nextIndex = " + nextIndex + ", currentIndex = " + curIndex);
 
       isActive = true;
       curIndex = nextIndex;
     }
     else
     {
-      //System.out.println("nothing new...");
+      System.out.println("nothing new...");
       return; //right?
     }
 
@@ -107,9 +108,11 @@ abstract public class BehaviorDiscrete extends Behavior
       return;
     }
 
+    System.out.println("curIndex = " + curIndex + ", lengthNanos.size() - 1 = " + (lengthNanos.size() - 1));
     //remove if this is the last one (and loopBehavior == ONCE)
     if (curIndex == lengthNanos.size() - 1)
     {
+      System.out.println("in TICK -- loopBehavior = " + loopBehavior);
       switch (loopBehavior)
       {
         case ONCE:
@@ -122,10 +125,16 @@ abstract public class BehaviorDiscrete extends Behavior
           //startNano += lengthNano; //add length of behavior to starting time
           //so then we also need to push out lastCheck into the past
           //lastCheck = now - lengthNano;
+          
           lastCheck = now;
           lengthNanos = loopLengthNanos(lengthNanos, lengthNano, 1, waitTime);
-
           curIndex = getIndexAtNano(lengthNanos, lastCheck);
+         
+          /*
+          startNano += Utils.millisToNanos(2000); //lengthNano;
+          //lastCheck = now - lengthNano;
+          curIndex = -1; //getIndexAtNano(lengthNanos, lastCheck);
+           */
           break;
         case REVERSE:
           //System.out.println("reversing...");

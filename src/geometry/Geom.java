@@ -80,20 +80,16 @@ public abstract class Geom
   boolean rotateRelative = true;
   boolean scaleRelative = true;
 
-  //temp!!! used for compatabilty with BehaviorSize3D... rethink...
-  public float w = 1f;
-  public float h = 1f;
-  public float d = 0f;
-  /** we are not really using this... should we be? Looks we are *always* using ScaleEnum.CENTER (in the transform) */
-//  @Deprecated
-//  public ScaleEnum scaleDirection = ScaleEnum.NE; //default
+  //protected float w = 1f;
+  //protected float h = 1f;
+  //protected float d = 0f;
+ //make this protected and add proper setters!
+  public  float w = 1f;
+  public  float h = 1f;
+  public  float d = 0f;
+
   public Colorf color = new Colorf();
-//
-//  public float r = (float) Math.random();
-//  public float g = (float) Math.random();
-//  public float b = (float) Math.random();
-//  public float a = 1f;
-//
+
   @Deprecated
   public float area = 0f; //i think i was using this for an picking alogrithm. it was a dumb idea. this shouldn't be stored.
 
@@ -194,6 +190,22 @@ public abstract class Geom
     setTranslate(p3f);
   }
 
+  public void setWidth(int w)
+  {
+    System.out.println("PIXEL ");
+
+    this.w = MatrixUtils.pixelToWorld(
+        Behaviorism.getInstance().canvasWidth / 2 + w,
+        Behaviorism.getInstance().canvasHeight / 2 - 0).x;
+
+    System.out.println("width 1 = " + this.w);
+
+ 
+  }
+  public void setWidth(float w)
+  {
+    this.w = w;
+  }
   /**
    * Instructions for the Geom to draw itself within the openGL context. Called during each frame of the openGL display loop.
    * gl and glu define the openGL context. offset is a tiny value that can be used to ensure that there are no rendering errors
@@ -461,14 +473,14 @@ public abstract class Geom
   {
     addGeomToLayer(g, false, 0);
 
-    BehaviorIsActive bia = BehaviorIsActive.activateAtMillis(g, System.nanoTime(), millisInFuture);
+    BehaviorIsActive.activateAtMillis(g, System.nanoTime(), millisInFuture);
   }
 
   public void addGeomToLayer(Geom g, long millisInFuture, int layerNum)
   {
     addGeomToLayer(g, false, layerNum);
 
-    BehaviorIsActive bia = BehaviorIsActive.activateAtMillis(g, System.nanoTime(), millisInFuture);
+    BehaviorIsActive.activateAtMillis(g, System.nanoTime(), millisInFuture);
   }
 
   /**

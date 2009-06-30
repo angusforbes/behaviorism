@@ -6,6 +6,8 @@
 package behaviors.geom;
 
 import geometry.Geom;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -13,5 +15,7 @@ import geometry.Geom;
  */
 public interface GeomUpdater 
 {
+  public List<Geom> attachedGeoms = new CopyOnWriteArrayList<Geom>();
+
   public void updateGeom(Geom g);
 }

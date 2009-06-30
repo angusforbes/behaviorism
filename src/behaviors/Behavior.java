@@ -1,10 +1,12 @@
 package behaviors;
 
 import geometry.Geom;
-import java.util.*;
 import javax.vecmath.Point3f;
 import utils.Utils;
 import behaviors.geom.discrete.BehaviorIsPaused;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import utils.RenderUtils;
 
 abstract public class Behavior
 {
@@ -24,41 +26,33 @@ abstract public class Behavior
   public boolean isActive = false; //change() won't be called unless this is true
   public boolean isInterrupted = false;
   public long interruptNano = -1L;
-  //public float[] ranges;
-  //public float[] offsets;
-  public int loopCount = 0;
 
-  public enum LoopEnum
+  public long startTime = 0L;
+
+  ///TESTING THIS
+  public List<Geom> attachedGeoms = new CopyOnWriteArrayList<Geom>();
+  public List<Behavior> attachedBehaviors = new CopyOnWriteArrayList<Behavior>();
+  public void attachBehavior(Behavior b)
   {
-    // a negative number means "do it forever"
-    NONE(0), ONCE(1), REVERSE(-1), CONTINUE(-1), LOOP(-1);
-
-    public int howManyTimes = 1;
-    public LoopEnum howManyTimes(int times)
-    {
-      howManyTimes = times;
-      return this;
-    }
-
-    LoopEnum(int times)
-    {
-      howManyTimes = times;
-    }
+    attachedBehaviors.add(b);
   }
 
-  protected long relativeStartNano = 0L;
-  protected long relativeEndNano = 0L;
-  public long startTime = 0L;
-  public long startNano = 0L;
-  public long lengthNano = 0L;
-  public float percentage = 0f;
-  public float startPercent = 0f;
-  public long now = 0L;
-  public long lastCheck = 0L;
-  public LoopEnum loopBehavior = LoopEnum.NONE;
-  protected int direction = 1; //this needs to be protected, set only on initialization! -- this is because changing it in midstream would mess everything up!
-  public List<AccelerationPoint> aps = new ArrayList<AccelerationPoint>();
-  //public List<Disposal> disposals = new ArrayList<Disposal>();
+  public void attachGeom(Geom g)
+  {
+    attachedGeoms.add(g);
+  }
+
+  public Behavior(long startTime)
+  {
+    this.startTime = startTime;
+     RenderUtils.getWorld().scheduleBehavior(this);
+  }
+
+  public Behavior()
+  {
+     RenderUtils.getWorld().scheduleBehavior(this);
+  }
+  ///DONE TESTING
 
   /*
   public void addDisposal(Disposal disposal)
@@ -300,7 +294,7 @@ abstract public class Behavior
    */
   public void pause(long nano)
   {
-    this.startNano = nano - lastCheck;
+    //this.startNano = nano - lastCheck;
   }
   
   public void step(long pauseNano, long stepNano)
@@ -310,10 +304,14 @@ abstract public class Behavior
   }
   
 
+  public void reverse()
+  {
+  }
   /**
    * reverse causes the behavior to reverse what it was doing.
    * seems to mess up the stepper, rethink at some later time...
    */
+   /*
   public void reverse()
   {
     //System.out.println("!!!! in reverse: lastCheck was = " + Utils.nanosToMillis(lastCheck));
@@ -330,6 +328,7 @@ abstract public class Behavior
     //this.lastCheck += (lengthNano - lastCheck) - lastCheck;
     System.out.println("in reverse: lastCheck is = " + Utils.nanosToMillis(lastCheck));
   }
+  */
 
   /**
    * changeSpeed increases or decreases the speed of the Behavior by a specified
@@ -340,6 +339,9 @@ abstract public class Behavior
    * seems to mess up the stepper, think about this sometime.
    * @param amount
    */
+  public void changeSpeed(float amount) //i.e. 2f doubles, .5f halves
+  {}
+  /*
   public void changeSpeed(float amount) //i.e. 2f doubles, .5f halves
   {
     if (amount == 0f) {
@@ -355,7 +357,7 @@ abstract public class Behavior
     this.relativeEndNano = (long) (lastCheck + ((relativeEndNano - lastCheck) * ratio));
     this.relativeStartNano = (long) (lastCheck - ((lastCheck - relativeStartNano) * ratio));
   }
-
+  */
   /**
    * Gets the time (in nanoseconds) of the next scheduled flip,
    * or in the case where loopBehavior = LoopEnum.ONCE, the scheduled time
@@ -366,82 +368,15 @@ abstract public class Behavior
    */
   public long getFlipNano()
   {
+  return -1;
+  }
+  /*
+  public long getFlipNano()
+  {
     return startNano + lengthNano;
   }
-
-  /**
-   * Gets the percentage of time that has passed between the start of this
-   * behavior and the end of the behavior. This method does not take in to account
-   * at all the values of the AccelrationPoints. It is simply the raw percentage
-   * value of time passed.
-   */
-  public float getRawPercentage(long currentNano)
-  {
-    return (float) ((float) currentNano / (float) lengthNano); //% of raw time elapsed
-  }
-
-  /** 
-   * Gets the percentage of time that has passed between the start of this
-   * behavior and the end of the behavior, appropriately adjusted by the 
-   * AccelelrationPoints attached to the behavior
-   */
-  public float getPercentage(long currentNano)
-  {
-    float perc_time = 0f;
-    float perc_dist = 0f;
-
-    float percentageAtMillis = getRawPercentage(currentNano);
-
-    //System.out.println("in getPercentage(long): ( " + currentNano + "/" + lengthNano+ " ) init raw percentageAtMillis... = " + percentageAtMillis);
-
-    if (percentageAtMillis < 0f || percentageAtMillis > 1f) {
-      System.out.println("!!!!!!!!!!!!!!!!!!!!!in getPercentage(long): exiting: weird percentage! = " + percentageAtMillis);
-    /* Come up with better way to indicate this... this shoudl never happen except perhaps at very beginning when loading */
-    //System.exit(0);
-    }
-
-    //adjust the raw percentage if there are acceleration points
-    float diff_dist, diff_time, part_dist;
-
-    for (int i = 0; i < aps.size(); i++) {
-      AccelerationPoint ap = aps.get(i);
-
-      if (percentageAtMillis < ap.percentage_time) {
-        diff_dist = ap.percentage_dist - perc_dist;
-        diff_time = ap.percentage_time - perc_time;
-        part_dist = (diff_dist * (percentageAtMillis - perc_time)) / diff_time;
-        percentageAtMillis = (perc_dist + part_dist);
-        break;
-      } else {
-        perc_time = ap.percentage_time;
-        perc_dist = ap.percentage_dist;
-      }
-    }
-
-    //System.out.println("in getPercentage(long): returning percentageAtMillis... = " + percentageAtMillis);
-
-    return (float) percentageAtMillis;
-  }
-
-  protected void setAccelerationPoints()
-  {
-    setAccelerationPoints(null);
-  }
-
-  /** 
-   * Sets the AccelerationPoints for this Behavior. If the input argument is null or empty,
-   * then sets a single default AccelerationPoint of (1.0f, 1.0f) so that checking on the 
-   * AccelerationPoints won't cause a problem.
-   */
-  public void setAccelerationPoints(List<AccelerationPoint> aps) //just default for now
-  {
-    if (aps == null || aps.size() == 0) {
-      this.aps.add(new AccelerationPoint(1.0f, 1.0f));
-    } else {
-      this.aps = aps;
-    }
-  }
-
+  */
+  
   /** 
    * This creates a set of behaviors to rotate around a center point with a varying radius.
    * So you can create a spiraling effect. Like in the video game "Tempest".
@@ -517,8 +452,8 @@ abstract public class Behavior
       str += "id=" + id + " : ";
     }
 
-    str += "lengthMS=" + Utils.nanosToMillis(lengthNano) + ", percentage="+percentage + ", dir="+ direction +
-      " loop="+loopBehavior;
+//    str += "lengthMS=" + Utils.nanosToMillis(lengthNano) + ", percentage="+percentage + ", dir="+ direction +
+//      " loop="+loopBehavior;
     return str;
   }
 

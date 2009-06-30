@@ -4,13 +4,12 @@ package behaviors.geom.intermittent;
 
 import behaviors.BehaviorIntermittent;
 import behaviors.BehaviorIntermittent.IntermittentBehaviorBuilder;
-import behaviors.geom.*;
 
 /**
  *
  * @author angus
  */
-public abstract class BehaviorGeomIntermittent extends BehaviorIntermittent implements GeomUpdater
+public abstract class BehaviorGeomIntermittent extends BehaviorIntermittent //implements GeomUpdater
 {
   
   public BehaviorGeomIntermittent(IntermittentBehaviorBuilder builder)

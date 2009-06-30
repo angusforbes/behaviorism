@@ -19,7 +19,6 @@ import renderers.Renderer;
 import utils.GeomUtils;
 import utils.MatrixUtils;
 import utils.RenderUtils;
-import utils.Utils;
 
 public class GeomRect extends Geom
 {

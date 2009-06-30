@@ -8,7 +8,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUnurbs;
 import javax.vecmath.Point3f;
-import renderers.Renderer;
 import utils.RenderUtils;
 
 /**
@@ -70,8 +69,9 @@ public class GeomGluNurbsSurface extends Geom
     super(p3f);
 
     this.numKnotsU = p3fs.size() + orderU;
-    this.numKnotsV = p3fs.size() + orderU;
+    this.numKnotsV = p3fs.size() + orderV;
     this.knotArrayU = knotArrayU;
+    this.knotArrayV = knotArrayV;
     this.orderU = orderU;
     this.orderV = orderV;
     this.strideU = 3;

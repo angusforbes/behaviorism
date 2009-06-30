@@ -54,12 +54,10 @@ public class Renderer implements GLEventListener
    */
   public static Renderer getInstance()
   {
-    if (instance != null)
+    if (instance == null)
     {
-      return instance;
+      instance = new Renderer();
     }
-
-    instance = new Renderer();
 
     return instance;
   }

@@ -9,7 +9,7 @@ import utils.RenderUtils;
  *
  * @author angus
  */
-public class BehaviorIntermittent extends BehaviorDiscrete
+abstract public class BehaviorIntermittent extends BehaviorDiscrete
 {
   public BehaviorIntermittent(IntermittentBehaviorBuilder builder)
   {

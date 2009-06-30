@@ -70,12 +70,10 @@ public class Behaviorism
    */
   public static Behaviorism getInstance()
   {
-    if (instance != null)
+    if (instance == null)
     {
-      return instance;
+      instance = new Behaviorism();
     }
-
-    instance = new Behaviorism();
 
     return instance;
   }

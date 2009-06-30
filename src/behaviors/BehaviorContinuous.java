@@ -1,15 +1,13 @@
 package behaviors;
 
-import behaviors.Behavior.LoopEnum;
-import behaviors.BehaviorGeom.BehaviorBuilder;
+import behaviors.BehaviorGeomOld.BehaviorBuilder;
 import java.util.List;
-import utils.Utils;
 
 /**
  *
  * @author angus
  */
-abstract public class BehaviorContinuous extends Behavior
+abstract public class BehaviorContinuous extends BehaviorTimed
 {
 
   public float[] minvals; //not needed for most... (see BehaviorSineWave, etc)

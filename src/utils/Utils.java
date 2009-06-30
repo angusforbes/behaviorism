@@ -735,8 +735,9 @@ public class Utils
       bimage = gc.createCompatibleImage(
         image.getWidth(null), image.getHeight(null), transparency);
     }
-    catch (HeadlessException e)
+    catch (HeadlessException he)
     {
+      he.printStackTrace();
       // The system does not have a screen
     }
 

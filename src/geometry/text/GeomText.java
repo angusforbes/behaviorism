@@ -568,18 +568,21 @@ public class GeomText extends GeomRect
    */
   public Rectangle2D getStringWidthUsingTextRenderer(TextRenderer tr)
   {
+    Rectangle2D rect = null;
     frc = tr.getFontRenderContext();
     font = tr.getFont();
 
     if (exactPixelBounds == true)
     {
       GlyphVector gv = font.createGlyphVector(frc, this.text);
-      return gv.getPixelBounds(null, 0f, 0f);
+      rect = gv.getPixelBounds(null, 0f, 0f);
     }
     else
     {
-      return font.getStringBounds(this.text, frc);
+      rect = font.getStringBounds(this.text, frc);
     }
+
+    return rect;
   }
 
   /**

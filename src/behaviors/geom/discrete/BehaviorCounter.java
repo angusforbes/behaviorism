@@ -114,21 +114,25 @@ public class BehaviorCounter extends BehaviorGeomDiscrete
      
       if (countIndex == counts.size())
       {
-        if (countBehavior == LoopEnum.ONCE)
+        switch(countBehavior)
         {
-          isActive = false;
-          isDone = true;
+
+          case REVERSE:
+            Collections.reverse(counts);
+            countIndex = 1; //will start at second index so we don't get end of the list a seconde time (when it gets moved to the beginning)
+            break;
+
+          case LOOP:
+            countIndex = 0;
+            break;
+
+          case ONCE:
+          default:
+            isActive = false;
+            isDone = true;
+            break;
         }
-        else if (countBehavior == LoopEnum.REVERSE)
-        {
-          Collections.reverse(counts);
-          countIndex = 1; //will start at second index so we don't get end of the list a seconde time (when it gets moved to the beginning)
-        }
-        else if (countBehavior == LoopEnum.LOOP)
-        {
-          countIndex = 0;
-        }
-        
+
       }
     }
   }

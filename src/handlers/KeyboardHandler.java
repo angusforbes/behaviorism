@@ -46,12 +46,10 @@ public class KeyboardHandler implements KeyListener
    */
   public static KeyboardHandler getInstance()
   {
-    if (instance != null)
+    if (instance == null)
     {
-      return instance;
+      instance = new KeyboardHandler();
     }
-
-    instance = new KeyboardHandler();
 
     return instance;
   }

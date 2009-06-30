@@ -31,12 +31,12 @@
             <line>0</line>
         </file>
         <file>
-            <url>src/algorithms/PackingAlgorithm.java</url>
-            <line>1534</line>
-        </file>
-        <file>
             <url>src/renderers/Renderer.java</url>
             <line>113</line>
+        </file>
+        <file>
+            <url>src/algorithms/PackingAlgorithm.java</url>
+            <line>1534</line>
         </file>
         <file>
             <url>src/worlds/celltango/WorldCellTangoFireworks.java</url>
@@ -50,9 +50,9 @@
         </file>
         <file>
             <url>src/geometry/text/GeomText.java</url>
-            <line>78</line>
-            <line>208</line>
-            <line>584</line>
+            <line>87</line>
+            <line>228</line>
+            <line>486</line>
         </file>
     </editor-bookmarks>
 </project-private>

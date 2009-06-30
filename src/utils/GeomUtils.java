@@ -1742,7 +1742,7 @@ public class GeomUtils
 
 
 
-    float x, y, z;
+    //float x, y, z;
 
 
     float a, b, c, mu, i;
@@ -1824,7 +1824,7 @@ public class GeomUtils
 
 
 
-    float x, y, z;
+  //  float x, y, z;
 
 
     float a, b, c, mu, i;
@@ -1982,7 +1982,7 @@ public class GeomUtils
   public static Rectangle2D.Float pathToRect(Path2D.Float path)
   {
     //hmm isn't there some way of checking how many points the path has??
-    float x, y, w, h;
+   // float x, y, w, h;
 
     PathIterator pi = path.getPathIterator(null);
 
@@ -1991,7 +1991,7 @@ public class GeomUtils
     Point2D.Float pt1 = new Point2D.Float();
     Point2D.Float pt2 = new Point2D.Float();
 
-    Point2D.Float curPoint = null;
+    //Point2D.Float curPoint = null;
 
     int idx = 0;
 
@@ -2041,7 +2041,7 @@ public class GeomUtils
 
     float[] vals = new float[6];
 
-    Point2D.Float curPoint = null;
+    //Point2D.Float curPoint = null;
 
     while (!pi.isDone())
     {
@@ -2241,13 +2241,15 @@ public class GeomUtils
     return new Point(px, py);
   }
 
+  //wtf?
+  @Deprecated
   public Point3f lngLatToPoint3f(
     float lng, float lat)
   {
-    float s1 = -75f;
-    float s2 = 0f;
-    float offset = 5f;
-    float ss = 10;
+//    float s1 = -75f;
+//    float s2 = 0f;
+//    float offset = 5f;
+//    float ss = 10;
 
     if (lng >= -180 && lng < -80)
     { //compress

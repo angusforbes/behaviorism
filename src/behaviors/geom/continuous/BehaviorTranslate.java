@@ -1,11 +1,11 @@
 package behaviors.geom.continuous;
 
-import behaviors.Behavior.LoopEnum;
 import behaviors.BehaviorContinuous.ContinuousBehaviorBuilder;
 import geometry.Geom;
 import javax.vecmath.Point3f;
 import utils.GeomUtils;
 import utils.MatrixUtils;
+import utils.RenderUtils;
 
 /**
  *
@@ -18,12 +18,31 @@ public class BehaviorTranslate extends BehaviorGeomContinuous
     long lengthMS, 
     Point3f ranges)
   {
-    return new BehaviorTranslate(
+    BehaviorTranslate bt =  new BehaviorTranslate(
       new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(ranges)).loop(
         //(LoopEnum.REVERSE).howManyTimes(4))
         LoopEnum.ONCE )
         );
+
+ 
+    return bt;
+
   }
+ public static BehaviorTranslate translate(
+    long startTime,
+    long lengthMS,
+    LoopEnum loop,
+    Point3f ranges)
+  {
+    BehaviorTranslate bt = new BehaviorTranslate(
+      new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(ranges)).loop(
+        loop )
+       );
+
+ 
+    return bt;
+  }
+
 
 
   public static BehaviorTranslate translate(

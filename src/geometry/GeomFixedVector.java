@@ -2,7 +2,6 @@
 package geometry;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
 
 /**

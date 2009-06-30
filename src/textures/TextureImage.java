@@ -19,7 +19,7 @@ public class TextureImage
 {
   public List<Geom> attachedGeoms = new ArrayList<Geom>();
   public TextureData textureData = null;
-  public Texture texture;
+  public Texture texture = null;
   public boolean isTextureWaiting = false;
   public int w; //texture width in pixels
   public int h; //texture height in pixels

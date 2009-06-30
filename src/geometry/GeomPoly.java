@@ -31,6 +31,8 @@ public class GeomPoly extends Geom
   {
     this.isSelectable = true;
   }
+
+  /*
   public GeomPoly(boolean rand)
   {
     this.isSelectable = true;
@@ -54,6 +56,7 @@ public class GeomPoly extends Geom
 
     //selectableBoundary = verts;
   }
+  */
 
   public GeomPoly(Point3f ... p3fs)
   {

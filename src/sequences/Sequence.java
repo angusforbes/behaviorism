@@ -1,19 +1,28 @@
 package sequences;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import utils.RenderUtils;
 import worlds.World;
+import static utils.Utils.*;
 
 /**
  *
  * @author angus
  */
-abstract public class Sequence
+public class Sequence
 {
+  public List<Sequence> sequences = new CopyOnWriteArrayList<Sequence>();
+  long executeTime = 0;
 
 	public World world = null;
 	public long baseNano = -1;
 	public long pauseNano = -1;
+
+  public Sequence()
+  {
+    this.baseNano = now();
+  }
 
 	public Sequence(World world, long baseNano)
 	{
@@ -22,9 +31,28 @@ abstract public class Sequence
 	}
 
 	//public abstract List<Sequence> execute();
-	public abstract void execute();
+	public void execute(final long currentNano)
+  {
 
-	public static void executeSequences(final List<Sequence> sequences,
+  }
+
+
+  public void executeSequences(
+    //final List<Sequence> sequences,
+					final long currentNano)
+	{
+    for (Sequence sequence : sequences)
+    {
+      sequence.executeSequences(currentNano);
+    }
+
+    if (currentNano >= executeTime)
+    {
+      execute(currentNano);
+    }
+  }
+
+	public static void executeSequencesOld(final List<Sequence> sequences,
 					final long currentNano)
 	{
 		/*
@@ -70,7 +98,7 @@ abstract public class Sequence
 						{
 							System.out.println("in executeSequences : executing a sequence!");
 							//toBeScheduled.addAll(s.execute());
-							s.execute();
+						//	s.execute();
 
 							sequences.remove(s);
 						}
@@ -176,22 +204,14 @@ abstract public class Sequence
 		}
 	}
 	//public static void addSequence(SortedMap<Long, List<Sequence>> sequences, Sequence s)
-	public static void addSequence(List<Sequence> sequences, Sequence s)
+	public void addSequence(Sequence s)
 	{
-		//synchronized (sequences)
-		{
 			sequences.add(s);
-		/*
-		List list = sequences.get(s.baseNano);
-		if(list == null)
-		{
-		list = new ArrayList<Sequence>();
-		sequences.put(s.baseNano, list);
-		}
-		
-		Utils.addTo(list, s);
-		 */
-		}
+	}
+
+  public void removeSequence(Sequence s)
+	{
+			sequences.remove(s);
 	}
 
 	@Override

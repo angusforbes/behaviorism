@@ -3,7 +3,6 @@
 package behaviors.geom.continuous;
 
 import geometry.Geom;
-import behaviors.Behavior.LoopEnum;
 import javax.vecmath.Point3f;
 import utils.MatrixUtils;
 

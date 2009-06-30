@@ -3,11 +3,11 @@
  */
 package worlds;
 
-import behaviors.BehaviorGeom;
+import behaviors.Behavior;
+import behaviors.BehaviorGeomOld;
 //import behaviors.BehaviorIsActive;
 import geometry.Geom;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import sequences.Sequence;
 import geometry.GeomPoint;
 import geometry.GeomPoly;
@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import renderers.Renderer;
 import renderers.cameras.Cam;
 import renderers.cameras.CamBasic;
@@ -31,18 +32,27 @@ public abstract class World extends GeomPoint //does this make sense?
 //we'll have to make a lot of chnages
 //to RendererJogl modelview, etc?
 {
+  //public List<Sequence> sequences = new CopyOnWriteArrayList<Sequence>();
+  public Sequence sequence = new Sequence(); //CopyOnWriteArrayList<Sequence>();
   //public List<Geom> geoms = new CopyOnWriteArrayList<Geom>();
-  //public List<BehaviorGeom> behaviors = new CopyOnWriteArrayList<BehaviorGeom>();
-  public List<Sequence> sequences = new CopyOnWriteArrayList<Sequence>();
+  //public List<BehaviorGeomOld> behaviors = new CopyOnWriteArrayList<BehaviorGeomOld>();
   public SortedMap<Integer, RendererLayer> layers = new TreeMap<Integer, RendererLayer>();  //protected Connector database = null;
   //public List<Geom> geoms = Collections.synchronizedList(new ArrayList<Geom>());
-  //public List<BehaviorGeom> behaviors = Collections.synchronizedList(new ArrayList<BehaviorGeom>());
+  //public List<BehaviorGeomOld> behaviors = Collections.synchronizedList(new ArrayList<BehaviorGeomOld>());
   //public List<Sequence> sequences = Collections.synchronizedList(new ArrayList<Sequence>());
   ////public SortedMap<Long, List<Sequence>> sequences = 
   ////				Collections.synchronizedSortedMap(new TreeMap<Long, List<Sequence>>());
   //public Data data = new Data();
   public Cam cam = new CamBasic(); //this cam should be the same as the cam in RendererJogl, or should point to it.
   //public State state = new State();
+
+  //TESTING
+  public List<Behavior> behaviors2 = new CopyOnWriteArrayList<Behavior>();
+  public void scheduleBehavior(Behavior b)
+  {
+    behaviors2.add(b);
+  }
+  //DONE WITH TEST CODE
 
   public abstract void setUpWorld();
 
@@ -108,7 +118,7 @@ public abstract class World extends GeomPoint //does this make sense?
   //hmm think about this a bit more...
   public GeomPoly getWorldGeom()
   {
-    Rectangle2D.Float sb = getScreenBoundsInWorldCoords();
+    //Rectangle2D.Float sb = getScreenBoundsInWorldCoords();
     
     List<GeomPoint> worldBoundaryPoints = getWorldBoundaryPoints();
     
@@ -223,6 +233,7 @@ public abstract class World extends GeomPoint //does this make sense?
   }
   */
 
+  /*
   public void addSequence(Sequence s)
   {
     //synchronized(sequences)
@@ -231,20 +242,21 @@ public abstract class World extends GeomPoint //does this make sense?
     }
 
   //does it really matter if they are sorted??
-		/*
-  synchronized(sequences)
-  {
-  List list = sequences.get(s.baseNano);
-  if(list == null)
-  {
-  list = new ArrayList<Sequence>();
-  sequences.put(s.baseNano, list);
+		
+//  synchronized(sequences)
+//  {
+//  List list = sequences.get(s.baseNano);
+//  if(list == null)
+//  {
+//  list = new ArrayList<Sequence>();
+//  sequences.put(s.baseNano, list);
+//  }
+//
+//  Utils.addTo(list, s);
+//  }
+   
   }
-  
-  Utils.addTo(list, s);
-  }
-   */
-  }
+  */
 
   /*
   public void removeSequence(Sequence s)
@@ -255,6 +267,7 @@ public abstract class World extends GeomPoint //does this make sense?
   }
   }
    */
+  /*
   public void clearSequences(Sequence s)
   {
     //synchronized(sequences)
@@ -262,7 +275,7 @@ public abstract class World extends GeomPoint //does this make sense?
       sequences.clear();
     }
   }
-
+  */
   public void clearGeoms()
   {
     //synchronized(geoms)
@@ -271,7 +284,7 @@ public abstract class World extends GeomPoint //does this make sense?
     }
   }
 
-  public void destroyBehavior(BehaviorGeom b)
+  public void destroyBehavior(BehaviorGeomOld b)
   {
     b.isDone = true;
   /*

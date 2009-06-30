@@ -136,7 +136,7 @@ public class RenderUtils
   //public Shape getScreenShapeForWorldCoords(GL gl, GLU glu, Geom g)
   public static Path2D.Float getScreenShapeForWorldCoords(Geom g)
   {
-    Renderer rj = getRenderer();
+    //Renderer rj = getRenderer();
 
     Path2D.Float p2f = null;
     double projection[] = new double[16];
@@ -284,7 +284,7 @@ public class RenderUtils
 
   public static Point3d rayIntersect(Geom g, float x, float y /*int x, int y*/, Point3d offsetPt)
   {
-    Renderer rj = getRenderer();
+    //Renderer rj = getRenderer();
 
     //1. get values of ray (at screen coords) at near and far points (in world coordinates)
     //2. get Geom in world coordinates

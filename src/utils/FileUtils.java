@@ -257,6 +257,21 @@ public class FileUtils
 
   }
 
+  public static URL loadURL(String urlStr)
+  {
+    URL url = null;
+    try
+    {
+      url = new URL(urlStr);
+    }
+      catch(MalformedURLException mue)
+    {
+      mue.printStackTrace();
+    }
+
+    return url;
+  }
+
   public static URI toURI(URL url)
   {
     try
