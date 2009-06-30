@@ -11,22 +11,24 @@ public class BehaviorInterpolated extends Behavior
 {
 
   public float offsetPercentage = 0f;
-  public float rawPercentage = 0f;
-  public float prevRawPercentage = 0f;
   public float percentage = 0f;
-  public long loopLength = Utils.millisToNanos(1000L);
-  int numRepeats = 100;
-  int repeat = 0;
+  public long loopLength;
+  public int numRepeats = 1;
+  public int repeat = 0;
+  public boolean isReversing = false;
+  public boolean timeToLoop = false;
+  public int dir = 1; //1 = forward, -1 = backward
+
+  private float overshoot = 0f;
+  private float prevPercentage = 0f;
+
 
   public BehaviorInterpolated(long startTime, long lengthMS)
   {
     super(startTime);
     this.loopLength = Utils.millisToNanos(lengthMS);
   }
-  public boolean timeToLoop = false;
-  private float overshoot = 0f;
-  public float dir = 1f;
-
+  
   public void tick(long currentNano)
   {
     timeToLoop = false;
@@ -44,114 +46,68 @@ public class BehaviorInterpolated extends Behavior
     }
 
     isActive = true;
+    this.percentage = getRawPercentage(currentNano - startTime, loopLength);
 
-    this.rawPercentage = getRawPercentage(currentNano - startTime, loopLength);
-
-    if (this.rawPercentage >= 1.0f)
+    if (this.percentage >= 1.0f)
     {
-      repeat++;
-      System.out.println("repeat = " + repeat);
-      //if (reverse)
-      //reverse();
-      //continueGoing();
-      loopGoing();
+      this.overshoot = this.percentage - 1.0f;
+      this.percentage = 1.0f;
+      this.offsetPercentage = (percentage - prevPercentage) * dir;
+      this.prevPercentage = percentage;
+
       timeToLoop = true;
 
-    //once();
-
+      repeat++;
+      if (repeat >= numRepeats)
+      {
+        this.isDone = true;
+      }
+      else
+      {
+        if (isReversing == true)
+        {
+          reverseBehavior();
+        }
+        else
+        {
+          continueBehavior();
+        }
+        //loopBehavior(); //no sense of loop in simple version...
+      }
     }
     else
     {
-      this.offsetPercentage = (rawPercentage - prevRawPercentage) * dir;
-      this.prevRawPercentage = rawPercentage;
+      this.offsetPercentage = (percentage - prevPercentage) * dir;
+      System.out.println("HERE offsetPercentage = " + offsetPercentage);
+      this.prevPercentage = percentage;
     }
-
-  //ONCE
-//    if (timeToLoop == true)
-//    {
-//      this.isDone = true;
-//    }
 
   }
 
-  public void continueGoing()
+  public void continueBehavior()
   {
-    //up to 1.0 mark
-    this.overshoot = this.rawPercentage - 1.0f;
-    this.rawPercentage = 1.0f;
-    this.offsetPercentage = (rawPercentage - prevRawPercentage);
-    this.prevRawPercentage = rawPercentage;
-
     startTime += loopLength;
 
-    if (repeat < numRepeats)
-    {
-      //handle overshoot
-      this.prevRawPercentage = overshoot;
-      this.offsetPercentage += (overshoot);
-    }
-    else
-    {
-      this.isDone = true;
-    }
+    this.prevPercentage = overshoot;
+    this.offsetPercentage += (overshoot);
   }
 
-
-  public void loopGoing()
+  public void loopBehavior()
   {
-    //up to 1.0 mark
-    this.overshoot = this.rawPercentage - 1.0f;
-    this.rawPercentage = 1.0f;
-    this.offsetPercentage = (rawPercentage - prevRawPercentage);
-    this.prevRawPercentage = rawPercentage;
-
     startTime += loopLength;
 
-    if (repeat < numRepeats)
-    {
-
-      //handle overshoot
-      this.prevRawPercentage = overshoot;
-      this.offsetPercentage += (overshoot);
-    }
-    else
-    {
-      this.isDone = true;
-    }
+    this.prevPercentage = overshoot;
+    this.offsetPercentage += (overshoot);
   }
 
-  public void reverse()
+  public void reverseBehavior()
   {
-    //up to 1.0 mark
-    this.overshoot = this.rawPercentage - 1.0f;
-    this.rawPercentage = 1.0f;
-    this.offsetPercentage = (rawPercentage - prevRawPercentage) * dir;
-    this.prevRawPercentage = rawPercentage;
-
-
     dir *= -1f;
     startTime += loopLength;
 
-    if (repeat < numRepeats)
-    {
-
-      //handle overshoot
-      this.prevRawPercentage = overshoot;
-      this.offsetPercentage += (overshoot * dir);
-    }
-    else
-    {
-      this.isDone = true;
-    }
-  }
-
-  public void once()
-  {
-    this.overshoot = this.rawPercentage - 1.0f;
-    this.rawPercentage = 1.0f;
-    this.offsetPercentage = (rawPercentage - prevRawPercentage) * dir;
-    this.prevRawPercentage = rawPercentage;
-    this.isDone = true;
+    //handle overshoot
+    this.prevPercentage = overshoot;
+    this.offsetPercentage += (overshoot * dir);
   }
 
   public float getRawPercentage(long currentNano, long loopNano)
