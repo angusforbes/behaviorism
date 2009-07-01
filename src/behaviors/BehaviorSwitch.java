@@ -16,9 +16,9 @@ abstract public class BehaviorSwitch extends BehaviorPulse
 {
   public boolean on = true;
 
-  public BehaviorSwitch(long startTime)
+  public BehaviorSwitch(long startTime, long pulse)
   {
-    super(startTime);
+    super(startTime, pulse);
   }
 
   public void setOn(boolean on)

@@ -14,9 +14,10 @@ abstract public class BehaviorPulse extends BehaviorSimple
 {
   public long pulse = 1000L; //in milliseconds
 
-  public BehaviorPulse(long startTime)
+  public BehaviorPulse(long startTime, long pulse)
   {
     super(startTime);
+    setPulse(pulse);
   }
 
   public void setPulse(long pulse)

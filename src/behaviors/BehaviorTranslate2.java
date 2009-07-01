@@ -23,6 +23,8 @@ public class BehaviorTranslate2 extends BehaviorRange implements GeomUpdater
     if (isActive == true)
     {
       g.translate(offsets[0], offsets[1], offsets[2]);
+
+      System.out.println("geom translate = " + g.translate);
     }
   }
 }

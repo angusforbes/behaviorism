@@ -18,7 +18,8 @@ public class BehaviorInterpolated extends Behavior
   public boolean isReversing = false;
   public boolean timeToLoop = false;
   public int dir = 1; //1 = forward, -1 = backward
-
+  public Easing easingFunction = new EasingPull();
+  
   private float overshoot = 0f;
   private float prevPercentage = 0f;
 
@@ -52,7 +53,10 @@ public class BehaviorInterpolated extends Behavior
     {
       this.overshoot = this.percentage - 1.0f;
       this.percentage = 1.0f;
-      this.offsetPercentage = (percentage - prevPercentage) * dir;
+      this.offsetPercentage = 
+        (easingFunction.getPercentage(percentage) -
+        easingFunction.getPercentage(prevPercentage))
+        * dir;
       this.prevPercentage = percentage;
 
       timeToLoop = true;
@@ -77,8 +81,17 @@ public class BehaviorInterpolated extends Behavior
     }
     else
     {
-      this.offsetPercentage = (percentage - prevPercentage) * dir;
-      System.out.println("HERE offsetPercentage = " + offsetPercentage);
+      this.offsetPercentage = 
+        (easingFunction.getPercentage(percentage) -
+        easingFunction.getPercentage(prevPercentage))
+        * dir;
+
+    
+      System.out.println("\n***percentage = " + percentage);
+      System.out.println("prev percentage = " + prevPercentage);
+      System.out.println("eased percentage = " + easingFunction.getPercentage(percentage));
+      System.out.println("eased ppercentage = " + easingFunction.getPercentage(prevPercentage));
+      System.out.println("offsetPercentage = " + offsetPercentage + "***\n");
       this.prevPercentage = percentage;
     }
 
@@ -107,7 +120,7 @@ public class BehaviorInterpolated extends Behavior
 
     //handle overshoot
     this.prevPercentage = overshoot;
-    this.offsetPercentage += (overshoot * dir);
+    this.offsetPercentage += easingFunction.getPercentage(overshoot) * dir;
   }
 
   public float getRawPercentage(long currentNano, long loopNano)

@@ -127,16 +127,16 @@ public class SceneGraph
   public void processScheduledBehaviors()
   {
     /////testing new scheduler////////////
-    System.out.println(" global behaviors size : " + RenderUtils.getWorld().behaviors2.size() );
+   // System.out.println(" global behaviors size : " + RenderUtils.getWorld().behaviors2.size() );
     for (Behavior b : RenderUtils.getWorld().behaviors2)
     {
       b.tick(currentNano);
 
-      System.out.println("attached geoms size : " + b.attachedGeoms);
+     // System.out.println("attached geoms size : " + b.attachedGeoms);
       for (Geom g : b.attachedGeoms)
       {
-        System.out.println("updating Geom " + g);
-        System.out.println("is g done? " + g.isDone);
+       // System.out.println("updating Geom " + g);
+       // System.out.println("is g done? " + g.isDone);
         if (g.isDone == true)
         {
           b.attachedGeoms.remove(g);
@@ -147,7 +147,7 @@ public class SceneGraph
         }
       }
 
-      System.out.println("attached behaviors size : " + b.attachedGeoms);
+     // System.out.println("attached behaviors size : " + b.attachedGeoms);
       for (Behavior b2: b.attachedBehaviors)
       {
         if (b2.isDone == true)
