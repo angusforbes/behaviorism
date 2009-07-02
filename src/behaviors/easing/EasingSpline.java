@@ -1,5 +1,5 @@
 /* EasingSine.java ~ Jun 30, 2009 */
-package behaviors;
+package behaviors.easing;
 
 import java.util.Arrays;
 import org.apache.commons.math.FunctionEvaluationException;
@@ -7,8 +7,6 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.analysis.SplineInterpolator;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.commons.math.analysis.UnivariateRealInterpolator;
-import utils.Utils;
-import static behaviors.Easing.EasingEnum.*;
 
 /**
  *
@@ -22,48 +20,37 @@ public class EasingSpline extends Easing
   {
     super();
     int pts = 5;
-    double x[] = { 0.0, .25, .5, .75, 1.0 };
+    double t[] = { 0.0, .25, .5, .75, 1.0 };
     double y[] = { 0.0, .7, .5, .1, 1.0 };
 
-//    double x[] = new double[pts ];//{ 0.0, .25, .5, .75, 1.0 };
+//    double t[] = new double[pts ];//{ 0.0, .25, .5, .75, 1.0 };
 //    double y[] = new double[pts ]; //{  };
 //
 //
-//    x[0] = 0;
+//    t[0] = 0;
 //    y[0] = 0;
 //    for (int i = 1; i < pts-1; i++)
 //    {
-//      x[i] = i * (1/(double)(pts-1));
+//      t[i] = i * (1/(double)(pts-1));
 //      y[i] = Utils.random(-1,1);
-//      System.out.println("x[i] = " + x[i]);
+//      System.out.println("t[i] = " + t[i]);
 //    }
-//    x[pts-1] = 1;
+//    t[pts-1] = 1;
 //    y[pts-1] = 1;
 
-    System.out.println("x pts.. " + Arrays.toString(x));
+    System.out.println("x pts.. " + Arrays.toString(t));
 
     UnivariateRealInterpolator interpolator = new SplineInterpolator();
 
     try
     {
-    this.function = interpolator.interpolate(x, y);
+    this.function = interpolator.interpolate(t, y);
     }
     catch (MathException me)
     {
       me.printStackTrace();
     }
 
-  }
-
-  private float power(float perc, int exponent)
-  {
-    float tmp = perc;
-    for (int i = 1; i < exponent; i++)
-    {
-      tmp *= perc;
-    }
-
-    return tmp;
   }
 
   public float in(float perc)
@@ -99,28 +86,9 @@ public class EasingSpline extends Easing
       }
   }
 
-  public float getPercentage(float t)
+  public float outin(float perc)
   {
-    float sp;
-
-    switch (ease)
-    {
-      case IN:
-        sp = in(t);
-        break;
-
-      case OUT:
-        sp = out(t);
-        break;
-
-      case INOUT:
-      default:
-        sp = inout(t);
-        break;
-    }
-
-    //System.out.println("rawPercentage = " + t + " sinPerc = " + sp);
-
-    return sp;
+    //haven't done this yet...
+    return inout(perc);
   }
 }

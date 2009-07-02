@@ -1,6 +1,6 @@
 /* EasingSine.java ~ Jun 30, 2009 */
 
-package behaviors;
+package behaviors.easing;
 
 /**
  *

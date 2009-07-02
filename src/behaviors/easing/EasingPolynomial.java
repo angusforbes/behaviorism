@@ -1,7 +1,5 @@
 /* EasingSine.java ~ Jun 30, 2009 */
-package behaviors;
-
-import static behaviors.Easing.EasingEnum.*;
+package behaviors.easing;
 
 /**
  *
@@ -28,17 +26,7 @@ public class EasingPolynomial extends Easing
     this.exponent = power;
   }
 
-  private float power(float perc, int exponent)
-  {
-    float tmp = perc;
-    for (int i = 1; i < exponent; i++)
-    {
-      tmp *= perc;
-    }
-
-    return tmp;
-  }
-
+ 
   public float in(float perc)
   {
     return power(perc, exponent);
@@ -48,6 +36,12 @@ public class EasingPolynomial extends Easing
   {
     perc = 1f - perc;
     return 1f - power(perc, exponent);
+  }
+
+  public float outin(float perc)
+  {
+    //haven't done this one yet...
+    return inout(perc);
   }
 
   public float inout(float perc)
@@ -72,28 +66,4 @@ public class EasingPolynomial extends Easing
     }
   }
 
-  public float getPercentage(float t)
-  {
-    float sp;
-
-    switch (ease)
-    {
-      case IN:
-        sp = in(t);
-        break;
-
-      case OUT:
-        sp = out(t);
-        break;
-
-      case INOUT:
-      default:
-        sp = inout(t);
-        break;
-    }
-
-    //System.out.println("rawPercentage = " + t + " sinPerc = " + sp);
-
-    return sp;
-  }
 }
