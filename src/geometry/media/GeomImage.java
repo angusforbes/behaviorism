@@ -228,6 +228,10 @@ public class GeomImage extends GeomRect
     //might need this for macs???
     //gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
     //gl.glEnable(GL.GL_BLEND);
+    
+    //gl.glDisable(GL.GL_BLEND);
+
+
     gl.glBegin(gl.GL_QUADS);
 
     TextureCoords tc = this.textures.get(0).texture.getImageTexCoords();

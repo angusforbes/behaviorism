@@ -95,7 +95,7 @@ public class FileUtils
 
   public static List<File> getFilesFromDirectory(String dirName)
   {
-    File dir = new File(dirName); //e.g., "/data/images/celltango" 
+    File dir = new File(toCrossPlatformFilename(dirName)); //e.g., "/data/images/celltango"
 
     System.out.println("in getFilesFromDirectory: the dir is : " + dir);
     File[] files = dir.listFiles();
@@ -109,7 +109,7 @@ public class FileUtils
 
   public static List<File> getFilesFromDirectory(String dirName, final String filetype)
   {
-    File dir = new File(dirName); //e.g., "/data/images/celltango" 
+    File dir = new File(toCrossPlatformFilename(dirName)); //e.g., "/data/images/celltango"
 
     FilenameFilter filter = new FilenameFilter()
     {
@@ -136,7 +136,7 @@ public class FileUtils
   public static List<File> getFilesFromDirectoryMatching(String dirName, final String match)
   {
     //System.out.println("in getFilesFromDirectoryMatching() : dirName = " + dirName);
-    File dir = new File(dirName); //e.g., "/data/images/celltango" 
+    File dir = new File(toCrossPlatformFilename(dirName)); //e.g., "/data/images/celltango"
 
     FilenameFilter filter = new FilenameFilter()
     {

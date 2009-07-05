@@ -313,7 +313,7 @@ public class SceneGraph
       layer.sortGeomsInLayer();
 
 
-      layer.state.setState(gl);
+      layer.state.state(gl);
 
 
 
@@ -340,9 +340,9 @@ public class SceneGraph
 //          System.out.println("huhuhuhu?");
 //        }
 
-        if (g.state != null) //individual geoms can still override layer... should this be allowed???
+        if (g.hasState == true) //individual geoms can still override layer... should this be allowed???
         {
-          g.state.setState(gl);
+          g.getState().state(gl);
         }
 
         /*
@@ -390,9 +390,9 @@ public class SceneGraph
         //g.draw(gl, glu, 0f);
         g.draw(gl);
 
-        if (g.state != null) //individual geoms can still override layer... should this be allowed??? this is slow
+        if (g.hasState == true) //individual geoms can still override layer... should this be allowed??? this is slow
         {
-          layer.state.setState(gl); //have to revert to normal layer state if the geom has overridden it
+          layer.state.state(gl); //have to revert to normal layer state if the geom has overridden it
         }
 
         idx++;

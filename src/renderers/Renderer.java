@@ -334,18 +334,6 @@ public class Renderer implements GLEventListener
     //gl.glDepthMask(false); //may have to futz with for overlays!
     gl.glDepthMask(true); //may have to futz with for overlays!
 
-//    //set up tesselation callbacks/objects - used by SceneGraph.drawGeomPoly(...)
-//    tessellationCallback = new TessellationCallback(gl, glu);
-//    tessellationObject = glu.gluNewTess();
-//    glu.gluTessCallback(tessellationObject, GLU.GLU_TESS_VERTEX, tessellationCallback);// vertexCallback);
-//    glu.gluTessCallback(tessellationObject, GLU.GLU_TESS_BEGIN, tessellationCallback);// beginCallback);
-//    glu.gluTessCallback(tessellationObject, GLU.GLU_TESS_END, tessellationCallback);// endCallback);
-//    glu.gluTessCallback(tessellationObject, GLU.GLU_TESS_ERROR, tessellationCallback);// errorCallback);
-//    glu.gluTessCallback(tessellationObject, GLU.GLU_TESS_COMBINE, tessellationCallback);// combineCallback);
-
-    //set up global nurbs renderer
-   // nurbsRenderer = glu.gluNewNurbsRenderer();
-   // quadricRenderer = glu.gluNewQuadric();
 
     // 0 = do *not* synch with refresh rate (ie fast as possible), 1 = synch with refresh rate (ie always 60fps)
     gl.setSwapInterval(1); //0

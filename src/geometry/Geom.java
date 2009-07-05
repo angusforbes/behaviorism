@@ -121,7 +121,9 @@ public abstract class Geom
    * If null, the renderer will automatically inheret it's referenceGeom's states
    * (ie, either the referenceGeom Geom, or the current world iteself).
    */
-  public State state = null;
+  private State state = null;
+  public boolean hasState = false;
+
   public int layerNum = 0;
   //indicates which Geom mouse actions we fire when the MouseHandler finds a mouse event on this Geom.
   //The default value is simply to use itself.
@@ -188,6 +190,26 @@ public abstract class Geom
   public Geom(Point3f p3f)
   {
     setTranslate(p3f);
+  }
+
+  public void setState(State state)
+  {
+    this.state = state;
+  }
+
+  /**
+   * Gets the current State object. If State is null, then it creates the default State.
+   * (perhaps we should create a copy of the Layer state... except if it hasn't been added
+   * to the SceneGraph then we won't have a layer...)
+   * @return
+   */
+  public State getState()
+  {
+    if (this.state == null)
+    {
+      this.state = new State();
+    }
+    return this.state;
   }
 
   public void setWidth(int w)
@@ -619,8 +641,8 @@ public abstract class Geom
 //  
   public void addGeomToLayer(Geom g, boolean isActive, int layerNum)
   {
-    World.addGeomToSceneGraph(g, this.geoms, isActive, this);
-    World.addGeomToRendererLayer(g, layerNum);
+    RenderUtils.getWorld().addGeomToSceneGraph(g, this.geoms, isActive, this);
+    RenderUtils.getWorld().addGeomToRendererLayer(g, layerNum);
   }
 
   /**

@@ -20,6 +20,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import renderers.Renderer;
+import renderers.State;
 import renderers.cameras.Cam;
 import renderers.cameras.CamBasic;
 import renderers.layers.BackToFrontLayer;
@@ -58,7 +59,41 @@ public abstract class World extends GeomPoint
     this.parent = this.cam;
   }
 
- 
+  /**
+   * It doesn't make sense to set the State of the World, since it will never actually
+   * be rendered. Rather, we probably want to set the State of one of the Layers.
+   * If a user attempts to set the World's State, we will default to setting
+   * the State of the default Layer 0.
+   * @param state
+   */
+  @Override
+  public void setState(State state)
+  {
+    layers.get(0).state = state;
+  }
+
+  /**
+   * Since the World itself doesn't have a State, we will assume that
+   * we are instead trying to get the default Layer's State.
+   * @return
+   */
+  @Override
+  public State getState()
+  {
+    return layers.get(0).state;
+  }
+
+  public void setState(int layer, State state)
+  {
+    layers.get(layer).state = state;
+  }
+
+  public State getState(int layer)
+  {
+    return layers.get(layer).state;
+  }
+
+
   public static Properties loadPropertiesFile()
   {
     return loadPropertiesFile("behaviorism.properties");
@@ -155,19 +190,20 @@ public abstract class World extends GeomPoint
   }
   */
   
-  public static void addGeomToSceneGraph(Geom g, List<Geom> geomList, boolean isActive, Geom parentGeom)
+  public void addGeomToSceneGraph(Geom g, List<Geom> geomList, boolean isActive, Geom parentGeom)
   {
     geomList.add(g);
     g.parent = parentGeom;
     g.isActive = isActive;
   }
   
-  public static void addGeomToRendererLayer(Geom g, int layerNum)
+  public void addGeomToRendererLayer(Geom g, int layerNum)
   {
     g.layerNum = layerNum; 
+
+    ///HMM this was all commented out, but it seems right...
     
-    /*
-    RendererLayer layer = BehaviorismDriver.renderer.currentWorld.layers.get(layerNum);
+    RendererLayer layer = layers.get(layerNum);
 
     if (layer != null)
     {
@@ -175,10 +211,11 @@ public abstract class World extends GeomPoint
     }
     else
     {
-      System.out.println("ERROR in addGeomToLayer! No such layer as layer " + layerNum);
-      BehaviorismDriver.renderer.currentWorld.layers.get(0).attachedGeoms.add(g);
+      System.err.println("ERROR in addGeomToLayer! No such layer as layer " + layerNum);
+      System.err.println("... using layer 0 instead ...");
+      layers.get(0).attachedGeoms.add(g);
     }
-    */
+    
   }
 
   public void addLayer(int layerNum, RendererLayer layer)

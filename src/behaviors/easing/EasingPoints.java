@@ -31,6 +31,12 @@ public class EasingPoints extends Easing
     this.y = y;
   }
 
+  /**
+   * Create an interplator from a set of random values between minY and maxY.
+   * @param pts
+   * @param minY
+   * @param maxY
+   */
   public EasingPoints(int pts, double minY, double maxY)
   {
     new EasingPoints(EasingEnum.OUT, pts, minY, maxY);

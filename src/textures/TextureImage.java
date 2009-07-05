@@ -6,6 +6,7 @@ import com.sun.opengl.util.texture.TextureData;
 import com.sun.opengl.util.texture.TextureIO;
 import geometry.Geom;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,6 +29,10 @@ public class TextureImage
   public TextureImage(URL url)
   {
     generateTextureData(url, false);
+  }
+  public TextureImage(File file)
+  {
+    generateTextureData(file, false);
   }
 
  /**
@@ -92,6 +97,27 @@ public class TextureImage
     try
     {
       this.textureData = TextureIO.newTextureData(url, useMipMaps, imageType);
+    }
+    catch (IOException ioe)
+    {
+      ioe.printStackTrace();
+    }
+
+    this.w = textureData.getWidth();
+    this.h = textureData.getHeight();
+  //	normalizeSize(this.w);
+  //normalizeSize(maxSize);
+  }
+
+
+  public void generateTextureData(File file, boolean useMipMaps)
+  {
+    //setColor(1f, 1f, 1f, 1f);
+    String imageType = TextureIO.JPG;
+
+    try
+    {
+      this.textureData = TextureIO.newTextureData(file, useMipMaps, imageType);
     }
     catch (IOException ioe)
     {

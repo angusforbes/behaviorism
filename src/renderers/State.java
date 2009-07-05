@@ -8,7 +8,8 @@ import utils.RenderUtils;
 public class State
 {
   public boolean DEPTH_TEST = true;
-  public boolean BLEND = true;
+  //public boolean BLEND = true;
+  public boolean BLEND = false;
 
   /** create a new State with default values */
   public State()
@@ -22,7 +23,7 @@ public class State
     this.BLEND = parentState.BLEND;
   }
   
-  public void setState(GL gl)
+  public void state(GL gl)
   {
     if (DEPTH_TEST)
     {
