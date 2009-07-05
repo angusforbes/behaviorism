@@ -165,13 +165,15 @@ public class GeomCircle extends GeomPoly
       return;
     }
 
-    GLU glu = Renderer.getInstance().glu;
+    GLU glu = RenderUtils.getGLU();
 
     //get Tesselator object
-    GLUtessellator tobj = Renderer.getInstance().tessellationObject;
+    GLUtessellator tobj = RenderUtils.getTesselator();
 
     if (tobj == null)
     {
+
+      System.err.println("ERROR in GeomCircle : can't get GLUtessellator!");
       //error-- tesselationObjbect not ready yet, or initialized wrong (in RendererJogl!)
       return;
     }
@@ -273,7 +275,7 @@ public class GeomCircle extends GeomPoly
     for (int i = 0; i < vertices.size() / 2; i++)
     {
       GeomPoint gp = vertices.get(i);
-      System.out.println("gp = " + gp);
+      //System.out.println("gp = " + gp);
       double[] dubArr = new double[]
       {
         gp.translate.x,

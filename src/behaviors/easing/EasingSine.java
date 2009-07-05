@@ -1,14 +1,21 @@
 /* EasingSine.java ~ Jun 30, 2009 */
 package behaviors.easing;
 
-import static behaviors.easing.Easing.EasingEnum.*;
-
 /**
  *
  * @author angus
  */
 public class EasingSine extends Easing
 {
+ public EasingSine(EasingEnum ease)
+  {
+    super(ease);
+  }
+
+  public EasingSine()
+  {
+    super(EasingEnum.OUT);
+  }
 
   public float in(float perc)
   {

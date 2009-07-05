@@ -44,9 +44,19 @@ import javax.vecmath.Point3f;
     public boolean fitInBox = false;
     public List<TextRenderer> textRenderers = null;
 
+    public TextBuilder()
+    {
+    }
+
     public TextBuilder(String text)
     {
       this.text = text;
+    }
+
+    public TextBuilder text(String text)
+    {
+      this.text = text;
+      return this;
     }
 
     /**
@@ -60,6 +70,7 @@ import javax.vecmath.Point3f;
       this.textRenderers = FontHandler.getInstance().getFontFamily(font, fontStyle);
       return this;
     }
+
 
     /**
      * LOD
@@ -143,6 +154,7 @@ import javax.vecmath.Point3f;
       this.usePixelAnchor = false;
       return this;
     }
+
 
     public TextBuilder anchor(int x, int y)
     {

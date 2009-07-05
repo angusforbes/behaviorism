@@ -6,7 +6,6 @@ package renderers.cameras;
 
 import behaviorism.Behaviorism;
 import behaviors.Behavior;
-import behaviors.geom.continuous.BehaviorTranslate;
 import geometry.GeomPoint;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
@@ -132,6 +131,7 @@ public class CamBasic extends Cam
   @Override
   public void moveTo(float x, float y, float z, long when, long howfast)
   {
+    /*
     float dist_x = x - translate.x;
     float dist_y = y - translate.y;
     float dist_z = z - translate.z;
@@ -140,6 +140,7 @@ public class CamBasic extends Cam
       new Point3f(dist_x, dist_y, dist_z));
 
     attachBehavior(moveBehavior);
+     */
   }
 
   @Override

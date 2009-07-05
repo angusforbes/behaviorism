@@ -10,6 +10,16 @@ public class EasingPull extends Easing
 
   float pull = 5f; //1.70158f;
 
+  public EasingPull(EasingEnum ease)
+  {
+    super(ease);
+  }
+
+  public EasingPull()
+  {
+    super(EasingEnum.OUT);
+  }
+
   public float in(float t)
   {
     return t * t * ((pull + 1) * t - pull);

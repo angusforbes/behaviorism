@@ -2,8 +2,6 @@
 
 package behaviors;
 
-import utils.Utils;
-
 /**
  * BehaviorPulse will become active one time every specified time period.
  * This pulse time can be updated at any time and will take effect after the next
@@ -39,25 +37,12 @@ abstract public class BehaviorSwitch extends BehaviorPulse
   }
 
   @Override
-  public void tick(long currentNano)
+  public void tick()
   {
-    isActive = false;
-
-    if (isInterrupted == true && interruptNano <= currentNano)
+    super.tick();
+    if (isActive)
     {
-      this.isDone = true;
-      return;
+      toggleSwitch();
     }
-
-    if (currentNano < startTime)
-    {
-      return;
-    }
-
-    isActive = true;
-
-    startTime += Utils.millisToNanos(pulse);
-    toggleSwitch();
   }
-
 }

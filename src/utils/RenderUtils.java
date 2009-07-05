@@ -21,6 +21,7 @@ import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import renderers.Renderer;
+import renderers.SceneGraph;
 import renderers.TessellationCallback;
 import renderers.cameras.Cam;
 import worlds.World;
@@ -156,6 +157,11 @@ public class RenderUtils
 
 
     return p2f;
+  }
+
+  public static long getTick()
+  {
+    return SceneGraph.getInstance().currentNano;
   }
 
   public static Renderer getRenderer()

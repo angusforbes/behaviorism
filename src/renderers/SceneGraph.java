@@ -3,7 +3,7 @@ package renderers;
 import behaviorism.Behaviorism;
 import renderers.layers.RendererLayer;
 import behaviors.Behavior;
-import behaviors.geom.BehaviorUpdater;
+import behaviors.behavior.BehaviorUpdater;
 import behaviors.geom.GeomUpdater;
 import handlers.MouseHandler;
 import com.sun.opengl.util.j2d.TextRenderer;
@@ -86,7 +86,7 @@ public class SceneGraph
     if (b.isDone == true && Behavior.debugBehaviors == false) //don't remove if just stepping...
     {
       g.behaviors.remove(b);
-      b.isActive = false;
+      b.isActive =(false);
       b.dispose();
       return;
     }
@@ -118,7 +118,7 @@ public class SceneGraph
       }
       else //not globally or locally paused
       {
-        b.tick(currentNano);
+        b.tick();
       }
     }
   }
@@ -130,7 +130,7 @@ public class SceneGraph
    // System.out.println(" global behaviors size : " + RenderUtils.getWorld().behaviors2.size() );
     for (Behavior b : RenderUtils.getWorld().behaviors2)
     {
-      b.tick(currentNano);
+      b.tick();
 
      // System.out.println("attached geoms size : " + b.attachedGeoms);
       for (Geom g : b.attachedGeoms)
@@ -141,35 +141,37 @@ public class SceneGraph
         {
           b.attachedGeoms.remove(g);
         }
-        else if (b.isActive)
+        else if (b.isActive == true) //g.isActive?
         {
           ((GeomUpdater)b).updateGeom(g);
         }
       }
 
-     // System.out.println("attached behaviors size : " + b.attachedGeoms);
+      //System.out.println("attached behaviors size : " + b.attachedGeoms);
       for (Behavior b2: b.attachedBehaviors)
       {
         if (b2.isDone == true)
         {
           b2.attachedBehaviors.remove(b2);
         }
-        else if (b2.isActive)
+        else if (b.isActive == true)
         {
           ((BehaviorUpdater)b).updateBehavior(b2);
         }
       }
 
-      if (b.attachedBehaviors.size() == 0 && b.attachedGeoms.size() == 0)
+      if (b.autoRemove == true && b.isScheduled == true && b.attachedBehaviors.size() == 0 && b.attachedGeoms.size() == 0)
       {
-        b.isDone = true;
+       ///// NEED TO THINK ABOUT THIS... sometimes removes before they've even started!
+        b.isDone = (true);
       }
 
       if (b.isDone == true)
       {
-        System.out.println("REMOVING behavior from scheduler");
+
+          System.out.println("REMOVING behavior from scheduler");
         RenderUtils.getWorld().behaviors2.remove(b);
-        b.isActive = false;
+        b.isActive = (false);
         b.dispose();
       }
     }

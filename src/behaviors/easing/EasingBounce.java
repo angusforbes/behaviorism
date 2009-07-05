@@ -1,8 +1,6 @@
 /* EasingBounce.java ~ Jun 30, 2009 */
 package behaviors.easing;
 
-import static behaviors.easing.Easing.EasingEnum.*;
-
 /**
  *
  * @author angus
@@ -17,25 +15,42 @@ public class EasingBounce extends Easing
 
   public EasingBounce()
   {
-    super();
-    setBounce(15);
-    setDecayWidth(.7f);
-    setDecayHeight(.5f);
-    setCurveWidth(25, .7f);
+    super(EasingEnum.OUT);
+    initBounce(15, .7f, .5f);
+}
+
+  public EasingBounce(EasingEnum ease)
+  {
+    super(ease);
+    initBounce(15, .7f, .5f);
   }
 
   public EasingBounce(int bounce, float decay)
   {
-    super();
-    setBounce(bounce);
-    setDecayWidth(decay);
-    setDecayHeight(decay);
-    setCurveWidth(bounce, decay);
+    super(EasingEnum.OUT);
+    initBounce(bounce, decay, decay);
+  }
+  
+  public EasingBounce(EasingEnum ease, int bounce, float decay)
+  {
+    super(ease);
+    initBounce(bounce, decay, decay);
   }
 
   public EasingBounce(int bounce, float decayW, float decayH)
   {
-    super();
+    super(EasingEnum.OUT);
+    initBounce(bounce, decayW, decayH);
+  }
+
+  public EasingBounce(EasingEnum ease, int bounce, float decayW, float decayH)
+  {
+    super(ease);
+    initBounce(bounce, decayW, decayH);
+  }
+
+  public void initBounce(int bounce, float decayW, float decayH)
+  {
     setBounce(bounce);
     setDecayWidth(decayW);
     setDecayHeight(decayH);
@@ -54,6 +69,8 @@ public class EasingBounce extends Easing
     }
     
     this.a = 1f / coeff;
+
+    System.out.println("in setCurveWidth : this.a = " + this.a + ", coeff = " + coeff);
   }
 
   public void setBounce(int bounce)
@@ -71,6 +88,7 @@ public class EasingBounce extends Easing
     this.decayHeight = decay;
   }
 
+  
   protected float power(float perc, int exponent)
   {
     float tmp = perc;
@@ -81,6 +99,7 @@ public class EasingBounce extends Easing
 
     return tmp;
   }
+  
 
   public float in(float perc)
   {
@@ -89,10 +108,12 @@ public class EasingBounce extends Easing
 
   public float out(float perc)
   {
-    float place = a * .5f;
+    float place = this.a * .5f;
     float prevPlace = place;
     float sp = 1f;
     float width = place;
+
+  //  System.out.println("init place = " + place);
     if ( perc <= place )
     {
       sp = (float) Math.sin((-Math.PI/2) + perc * 1/width * (Math.PI/2)) + 1f;
@@ -111,6 +132,7 @@ public class EasingBounce extends Easing
           sp = 1f - ((1f - sp) * power(decayHeight, i));
         }
 
+   // System.out.println("sp = " + sp + " place/pp = " + place + "/" + prevPlace);
         prevPlace = place;
         
       }

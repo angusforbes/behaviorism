@@ -8,8 +8,31 @@ package behaviors.easing;
  */
 public class EasingLinear extends Easing
 {
-  public float getPercentage(float rawPercentage)
+  public EasingLinear()
   {
-    return rawPercentage;
+    super();
   }
+
+  public EasingLinear(EasingEnum ease)
+  {
+    super(ease);
+  }
+
+  public float in(float perc)
+  {
+    return perc;
+  }
+  public float out(float perc)
+  {
+    return perc;
+  }
+  public float inout(float perc)
+  {
+    return perc;
+  }
+  public float outin(float perc)
+  {
+    return perc;
+  }
+
 }

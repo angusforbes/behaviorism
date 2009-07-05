@@ -1,18 +1,15 @@
 /* BehaviorInterpolated.java ~ Jun 29, 2009 */
 package behaviors;
 
-import utils.Utils;
-
 /**
  *
  * @author angus
  */
 public class BehaviorRange extends BehaviorInterpolated
 {
+
   protected float ranges[] = null;
   protected float offsets[] = null;
-
-  public boolean isLooping = false; //true = pop back to start, false = keep going...
 
   public BehaviorRange(long startTime, long lengthMS, float[] ranges)
   {
@@ -20,7 +17,6 @@ public class BehaviorRange extends BehaviorInterpolated
     this.ranges = ranges;
     this.offsets = new float[ranges.length];
   }
-
 
   final protected void resetOffsets()
   {
@@ -57,20 +53,17 @@ public class BehaviorRange extends BehaviorInterpolated
   }
 
   @Override
-  public void tick(long currentNano)
+  public void tick()
   {
     resetOffsets();
-    super.tick(currentNano);
+    super.tick();
 
     if (isActive == true)
     {
-      
-      if (timeToLoop == true && isLooping == true)
-      {
-        subtractFromOffsets(1.0f);
-      }
-
       addToOffsets(offsetPercentage);
     }
   }
+
+
+
 }

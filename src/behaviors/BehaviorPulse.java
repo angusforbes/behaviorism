@@ -2,6 +2,8 @@
 
 package behaviors;
 
+import utils.RenderUtils;
+import static utils.RenderUtils.*;
 import utils.Utils;
 
 /**
@@ -26,24 +28,42 @@ abstract public class BehaviorPulse extends BehaviorSimple
   }
 
   @Override
-  public void tick(long currentNano)
+  public void tick()
   {
     isActive = false;
 
-    if (isInterrupted == true && interruptNano <= currentNano)
+    if (isInterrupted == true && interruptNano <= getTick())
     {
       this.isDone = true;
       return;
     }
 
-    if (currentNano < startTime)
+    if (getTick() < nextTime)
     {
       return;
     }
 
     isActive = true;
 
-    startTime += Utils.millisToNanos(pulse);
+    nextTime += Utils.millisToNanos(pulse);
   }
 
+  @Override
+  public void changeSpeed(float increase)
+  {
+    //update pulses
+    float ratio = 1f/increase;
+
+    pulse *= ratio;
+
+    //and we can't forget to correctly update speed of current cycle
+    nextTime = getTick() + (long)((nextTime - getTick()) * ratio);
+  }
+
+
+  @Override
+  public void reverse()
+  {
+    nextTime = getTick() + (getTick() - Utils.millisToNanos(pulse));
+  }
 }

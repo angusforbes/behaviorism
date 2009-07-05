@@ -7,6 +7,7 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.analysis.SplineInterpolator;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.commons.math.analysis.UnivariateRealInterpolator;
+import utils.Utils;
 
 /**
  *
@@ -15,29 +16,51 @@ import org.apache.commons.math.analysis.UnivariateRealInterpolator;
 public class EasingSpline extends Easing
 {
   UnivariateRealFunction function = null;
+  double t[];
+  double y[];
 
-  public EasingSpline()
+
+  public EasingSpline(double[] t, double[] y)
   {
-    super();
-    int pts = 5;
-    double t[] = { 0.0, .25, .5, .75, 1.0 };
-    double y[] = { 0.0, .7, .5, .1, 1.0 };
+    new EasingSpline(EasingEnum.OUT, t, y);
+  }
 
-//    double t[] = new double[pts ];//{ 0.0, .25, .5, .75, 1.0 };
-//    double y[] = new double[pts ]; //{  };
-//
-//
-//    t[0] = 0;
-//    y[0] = 0;
-//    for (int i = 1; i < pts-1; i++)
-//    {
-//      t[i] = i * (1/(double)(pts-1));
-//      y[i] = Utils.random(-1,1);
-//      System.out.println("t[i] = " + t[i]);
-//    }
-//    t[pts-1] = 1;
-//    y[pts-1] = 1;
+  public EasingSpline(int pts, double minY, double maxY)
+  {
+    new EasingSpline(EasingEnum.OUT, pts, minY, maxY);
+  }
 
+  public EasingSpline(EasingEnum ease, double[] t, double[] y)
+  {
+    super(ease);
+    this.t = t;
+    this.y = y;
+    initSpline();
+  }
+
+  public EasingSpline(EasingEnum ease, int pts, double minY, double maxY)
+  {
+    super(ease);
+  
+    t = new double[pts];
+    y = new double[pts];
+
+    t[0] = 0;
+    y[0] = 0;
+    for (int i = 1; i < pts-1; i++)
+    {
+      t[i] = i * (1/(double)(pts-1));
+      y[i] = Utils.random(minY, maxY);
+      //System.out.println("t[i] = " + t[i]);
+    }
+    t[pts-1] = 1;
+    y[pts-1] = 1;
+
+    initSpline();
+  }
+
+  public void initSpline()
+  {
     System.out.println("x pts.. " + Arrays.toString(t));
 
     UnivariateRealInterpolator interpolator = new SplineInterpolator();
@@ -86,9 +109,17 @@ public class EasingSpline extends Easing
       }
   }
 
+
   public float outin(float perc)
   {
-    //haven't done this yet...
-    return inout(perc);
+    if (perc < .5f)
+    {
+      return out(perc * 2) * .5f;
+    }
+    else
+    {
+      return in(perc * 2f - 1f) * .5f + .5f;
+    }
   }
+  
 }

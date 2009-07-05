@@ -4,6 +4,7 @@ package geometry;
 import behaviorism.Behaviorism;
 import renderers.State;
 import behaviors.Behavior;
+import behaviors.geom.BehaviorActivateGeom;
 import data.Data;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
-import behaviors.geom.discrete.BehaviorIsActive;
 import textures.TextureImage;
 import utils.MatrixUtils;
 import utils.RenderUtils;
@@ -464,7 +464,7 @@ public abstract class Geom
 
   /**
    * This version of addGeom activates the Geom a specified number of milliseconds in the future.
-   * It is simply a convience method to avoid having to define a BehaviorIsActive behavior since
+   * It is simply a convience method to avoid having to define a BehaviorActivateGeom behavior since
    * it is such a common thing to need to do.
    * @param g
    * @param millisInFuture
@@ -473,14 +473,14 @@ public abstract class Geom
   {
     addGeomToLayer(g, false, 0);
 
-    BehaviorIsActive.activateAtMillis(g, System.nanoTime(), millisInFuture);
+    BehaviorActivateGeom.activateAtMillis(g, System.nanoTime(), millisInFuture);
   }
 
   public void addGeomToLayer(Geom g, long millisInFuture, int layerNum)
   {
     addGeomToLayer(g, false, layerNum);
 
-    BehaviorIsActive.activateAtMillis(g, System.nanoTime(), millisInFuture);
+    BehaviorActivateGeom.activateAtMillis(g, System.nanoTime(), millisInFuture);
   }
 
   /**
@@ -501,7 +501,7 @@ public abstract class Geom
    * //etc
    * addGeom(g2, baseNano, 2000L);
    *
-   * It is simply a convience method to avoid having to define a BehaviorIsActive behavior since
+   * It is simply a convience method to avoid having to define a BehaviorActivateGeom behavior since
    * it is such a common thing to need to do.
    * @param g
    * @param millisInFuture
@@ -510,38 +510,40 @@ public abstract class Geom
   {
     addGeomToLayer(g, false, 0);
 
-    BehaviorIsActive.activateAtMillis(g, baseNano, millisInFuture);
+    BehaviorActivateGeom.activateAtMillis(g, baseNano, millisInFuture);
   }
 
   public void addGeomActivateChildrenFalse(Geom g, long baseNano, long millisInFuture)
   {
     addGeomToLayer(g, false, 0);
 
-    BehaviorIsActive bia = BehaviorIsActive.activateAtMillis(g, baseNano, millisInFuture);
-    bia.activateChildren = false;
+    BehaviorActivateGeom bia = BehaviorActivateGeom.activateAtMillis(g, baseNano, millisInFuture);
+    bia.updateChildren = false;
   }
 
   public void addGeomToLayer(Geom g, long baseNano, long millisInFuture, int layerNum)
   {
     addGeomToLayer(g, false, layerNum);
 
-    BehaviorIsActive.activateAtMillis(g, baseNano, millisInFuture);
+    BehaviorActivateGeom.activateAtMillis(g, baseNano, millisInFuture);
   }
 
+  /*
   public void addGeom(Geom g, long baseNano,
     List<Long> timesMSs)
   {
     addGeomToLayer(g, false, 0);
 
-    BehaviorIsActive.activateBetweenMillis(g, baseNano, timesMSs);
+    BehaviorActivateGeom.activateBetweenMillis(g, baseNano, timesMSs);
   }
 
   public void addGeomToLayer(Geom g, long baseNano, List<Long> timesMSs, int layerNum)
   {
     addGeomToLayer(g, false, layerNum);
 
-    BehaviorIsActive.activateBetweenMillis(g, baseNano, timesMSs);
+    BehaviorActivateGeom.activateBetweenMillis(g, baseNano, timesMSs);
   }
+  */
 
   /**
    * Adds a Geom to this World. By default the Geom is immediately activated.
@@ -564,7 +566,7 @@ public abstract class Geom
 
   /**
    * This version of addGeom activates the Geom a specified number of milliseconds in the future.
-   * It is simply a convience method to avoid having to define a BehaviorIsActive behavior since
+   * It is simply a convience method to avoid having to define a BehaviorActivateGeom behavior since
    * it is such a common thing to need to do.
    * @param g
    * @param millisInFuture
@@ -591,7 +593,7 @@ public abstract class Geom
    * //etc
    * addGeom(g2, baseNano, 2000L);
    *
-   * It is simply a convience method to avoid having to define a BehaviorIsActive behavior since
+   * It is simply a convience method to avoid having to define a BehaviorActivateGeom behavior since
    * it is such a common thing to need to do.
    * @param g
    * @param millisInFuture
@@ -603,7 +605,7 @@ public abstract class Geom
 //    g.referenceGeom = this;
 //    geoms.add(g);
 //      
-//	  BehaviorIsActive bia = BehaviorIsActive.activateAtMillis(g, baseNano, millisInFuture);
+//	  BehaviorActivateGeom bia = BehaviorActivateGeom.activateAtMillis(g, baseNano, millisInFuture);
 //		//g.attachBehavior(bia);
 //  }
 //
@@ -612,7 +614,7 @@ public abstract class Geom
 //    addGeomToSceneGraph(g, this.geoms, false, this);
 //    BehaviorismDriver.renderer.currentWorld.addGeomToRendererLayer(g, layerNum);
 // 
-//    BehaviorIsActive bia = BehaviorIsActive.activateAtMillis(g, baseNano, millisInFuture);
+//    BehaviorActivateGeom bia = BehaviorActivateGeom.activateAtMillis(g, baseNano, millisInFuture);
 //  }
 //  
   public void addGeomToLayer(Geom g, boolean isActive, int layerNum)
@@ -647,7 +649,7 @@ public abstract class Geom
 //			g.referenceGeom = this;
 //			geoms.add(g);
 //
-//	  BehaviorIsActive bia = BehaviorIsActive.activateBetweenMillis(g, baseNano, timesMSs);
+//	  BehaviorActivateGeom bia = BehaviorActivateGeom.activateBetweenMillis(g, baseNano, timesMSs);
 //		g.attachBehavior(bia);
 //  }
 //	
@@ -1194,7 +1196,7 @@ public abstract class Geom
 
   public void setScaleAnchor(float x, float y, float z)
   {
-    if (x != scaleAnchor.x && y != scaleAnchor.y && z != scaleAnchor.z)
+    if (x != scaleAnchor.x || y != scaleAnchor.y || z != scaleAnchor.z)
     {
       scaleAnchor.set(x, y, z);
       isTransformed = true;

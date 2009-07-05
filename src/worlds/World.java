@@ -4,7 +4,6 @@
 package worlds;
 
 import behaviors.Behavior;
-import behaviors.BehaviorGeomOld;
 //import behaviors.BehaviorIsActive;
 import geometry.Geom;
 import java.util.List;
@@ -27,24 +26,11 @@ import renderers.layers.BackToFrontLayer;
 import renderers.layers.RendererLayer;
 import utils.RenderUtils;
 
-//public abstract class World
-public abstract class World extends GeomPoint //does this make sense?
-//we'll have to make a lot of chnages
-//to RendererJogl modelview, etc?
+public abstract class World extends GeomPoint
 {
-  //public List<Sequence> sequences = new CopyOnWriteArrayList<Sequence>();
   public Sequence sequence = new Sequence(); //CopyOnWriteArrayList<Sequence>();
-  //public List<Geom> geoms = new CopyOnWriteArrayList<Geom>();
-  //public List<BehaviorGeomOld> behaviors = new CopyOnWriteArrayList<BehaviorGeomOld>();
   public SortedMap<Integer, RendererLayer> layers = new TreeMap<Integer, RendererLayer>();  //protected Connector database = null;
-  //public List<Geom> geoms = Collections.synchronizedList(new ArrayList<Geom>());
-  //public List<BehaviorGeomOld> behaviors = Collections.synchronizedList(new ArrayList<BehaviorGeomOld>());
-  //public List<Sequence> sequences = Collections.synchronizedList(new ArrayList<Sequence>());
-  ////public SortedMap<Long, List<Sequence>> sequences = 
-  ////				Collections.synchronizedSortedMap(new TreeMap<Long, List<Sequence>>());
-  //public Data data = new Data();
   public Cam cam = new CamBasic(); //this cam should be the same as the cam in RendererJogl, or should point to it.
-  //public State state = new State();
 
   //TESTING
   public List<Behavior> behaviors2 = new CopyOnWriteArrayList<Behavior>();
@@ -141,7 +127,7 @@ public abstract class World extends GeomPoint //does this make sense?
   /**
    * This method can be overridden by a subclass to attach World-specifc methods to particular keys.
    * It returns true if a World-specifc key was found (which causes the KeyboardHandler to ignore
-   * the key if the same key should happen to trigger some other action). It returns false if no World-specifc
+   * the key if the same key shoul happen to trigger some other action). It returns false if no World-specifc
    * key was pressed. 
    * @param keys
    * @param keysPressing
@@ -276,46 +262,7 @@ public abstract class World extends GeomPoint //does this make sense?
     }
   }
   */
-  public void clearGeoms()
-  {
-    //synchronized(geoms)
-    {
-      geoms.clear();
-    }
-  }
-
-  public void destroyBehavior(BehaviorGeomOld b)
-  {
-    b.isDone = true;
-  /*
-  synchronized(behaviors)
-  {
-  //something like : b.isDone = true, so that at next tick, it will be automatically detached from Geoms.
-  behaviors.remove(b);
-  }
-   */
-  //okay also should remove it from every Geom that has it
-  }
-
-  /*
-  public void registerBehavior(GeomUpdater b)
-  {
-  //synchronized(behaviors)
-  {
-  behaviors.add(b);
-  }
-  }
-   */
-  /*
-  public void registerBehavior(Behavior b)
-  {
-    //synchronized(behaviors)
-    {
-      //behaviors.add(b);
-    }
-  }
-  */
-
+ 
   /** 
   This rewinds to the parent-most node of the Geom. It then traverses all the nodes back down to the Geom, 
   and at each level makes the node the last thing rendered among all other nodes at that level. I don't think

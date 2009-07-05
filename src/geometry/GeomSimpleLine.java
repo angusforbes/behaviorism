@@ -61,8 +61,9 @@ public class GeomSimpleLine extends Geom
 
   public GeomSimpleLine(Point3f p1, Point3f p2)
   {
-    translate = p1;
-    ends[0] = new GeomPoint(p1.x, p1.y, p1.z);
+    setTranslate(p1);
+    //ends[0] = new GeomPoint(p1.x, p1.y, p1.z);
+    ends[0] = new GeomPoint(0f,0f,0f);
     ends[1] = new GeomPoint(p2.x, p2.y, p2.z);
   }
 

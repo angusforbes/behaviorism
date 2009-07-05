@@ -2,6 +2,8 @@
 
 package behaviors;
 
+import static utils.RenderUtils.*;
+
 /**
  * BehaviorSimple is a basic Behavior that updates the Geom every frame.
  * There is no notion of interpolation or time. The behavior will
@@ -17,22 +19,29 @@ public abstract class BehaviorSimple extends Behavior
     super(startTime);
   }
 
-  public void tick(long currentNano)
+  public void tick()
   {
     isActive = false;
 
-    if (isInterrupted == true && interruptNano <= currentNano)
+    if (isInterrupted == true && interruptNano <= getTick())
     {
       this.isDone = true;
       return;
     }
 
-    if (currentNano < startTime)
+    if (getTick() < nextTime)
     {
       return;
     }
 
     isActive = true;
+    isDone = true;
+  }
+
+   @Override
+  public void changeSpeed(float increase)
+  {
+    nextTime = getTick() + (long)((nextTime - getTick()) * (1f/increase));
   }
 
 }

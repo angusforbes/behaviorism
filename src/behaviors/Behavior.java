@@ -1,9 +1,7 @@
 package behaviors;
 
 import geometry.Geom;
-import javax.vecmath.Point3f;
 import utils.Utils;
-import behaviors.geom.discrete.BehaviorIsPaused;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import utils.RenderUtils;
@@ -21,13 +19,20 @@ abstract public class Behavior
   public String id = null; //not currently used...
 
   public static boolean debugBehaviors = false;    //public boolean remove = false;
+//  public AtomicBoolean isActive = new AtomicBoolean(false); //update() won't be called unless this is true
+//  public AtomicBoolean isDone = new AtomicBoolean(false);
+//  public AtomicBoolean isScheduled = new AtomicBoolean(false);
+  public boolean isActive = false; //update() won't be called unless this is true
   public boolean isDone = false;
+  public boolean isScheduled = false;
   public boolean isPaused = false;
-  public boolean isActive = false; //change() won't be called unless this is true
   public boolean isInterrupted = false;
+
+  public boolean autoRemove = true;
+
   public long interruptNano = -1L;
 
-  public long startTime = 0L;
+  public long nextTime = 0L;
 
   ///TESTING THIS
   public List<Geom> attachedGeoms = new CopyOnWriteArrayList<Geom>();
@@ -35,22 +40,40 @@ abstract public class Behavior
   public void attachBehavior(Behavior b)
   {
     attachedBehaviors.add(b);
+    schedule(true);
+  }
+
+  //returns if it was already scheduled.
+  //the idea is that this one is for manually scheduling,
+  //so autoRemove is turned off.
+  public boolean schedule(boolean autoRemove)
+  {
+
+    if (isScheduled == false)
+    {
+      this.autoRemove = autoRemove;
+      RenderUtils.getWorld().scheduleBehavior(this);
+      isScheduled = true;
+      return true;
+    }
+
+    return false;
   }
 
   public void attachGeom(Geom g)
   {
     attachedGeoms.add(g);
+    schedule(true);
   }
 
   public Behavior(long startTime)
   {
-    this.startTime = startTime;
-     RenderUtils.getWorld().scheduleBehavior(this);
+    this.nextTime = startTime;
   }
 
   public Behavior()
   {
-     RenderUtils.getWorld().scheduleBehavior(this);
+    // RenderUtils.getWorld().scheduleBehavior(this);
   }
   ///DONE TESTING
 
@@ -75,8 +98,8 @@ abstract public class Behavior
 
   public void interruptImmediately()
   {
-    isDone = true;
-    isActive = false;
+    isDone = (true);
+    isActive =(false);
     //interrupt(System.nanoTime());
     interrupt(0); //System.nanoTime());
   }
@@ -97,135 +120,8 @@ abstract public class Behavior
     interrupt(Utils.nanoPlusMillis(baseNano, millis));
   }
 
-  public abstract void tick(long currentNano);
+  public abstract void tick();
   
-  /*
-  protected void resetOffsets() {
-  }
-  ; //shoudl be abstract... to do
-  
-  protected void addToOffsets(float percentage, int direction) {
-  }
-  
-  protected void subtractFromOffsets(float percentage, int direction) {
-  }
-   */
-  /*
-  public void tick(long currentNano)
-  {
-    isActive = false;
-
-    resetOffsets();
-
-    if (currentNano < startTime) {
-      return;
-    } //not ready yet
-
-    if (isInterrupted == true && interruptNano <= currentNano) {
-      this.isDone = true;
-      //call disposals?
-
-      return;
-    }
-
-    isActive = true;
-
-    now = currentNano - startNano;
-
-    if (now >= relativeEndNano) //changing direction, etc.
-    {
-      //System.out.println("A0");
-      if (lastCheck < relativeEndNano) {
-        //System.out.println("A1");
-        percentage = getPercentage(lengthNano) - getPercentage(lastCheck - relativeStartNano);
-        addToOffsets(percentage, direction);
-      }
-
-      lastCheck = now;
-
-      switch (loopBehavior) {
-        case ONCE:
-          this.isDone = true;
-          relativeStartNano = lengthNano;
-          return;
-
-        case LOOP:
-          subtractFromOffsets(1.0f, direction);
-
-          relativeStartNano += lengthNano;
-          relativeEndNano += lengthNano;
-          percentage = getPercentage(lastCheck - relativeStartNano);
-          addToOffsets(percentage, direction);
-          return;
-
-        case REVERSE:
-          relativeStartNano += lengthNano;
-          relativeEndNano += lengthNano;
-
-          //getting remainder of flipped percentage...
-          percentage = getPercentage(lastCheck - relativeStartNano);
-
-          direction *= -1; //switch direction
-          addToOffsets(percentage, direction);
-          return;
-      }
-    } else if (now <= relativeStartNano) {
-      //System.out.println("A4");
-      if (lastCheck > relativeStartNano) {
-        percentage = getPercentage(lastCheck - relativeStartNano);
-        subtractFromOffsets(percentage, direction);
-      }
-
-      lastCheck = now;
-      switch (loopBehavior) {
-        case ONCE: //do nothing - return without updating
-          relativeStartNano = 0L;
-          return;
-
-        case LOOP:
-          if (relativeStartNano - lengthNano >= 0L) {
-            relativeStartNano -= lengthNano;
-            relativeEndNano -= lengthNano;
-          } else {
-            return;
-          }
-
-          addToOffsets(1.0f, direction);
-
-          //getting remainder of flipped percentage...
-          percentage = getPercentage(lastCheck - relativeEndNano);
-
-          addToOffsets(percentage, direction);
-          return;
-
-        case REVERSE:
-          if (relativeStartNano - lengthNano >= 0L) {
-            relativeStartNano -= lengthNano;
-            relativeEndNano -= lengthNano;
-          } else {
-            return;
-          }
-
-          //getting remainder of reversed percentage...
-          percentage = getPercentage(relativeEndNano - lastCheck);
-          direction *= -1; //switch direction
-          addToOffsets(percentage, direction);
-          return;
-      }
-    } else {
-      //getting normal percentage...
-      if (lastCheck - relativeStartNano < 0) {
-        percentage = getPercentage(now - relativeStartNano);
-      } else {
-        percentage = (getPercentage(now - relativeStartNano) - getPercentage(lastCheck - relativeStartNano));
-      }
-      lastCheck = now;
-
-      addToOffsets(percentage, direction);
-      return;
-    }
-  }
-  */
   /**
    * Convenience wrapper for a BehaviorIsPaused behavior.
    * That is, they pause ALL behaviors for the Geom for some specified amount of time.
@@ -240,33 +136,21 @@ abstract public class Behavior
   public void pauseNow(Geom geom, long lengthMS)
   {
 
-    BehaviorIsPaused.pauseBetweenMillis(geom, System.nanoTime(), 0L, lengthMS, null, true);
+//    BehaviorIsPaused.pauseBetweenMillis(geom, System.nanoTime(), 0L, lengthMS, null, true);
 
-//    BehaviorIsPaused bip = new BehaviorIsPaused(System.nanoTime(), lengthMS,
-//      this);
-//    geom.attachBehavior(bip);
   }
 
   //public static BehaviorIsPaused pauseAtNano(Geom geom, long baseNano, List<Behavior> behaviorsToPause, boolean pauseChildren)
 
   public void pauseNano(Geom geom, long baseNano, long lengthMS)
   {
-    BehaviorIsPaused.pauseBetweenMillis(geom, baseNano, 0L, lengthMS, null, true);
+//    BehaviorIsPaused.pauseBetweenMillis(geom, baseNano, 0L, lengthMS, null, true);
 
-//    BehaviorIsPaused bip = new BehaviorIsPaused(baseNano, lengthMS,
-//      this);
-//    geom.attachBehavior(bip);
   }
 
   public void pauseNanoPlusMillis(Geom geom, long baseNano, long baseMillis, long lengthMS)
   {
-    BehaviorIsPaused.pauseBetweenMillis(geom, (Utils.nanoPlusMillis(baseNano, baseMillis)), 0L, lengthMS, null, true);
-
-//    BehaviorIsPaused bip = new BehaviorIsPaused(
-//      Utils.nanoPlusMillis(baseNano, baseMillis),
-//      lengthMS, this);
-//
-//    geom.attachBehavior(bip);
+//    BehaviorIsPaused.pauseBetweenMillis(geom, (Utils.nanoPlusMillis(baseNano, baseMillis)), 0L, lengthMS, null, true);
   }
 
   public void pause()
@@ -296,11 +180,13 @@ abstract public class Behavior
   {
     //this.startNano = nano - lastCheck;
   }
-  
+
+
+  //HMM THINK AOBUT THIS>..
   public void step(long pauseNano, long stepNano)
   {
-    pause(pauseNano);
-    tick(pauseNano + stepNano);
+//    pause(pauseNano);
+//    tick(pauseNano + stepNano);
   }
   
 
@@ -400,16 +286,16 @@ abstract public class Behavior
   //This method should be put somewhere else! Also, need to handle the rotation anchor prpoerly,
   //since I removed the determineRotateAnchor method!
   //also I made rotateAnchor be a Point3f instead of a GeomPoint
-
+  /*
   public static void compositeSpiralSpringBehavior(
     Point3f rotateOffset, BehaviorContinuous br, BehaviorContinuous bl, BehaviorContinuous bs,
     Geom geom) //should work for any Geom
   {
-    /*
+    
     //geom.determineRotateAnchor(rotateOffset);
 
     Behavior rotateAnchorBehaviorLine3D = behaviors.geom.continuous.BehaviorTranslate.translate(
-      bl.startTime,
+      bl.nextTime,
       Utils.nanosToMillis(bl.lengthNano),
       //bl.loopBehavior,
       new Point3f(-bl.ranges[0], -bl.ranges[1], -bl.ranges[2])); //range of line
@@ -421,7 +307,7 @@ abstract public class Behavior
     
 //    geom.rotateAnchor.scale = new Point3f(1f, 1f, 1f);
 //    BehaviorScale rotateAnchorBehaviorScale3D = new BehaviorScale(
-//    bs.startTime,
+//    bs.nextTime,
 //    Utils.nanosToMillis(bs.lengthNano),
 //    bs.loopBehavior,
 //    1f, 1f, 0f, //range of line
@@ -436,9 +322,9 @@ abstract public class Behavior
     }
     geom.rotateAnchor.attachBehavior(rotateAnchorBehaviorLine3D);
   //geom.rotateAnchor.attachBehavior(rotateAnchorBehaviorScale3D);
-     */
+     
   }
-
+  */
    @Override
   public String toString()
   {

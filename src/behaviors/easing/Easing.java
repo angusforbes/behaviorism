@@ -13,8 +13,24 @@ public abstract class Easing
     IN, OUT, INOUT, OUTIN
   };
 
-  public EasingEnum ease = EasingEnum.INOUT;
-  
+  public EasingEnum ease;
+
+
+  public Easing()
+  {
+    ease(EasingEnum.OUT);
+  }
+
+  public Easing(EasingEnum ease)
+  {
+    ease(ease);
+  }
+
+  final public void ease(EasingEnum ease)
+  {
+    this.ease = ease;
+  }
+
   public float getPercentage(float t)
   {
     float sp;

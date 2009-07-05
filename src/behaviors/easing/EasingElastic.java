@@ -1,8 +1,6 @@
 /* EasingBounce.java ~ Jun 30, 2009 */
 package behaviors.easing;
 
-import static behaviors.easing.Easing.EasingEnum.*;
-
 /**
  *
  * @author angus
@@ -12,11 +10,7 @@ public class EasingElastic extends EasingBounce
 
   public EasingElastic()
   {
-    super();
-    setBounce(15);
-    setDecayWidth(.5f);
-    setDecayHeight(.5f);
-    setCurveWidth(25, .5f);
+    super(15, .5f, .5f);
   }
 
   public EasingElastic(int bounce, float decay)
@@ -24,9 +18,20 @@ public class EasingElastic extends EasingBounce
     super(bounce, decay);
   }
 
+
+  public EasingElastic(EasingEnum ease)
+  {
+    super(ease, 15, .5f, .5f);
+  }
+
+  public EasingElastic(EasingEnum ease, int bounce, float decay)
+  {
+    super(ease, bounce, decay);
+  }
+
+  @Override
   public float out(float perc)
   {
-
     float place = a * .5f;
     float prevPlace = place;
     float sp = 1f;

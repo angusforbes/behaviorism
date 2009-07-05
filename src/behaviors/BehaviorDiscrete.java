@@ -1,360 +1,134 @@
-/* BehaviorDiscrete.java ~ Aug 14, 2008 */
+/* BehaviorDiscrete.java ~ Jul 3, 2009 */
 package behaviors;
 
-import behaviorism.Behaviorism;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import static utils.RenderUtils.*;
 import utils.Utils;
 
 /**
  *
  * @author angus
  */
-abstract public class BehaviorDiscrete extends BehaviorTimed
+public class BehaviorDiscrete extends Behavior
 {
 
-  public boolean isTimeToChange = false;
-  public boolean startOn;
-  public long waitTime;
-  public List<Long> lengthNanos;
+  protected long[] lengths = null;
+  protected long[] pulses = null;
+  protected int index = 0;
+  public int repeats = 1;
+  public int repeat = 0;
+  public boolean isLooping = true;
+  public boolean isReversing = false;
+  public boolean timeToLoop = false;
+  public int dir = 1;
 
-  public int curIndex = -1;
-
-  public BehaviorDiscrete(DiscreteBehaviorBuilder builder)
+  //pulses should start at 0, and then increase
+  public BehaviorDiscrete(long startTime, long[] pulses)
   {
-    initDiscreteBehavior(builder);
+    super(startTime);
+    this.pulses = pulses;
+    pulsesToLengths();
   }
 
-/*
-    if (index % 2 == 0) //even
-    {
-      if (startOn == true)
-      {
-        isGeomActive = true;
-      }
-      else
-      {
-        isGeomActive = false;
-      }
-    }
-    else //odd
-    {
-      if (startOn == true)
-      {
-        isGeomActive = false;
-      }
-      else
-      {
-        isGeomActive = true;
-      }
-    }
-
- */
-
-  
-  
-  @Override
-  public void tick(long currentNano)
+  public void setPulses(long[] pulses)
   {
-    System.out.println("ticking....");
-    isActive = false;
+    this.pulses = pulses;
+    pulsesToLengths();
+  }
 
-    if (currentNano < startTime)
+  //lengths will be one length less than pulses
+  protected void pulsesToLengths()
+  {
+    lengths = new long[pulses.length - 1];
+
+    for (int i = 1; i < pulses.length; i++)
     {
-      return;
-    } //not ready yet
+      lengths[i - 1] = pulses[i] - pulses[i - 1];
+    }
+  }
 
-    if (isInterrupted == true && interruptNano <= currentNano)
+  @Override
+  public void tick()
+  {
+
+    isActive = false;
+    timeToLoop = false;
+
+    if (isInterrupted == true && interruptNano <= getTick())
     {
       this.isDone = true;
-      //call disposals?
-    }
-
-    now = currentNano - startNano;
-    System.out.println(" : now(" + Utils.nanosToMillis(now) + ") ... len(" + Utils.nanosToMillis(lengthNano) + ")");
-
-    //System.out.println("now = " + now + ", lengthNano = " + lengthNano);
-    //System.out.println("lengthsNanos are... " + Arrays.toString(lengthNanos.toArray() ));
-    int nextIndex = getIndexAtNano(lengthNanos, now);
-
-    System.out.println("nextIndex = " + nextIndex);
-    //if we are at a different step in time, then we need to update the Geom
-    //Otherwise, it is the same as before and nothing needs to be done...
-    if (nextIndex != curIndex)
-    {
-      System.out.println("nextIndex = " + nextIndex + ", currentIndex = " + curIndex);
-
-      isActive = true;
-      curIndex = nextIndex;
-    }
-    else
-    {
-      System.out.println("nothing new...");
-      return; //right?
-    }
-
-    if (curIndex < 0)
-    {
-      System.out.println("why are we here???");
-      lastCheck = now;
-      //before anything...
-      //isGeomActive = false;
-      isActive = true;
-      //should toggle to whatever startOn is equal to
-
-      //System.out.println("before anything... index = " + index);
       return;
     }
 
-    System.out.println("curIndex = " + curIndex + ", lengthNanos.size() - 1 = " + (lengthNanos.size() - 1));
-    //remove if this is the last one (and loopBehavior == ONCE)
-    if (curIndex == lengthNanos.size() - 1)
-    {
-      System.out.println("in TICK -- loopBehavior = " + loopBehavior);
-      switch (loopBehavior)
-      {
-        case ONCE:
-          //System.out.println("onceing... ");
-          this.isDone = true;
-          lastCheck = now;
-          break;
-        case LOOP:
-          //System.out.println("looping...");
-          //startNano += lengthNano; //add length of behavior to starting time
-          //so then we also need to push out lastCheck into the past
-          //lastCheck = now - lengthNano;
-          
-          lastCheck = now;
-          lengthNanos = loopLengthNanos(lengthNanos, lengthNano, 1, waitTime);
-          curIndex = getIndexAtNano(lengthNanos, lastCheck);
-         
-          /*
-          startNano += Utils.millisToNanos(2000); //lengthNano;
-          //lastCheck = now - lengthNano;
-          curIndex = -1; //getIndexAtNano(lengthNanos, lastCheck);
-           */
-          break;
-        case REVERSE:
-          //System.out.println("reversing...");
-          lastCheck = now;
-          lengthNanos = reverseLengthNanos(lengthNanos, lengthNano, 1, waitTime);
-          if (lengthNanos.size() % 2 != 0)
-          {
-            startOn = !startOn;
-          }
 
-          curIndex = getIndexAtNano(lengthNanos, lastCheck);
-          break;
+    if (getTick() < nextTime)
+    {
+      return;
+    }
+
+    isActive = true;
+
+    if (index >= lengths.length || index < 0)
+    {
+      repeat++;
+      timeToLoop = true;
+
+      if (repeat < repeats)
+      {
+        if (isReversing == true)
+        {
+          reverseBehavior();
+        }
+        else
+        {
+          loopBehavior();
+        }
+      }
+      else
+      {
+        this.isDone = (true);
+        return;
       }
     }
-    else
-    {
-      lastCheck = now;
-    }
 
-    //System.out.println("...end of tick... curIndex = " + curIndex);
+//    System.out.println("\n dir = " + dir);
+//    System.out.println("index = " + index + ", we will sleep for " + lengths[index] + " ms");
+    nextTime += Utils.millisToNanos(lengths[index]);
+    index+=dir;
   }
 
-  final protected List<Long> loopLengthNanos(List<Long> lengthNanos, Long lengthNano, int dir, Long waitTime)
+  public void loopBehavior()
   {
-    if (dir == -1 && lengthNanos.get(0) - lengthNano < waitTime)
-    {
-      //can't rewind any further!
-      return lengthNanos;
-    }
-
-    List<Long> temp = new ArrayList<Long>();
-
-    for (Long ln : lengthNanos)
-    {
-      temp.add(ln + (lengthNano * dir));
-    }
-
-    return temp;
+    index = 0;
   }
 
-  final protected int getIndexAtNano(List<Long> lengthNanos, long now)
+  public void reverseBehavior()
   {
-    int index = Collections.binarySearch(lengthNanos, now);
-
-    if (index < 0)
-    {
-      index = -index - 2; //prev
-    }
-
-    return index;
+    dir *= -1;
+    index += dir;;
   }
 
-  final protected List<Long> reverseLengthNanos(List<Long> lengthNanos, Long lengthNano, int dir, Long waitTime)
+  @Override
+  public void changeSpeed(float increase)
   {
-    if (dir == -1 && lengthNanos.get(0) - lengthNano < waitTime)
+    //update pulses
+    float ratio = 1f/increase;
+    for (int i = 0; i < pulses.length; i++)
     {
-      //can't rewind any further!
-      return lengthNanos;
+      pulses[i] *= ratio;
     }
 
-    List<Long> temp = new ArrayList<Long>();
+    //update lengths
+    pulsesToLengths();
 
-    //long sn = lengthNanos.get(0);
-//		long sn = lengthNanos.get(lengthNanos.size() - 1);
-
-    long sn = lengthNanos.get(0) + (lengthNano * dir);
-    temp.add(sn);
-    for (int i = lengthNanos.size() - 1; i >= 1; i--)
-    {
-      long cur = lengthNanos.get(i);
-      long prev = lengthNanos.get(i - 1);
-      sn += ((cur - prev) * dir);
-      temp.add(sn);
-    }
-
-    return temp;
+    //and we can't forget to correctly update speed of current cycle
+    nextTime = getTick() + (long)((nextTime - getTick()) * ratio);
   }
-  
-  public static class DiscreteBehaviorBuilder
+
+  @Override
+  public void reverse()
   {
-    private boolean startOn = false;
-    private long startNano = 0L;
-    private long startTime = 0L;
-    private long lengthNano = 0L;
-    private List<Long> lengthNanos;
-    private long waitTime = 0L;
-    private LoopEnum loopBehavior = LoopEnum.ONCE;
-
-    public DiscreteBehaviorBuilder(long startTime)
-    {
-      //System.out.println("new DiscreteBehaviorBuilder...");
-      this.startNano = startTime;
-      this.startTime = startTime;
-
-      List<Long> lengthMSs = new ArrayList<Long>();
-      lengthMSs.add(0L);
-      initLengthMSs(lengthMSs);
-    }
-    
-    public DiscreteBehaviorBuilder(long startTime, long onMS)
-    {
-      this.startNano = startTime;
-      this.startTime = startTime;
-
-      List<Long> lengthMSs = new ArrayList<Long>();
-      lengthMSs.add(onMS);
-      initLengthMSs(lengthMSs);
-    }
-
-    public DiscreteBehaviorBuilder(long startTime, long onMS, long offMS)
-    {
-      this.startNano = startTime;
-      this.startTime = startTime;
-
-      List<Long> lengthMSs = new ArrayList<Long>();
-      lengthMSs.add(onMS);
-      lengthMSs.add(offMS);
-      
-      initLengthMSs(lengthMSs);
-    }
-
-    public DiscreteBehaviorBuilder(long startTime, List<Long> lengthMSs)
-    {
-      this.startNano = startTime;
-      this.startTime = startTime;
-      initLengthMSs(lengthMSs);
-    }
-
-    private void initLengthMSs(List<Long> lengthMSs)
-    {
-      this.lengthNanos = new ArrayList<Long>();
-
-      for (Long ms : lengthMSs)
-      {
-        lengthNanos.add(Utils.millisToNanos(ms));
-      }
-
-      //make sure in sorted order!
-      Collections.sort(lengthNanos);
-
-      this.lengthNano = lengthNanos.get(lengthNanos.size() - 1) - lengthNanos.get(0);
-
-      this.waitTime = lengthNanos.get(0);
-    }
-
-    public DiscreteBehaviorBuilder loop(LoopEnum loopBehavior)
-    {
-      this.loopBehavior = loopBehavior;
-      return this;
-    }
-
-    public DiscreteBehaviorBuilder startOn(boolean startOn)
-    {
-      this.startOn = startOn;
-      return this;
-    }
+    dir *= -1;
+    nextTime = getTick() + (Utils.millisToNanos(lengths[index]) - (nextTime - getTick()));
   }
 
-  public void initDiscreteBehavior(DiscreteBehaviorBuilder builder)
-  {
-    //System.out.println("in initDiscreteBehavior()...");
-    this.loopBehavior = builder.loopBehavior;
-    this.lengthNano = builder.lengthNano;
-    this.startNano = builder.startNano;
-    this.startTime = builder.startNano; //nothing will happen before the startTime
-    this.startOn = builder.startOn;
-    this.waitTime = builder.waitTime;
-    this.lengthNanos = builder.lengthNanos;
-
-    /*
-    lengthNanos = new ArrayList<Long>();
-    
-    for (Long ms : lengthMSs)
-    {
-    lengthNanos.add(Utils.millisToNanos(ms));
-    }
-    
-    //make sure in sorted order!
-    Collections.sort(lengthNanos);
-    
-    this.lengthNano = lengthNanos.get(lengthNanos.size() - 1) - lengthNanos.get(0);
-    
-    this.waitTime = lengthNanos.get(0);
-    
-    this.startNano = startNano;
-    this.startTime = startNano; //nothing will happen before the startTime
-     */
-    
-    //System.out.println("I am registered...");
-    //Behaviorism.renderer.currentWorld.registerBehavior(this);
-
-  //reverseLengthNanos(lengthNano, lengthNanos);
-  }
-
-  /*
-  public void initBehavior(DiscreteBehaviorBuilder builder)
-  {
-  System.out.println("in initBehavior : builder version");
-  if (builder.startPercent < 0f || builder.startPercent > 1f) {
-  System.err.println("startPercent must be between 0f and 1f!");
-  }
-  
-  this.startTime = builder.startTime; //nothing will happen before the startTime
-  this.lengthNano = builder.lengthNano; //length of one loop of the behavior
-  this.startPercent = builder.startPercent; //where in the loop the behavior begins
-  this.loopBehavior = builder.loopBehavior; //the looping behvior
-  this.ranges = builder.ranges;
-  this.offsets = builder.offsets;
-  
-  System.out.println("in initBehavior : builder : range x = " + ranges[0]);
-  //determine what will happen after startTime... ie for startPercent != 0f
-  this.startNano = this.startTime - (long) (this.lengthNano * this.startPercent);
-  this.lastCheck = (long) (this.lengthNano * startPercent);
-  
-  relativeStartNano = 0L;
-  relativeEndNano = lengthNano;
-  
-  setAccelerationPoints(builder.accelerationPoints);
-  
-  Behaviorism.renderer.currentWorld.registerBehavior(this);
-  }
-   */
 }

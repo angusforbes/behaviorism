@@ -11,13 +11,26 @@ public class EasingPolynomial extends Easing
 
   public EasingPolynomial()
   {
-    super();
+    super(EasingEnum.OUT);
     setExponent(2);
   }
 
+
   public EasingPolynomial(int power)
   {
-    super();
+    super(EasingEnum.OUT);
+    setExponent(power);
+  }
+
+  public EasingPolynomial(EasingEnum ease)
+  {
+    super(ease);
+    setExponent(2);
+  }
+
+  public EasingPolynomial(EasingEnum ease, int power)
+  {
+    super(ease);
     setExponent(power);
   }
 
