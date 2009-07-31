@@ -128,9 +128,12 @@ public abstract class Geom
   //The default value is simply to use itself.
   public Geom draggableObject = this;
   public Geom selectableObject = this;
+  public Geom pressableObject = this;
   public Geom clickableObject = this;
   public Geom releasableObject = this;
-  public Geom mouseoverableObject = this;
+  public Geom hoverableObject = this;
+  public Geom enterableObject = this;
+  public Geom exitableObject = this;
   /**
    * The parent of this Geom. Is either the Geom it is attached to, or null if the Geom is attached directly to the current world.
    * This is used by the MouseHandler to determine object selection, etc.
@@ -1416,16 +1419,17 @@ public abstract class Geom
   }
 
   /** these "action" methods SHOULD be overridden! */
+  //pressing and holding down
+  public void pressAction()
+  {
+
+  }
+
+
   public void clickAction()
   {
     //System.out.println("Geom superclass clickAction : I shouldn't be here... i should be with my children!");
     //System.out.println("you clicked a " + getClass());
-  }
-
-  public void dragAction()
-  {
-    //System.out.println("Geom superclass clickAction : I shouldn't be here... i should be with my children!");
-    //System.out.println("you dragged a " + getClass());
   }
 
   public void doubleClickAction()
@@ -1438,23 +1442,90 @@ public abstract class Geom
     //System.out.println("Geom superclass releaseAction : I shouldn't be here... i should be with my children!");
   }
 
+  
+
+  // these three are for hovering without moving
+  public void mouseInAction()
+  {
+
+  }
+
   public void mouseOverAction()
   {
+
+  }
+
+  public void mouseOutAction()
+  {
+
+  }
+
+
+  //these three look for mouse movement
+  public void mouseMovingAction()
+  {
   //  System.out.println("i am a " + getClass());
-   // System.out.println("Geom superclass mouseOverAction : I shouldn't be here... i should be with my children!");
+   // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
   }
 
   public void mouseStoppedMovingAction()
   {
   //  System.out.println("i am a " + getClass());
-   // System.out.println("Geom superclass mouseOverAction : I shouldn't be here... i should be with my children!");
+   // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
   }
+
+  public void mouseStartedMovingAction()
+  {
+  //  System.out.println("i am a " + getClass());
+   // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
+  }
+
+  //combo mouse pressed and mouse moved
+  public void dragAction()
+  {
+    //System.out.println("Geom superclass clickAction : I shouldn't be here... i should be with my children!");
+    //System.out.println("you dragged a " + getClass());
+  }
+
 
   public final void handleDrag()
   {
     if (draggableObject != null)
     {
       draggableObject.dragAction();
+    }
+  }
+
+  public final void handleMouseIn()
+  {
+    if (hoverableObject != null)
+    {
+      hoverableObject.mouseInAction();
+    }
+  }
+
+
+  public final void handleMouseOver()
+  {
+    if (hoverableObject != null)
+    {
+      hoverableObject.mouseOverAction();
+    }
+  }
+
+  public final void handleMouseOut()
+  {
+    if (hoverableObject != null)
+    {
+      hoverableObject.mouseOutAction();
+    }
+  }
+
+  public final void handlePress()
+  {
+    if (pressableObject != null)
+    {
+      pressableObject.pressAction();
     }
   }
 
@@ -1483,23 +1554,29 @@ public abstract class Geom
     }
   }
 
-  public final void handleMouseOver()
+  public final void handleMouseStartedMoving()
   {
-    System.out.println("n handleMouseOver : mouseoverableObject = " + mouseoverableObject);
-    if (mouseoverableObject != null)
+    if (hoverableObject != null)
     {
-      mouseoverableObject.mouseOverAction();
+      hoverableObject.mouseStartedMovingAction();
+    }
+
+  }
+
+  public final void handleMouseMoving()
+  {
+    if (hoverableObject != null)
+    {
+      hoverableObject.mouseMovingAction();
     }
 
   }
 
   public final void handleMouseStoppedMoving()
   {
-    System.out.println("in handleMouseStoppedMoving : mouseoverableObject = " + mouseoverableObject);
-    if (mouseoverableObject != null)
+    if (hoverableObject != null)
     {
-      System.out.println("mouseoverableObject != null");
-      mouseoverableObject.mouseStoppedMovingAction();
+      hoverableObject.mouseStoppedMovingAction();
     }
 
   }
@@ -1518,6 +1595,16 @@ public abstract class Geom
     selectableObject = g;
   }
 
+  public final void registerEnterableObject(Geom g)
+  {
+    enterableObject = g;
+  }
+
+  public final void registerExitableObject(Geom g)
+  {
+    exitableObject = g;
+  }
+
   public final void registerDraggableObject(Geom g)
   {
     draggableObject = g;
@@ -1525,12 +1612,12 @@ public abstract class Geom
 
   public final void registerClickableObject(Geom g)
   {
-    if (g == null)
-    {
-      isSelectable = false;
-    }
-
     clickableObject = g;
+  }
+
+  public final void registerPressableObject(Geom g)
+  {
+    pressableObject = g;
   }
 
   public final void registerReleasableObject(Geom g)
@@ -1538,9 +1625,9 @@ public abstract class Geom
     releasableObject = g;
   }
 
-  public final void registerMouseoverableObject(Geom g)
+  public final void registerHoverableObject(Geom g)
   {
-    mouseoverableObject = g;
+    hoverableObject = g;
   }
 
   /**

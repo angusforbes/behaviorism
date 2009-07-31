@@ -19,12 +19,32 @@ import renderers.cameras.Cam;
 import utils.GeomUtils;
 import utils.MatrixUtils;
 import utils.RenderUtils;
+import utils.Utils;
 
 /** 
  * MouseHandler is a wrapper for the various MouseListeners.
  * It is able to pick objects from the openGL scene and to send messages
  * to those objects as necessary. If no objects are picked, then mouse
  * movements are sent to the currently attached camera for processing.
+ *
+ * Types of events, in order of priority
+ * 1) Click events:
+ *  MousePressed : the mouse is being pressed over a geom
+ *  MouseReleased : the mouse is no longer being pressed over a geom
+ *  MouseClicked : the mouse has been pressed over a geom
+ *  MouseDoubleClicked : the mouse has been pressed twice (or more) over a geom
+ * 2) Drag events:
+ *  MouseDragged : the mouse is being pressed over a geom AND the mouse is moving
+ * 3) Hover events:
+ *  MouseIn - the mouse is over a geom for the first time
+ *  MouseOver - the mouse is over a geom the second time to the last time
+ *  MouseOut - the mouse is no longer over a geom
+ * 4) Move events:
+ *  MouseStartedMoving : the mouse has started moving over a geom
+ *  MouseMoving : the mouse is continuing to move over a geom
+ *  MouseStoppedMoving: the mouse has stopped moving over a geom
+ *
+ * If drag events are detected, then move events will be ignored.
  * 
  * @author angus
  */
@@ -43,7 +63,8 @@ public class MouseHandler extends MouseAdapter
   public AtomicBoolean wasMoving = new AtomicBoolean(false);
   public boolean isDragging = false;
   public boolean isPressing = false;
-  public boolean isProcessing = false;
+  public boolean isClicking = false;
+  public AtomicBoolean isProcessing = new AtomicBoolean(false);
   public boolean isReleasing = false;
   public int pre_abs_mx = 0;
   public int pre_abs_my = 0;
@@ -52,11 +73,12 @@ public class MouseHandler extends MouseAdapter
   public int mx = 0;
   public int my = 0;
   public int button = 0;
+  public int clicks = 0;
   public int pre_mx = 0;
   public int pre_my = 0;
   public Geom selectedGeom = null;
   public Geom mouseOverGeom = null;
-
+  public long lastTimeMoved = 0;
   private static MouseHandler instance = null;
 
   /**
@@ -76,45 +98,100 @@ public class MouseHandler extends MouseAdapter
   }
 
   private MouseHandler()
-  {}
+  {
+  }
+
   /**
    * processMouse is called from withing the openGL display loop.
    * It handles the selection, movement, and other interactions
    * of the mouse to objects in the current world including the camera.
    */
-  public /*static*/ void processMouse()
+  public void processMouse()
   {
-    //System.out.println( "isPressing: " + isPressing + " isProcessing: " + isProcessing );
-    if (isPressing == true && isProcessing == false)
+    if (isProcessing.get() == true)
     {
-      isProcessing = true;
-      processMousePressing();
+      return;
+    }
+
+    //System.out.println( "isPressing: " + isPressing + " isProcessing: " + isProcessing );
+
+    if (isReleasing == true)
+    {
+      processMouseReleasing();
+      isPressing = false;
+      isDragging = false;
+      //isMoving = false;
+      //selectedGeom = null;
+      isReleasing = false;
+    }
+    else if (isClicking == true)
+    {
+      processMouseClicking();
     }
     else if (isMoving.get() == true)
     {
       isMoving.set(false);
-      wasMoving.set(true);
-      processMouseMoving();
+      if (wasMoving.get() == false)
+      {
+        processMouseStartedMoving();
+        wasMoving.set(true);
+      }
+      else
+      {
+        processMouseMoving();
+      }
     }
-    else if (wasMoving.get() == true)
+    else if (wasMoving.get() == true && Utils.nanosToMillis(Utils.now() - lastTimeMoved) > 100L)
     {
       wasMoving.set(false);
       processMouseStoppedMoving();
     }
     else if (isDragging == true)
     {
+      isPressing = false;
       processMouseDragging();
       isDragging = false;
     }
-    else if (isReleasing == true)
+    else if (isPressing == true) // && isProcessing == false)
     {
-      processMouseReleasing();
-      isPressing = false;
-      isProcessing = false;
-      isDragging = false;
-      //isMoving = false;
-      //selectedGeom = null;
-      isReleasing = false;
+      processMousePressing();
+    }
+    else //check mouse overs
+    {
+      processMouseOver();
+    }
+
+
+    isClicking = false;
+
+    //always do this at end
+    isProcessing.set(false);
+  }
+  public Geom prevMouseOverGeom = null;
+
+  public void processMouseOver()
+  {
+    //System.out.println("in processMouseOver()");
+    Geom mog = getMouseOverGeom();
+
+    if (mog != prevMouseOverGeom)
+    {
+      if (prevMouseOverGeom != null)
+      {
+        prevMouseOverGeom.handleMouseOut();
+      }
+      if (mog != null)
+      {
+        mog.handleMouseIn();
+      }
+      prevMouseOverGeom = mog;
+    }
+    else if (mog == prevMouseOverGeom)
+    {
+      if (mog != null)
+      {
+        mog.handleMouseOver();
+      }
     }
   }
 
@@ -132,32 +209,47 @@ public class MouseHandler extends MouseAdapter
     Geom testMouseOverGeom = selectPossibleGeom(RenderUtils.getWorld().geoms, ptPixel);
     if (testMouseOverGeom != null)
     {
-      mouseOverGeom = testMouseOverGeom.mouseoverableObject;
+      mouseOverGeom = testMouseOverGeom.hoverableObject;
+
       //System.out.println("mouse over : " + mouseOverGeom);
       mouseGeom = worldPtToSelctedGeomPt(mouseWorld, mouseOverGeom);
+
       return mouseOverGeom;
     }
+
     return null;
 
   }
 
   private void processMouseMoving()
   {
+    //System.out.println("in processMouseMoving");
     Geom mog = getMouseOverGeom();
     if (mog != null)
     {
-        mouseOverGeom.handleMouseOver();
+      mouseOverGeom.handleMouseMoving();
+    }
+  }
+
+  private void processMouseStartedMoving()
+  {
+    //System.out.println("in processMouseStartedMoving");
+    Geom mog = getMouseOverGeom();
+    if (mog != null)
+    {
+      //System.out.println("mog = " + mog);
+      mouseOverGeom.handleMouseStartedMoving();
     }
   }
 
   private void processMouseStoppedMoving()
   {
-    System.out.println("in processMouseStoppedMoving");
+    //System.out.println("in processMouseStoppedMoving\n\n");
     Geom mog = getMouseOverGeom();
     if (mog != null)
     {
-      System.out.println("mog = " + mog);
-        mouseOverGeom.handleMouseStoppedMoving();
+      //System.out.println("mog = " + mog);
+      mouseOverGeom.handleMouseStoppedMoving();
     }
   }
 
@@ -168,9 +260,8 @@ public class MouseHandler extends MouseAdapter
       MatrixUtils.toPoint3d(mouseWorld), RenderUtils.getCamera().modelview, selectedGeom.modelview));
   }
 
-  private /*static*/ void processMousePressing()
+  private void getSelectedGeom()
   {
-
 //    double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 //    Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
 //    System.out.printf("ptWorld = %f/%f/%f\n", ptWorld.x, ptWorld.y, ptWorld.z);
@@ -190,13 +281,13 @@ public class MouseHandler extends MouseAdapter
       mouseGeom = worldPtToSelctedGeomPt(mouseWorld, selectedGeom.clickableObject);
       //hmm, or selectableObject??
 
-      
+
       ///System.out.println("you picked " + selectedGeom);
-      
+
       Point3d p3d_a = MatrixUtils.getGeomPointInAbsoluteCoordinates(
-      new Point3d(0, 0, 0), selectedGeom.modelview);
+        new Point3d(0, 0, 0), selectedGeom.modelview);
       Point3d p3d_b = MatrixUtils.getGeomPointInAbsoluteCoordinates(
-      new Point3d(selectedGeom.w, selectedGeom.h, 0), selectedGeom.modelview);
+        new Point3d(selectedGeom.w, selectedGeom.h, 0), selectedGeom.modelview);
 
 //      System.out.println("in abs coords it's anchor is " + MatrixUtils.toString(p3d_a) +
 //      " and other corner is " + MatrixUtils.toString(p3d_b));
@@ -205,11 +296,39 @@ public class MouseHandler extends MouseAdapter
 
       //this is done here so that handleClick can
       //be called as soon as the correct selectGeom is chosen
-      if (selectedGeom != null && button == 1)
-      {
-        selectedGeom.handleClick();
-      }
     }
+  }
+
+  private void processMousePressing()
+  {
+    getSelectedGeom();
+
+    if (selectedGeom != null)
+    {
+      selectedGeom.handlePress();
+    }
+  }
+
+  private void processMouseClicking()
+  {
+    getSelectedGeom();
+
+    if (selectedGeom != null && clicks > 1)
+    {
+      selectedGeom.handleDoubleClick();
+    }
+    else if (selectedGeom != null && clicks != 0)
+    {
+      selectedGeom.handleClick();
+    }
+    else if (selectedGeom != null)
+    {
+      System.out.println("PRESSING");
+    }
+
+    //tripleClick?
+
+
   }
 
   public /*static*/ void processMouseDragging()
@@ -227,7 +346,6 @@ public class MouseHandler extends MouseAdapter
       /** temp **/
 //      double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 //      Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
-
       Point3f ptWorld = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
 
       //System.out.println("ptWorld = " + ptWorld);
@@ -245,6 +363,10 @@ public class MouseHandler extends MouseAdapter
 
   public /*static*/ void processMouseReleasing()
   {
+    if (selectedGeom != null)
+    {
+      selectedGeom.handleRelease();
+    }
   }
 
   private /*static*/ void dragCamera()
@@ -340,33 +462,33 @@ public class MouseHandler extends MouseAdapter
     {
       selectedGeom = selectedGeom.selectableObject;
     }
-  //OKAY what we reallly want to do
-  //is get every geom in ***Camera Coordinates***
-  //then we know the depth value in those terms
-  //now we get a list of  -- hmm I have to think about this more when the camera is actually working!
+    //OKAY what we reallly want to do
+    //is get every geom in ***Camera Coordinates***
+    //then we know the depth value in those terms
+    //now we get a list of  -- hmm I have to think about this more when the camera is actually working!
         /*
-  //get list of all possible Geoms that might conceivably be selected
-  List<Geom> possibleGeoms = new ArrayList<Geom>();
-  selectPossibleGeoms(geoms, possibleGeoms, ptPixel); //recursive function to visit all active geoms
+    //get list of all possible Geoms that might conceivably be selected
+    List<Geom> possibleGeoms = new ArrayList<Geom>();
+    selectPossibleGeoms(geoms, possibleGeoms, ptPixel); //recursive function to visit all active geoms
 
-  //if none, then we are deselecting, return
-  if (possibleGeoms.size() == 0)
-  {
-  selectedGeom = null;
-  isDragging = false;
-  return;
-  }
+    //if none, then we are deselecting, return
+    if (possibleGeoms.size() == 0)
+    {
+    selectedGeom = null;
+    isDragging = false;
+    return;
+    }
 
 
-  //else get a sublist containing all Geoms with the closest z-value and in case there is more than one, choose
-  //the last one that was rendered (which will also be the last one in the sub-list).
-  //List<Geom>
-   */
+    //else get a sublist containing all Geoms with the closest z-value and in case there is more than one, choose
+    //the last one that was rendered (which will also be the last one in the sub-list).
+    //List<Geom>
+     */
 
-  //this was commented out before, so it might cause problems
-  //but in principle it is the right thing to do!
+    //this was commented out before, so it might cause problems
+    //but in principle it is the right thing to do!
 
-  //Behaviorism.renderer.currentWorld.adjustZOrder(selectedGeom);
+    //Behaviorism.renderer.currentWorld.adjustZOrder(selectedGeom);
   }
 
   /**
@@ -454,40 +576,6 @@ public class MouseHandler extends MouseAdapter
   @Override
   public void mouseClicked(MouseEvent e)
   {
-    System.out.println("CLICK COUNT = " + e.getClickCount());
-    if (e.getClickCount() == 2)
-    {
-      System.out.println("in MouseHandler : double click : button = " + button);
-      if (selectedGeom != null)
-      {
-        selectedGeom.handleDoubleClick();
-
-      /*
-      Point3f ps = new Point3f();
-      
-      ps.x = selectedGeom.draggableObject.translate.x;
-      ps.y = selectedGeom.draggableObject.translate.y;
-      ps.z = selectedGeom.draggableObject.translate.z;
-      Behaviorism.renderer.cam.CameraMove(ps);
-       */
-
-      }
-
-    }
-    else if (e.getClickCount() == 1)//single click
-    {
-      System.out.println("in MouseHandler : single click : button = " + button);
-      if (selectedGeom != null)
-      {
-        //isPressing = true;
-        mx = e.getX();
-        my = e.getY();
-        mousePixel.setLocation(mx, my);
-
-        selectedGeom.handleClick();
-      }
-    }
-
   }
 
   @Override
@@ -503,16 +591,13 @@ public class MouseHandler extends MouseAdapter
     pre_my = my;
 
     button = e.getButton();
+    clicks = e.getClickCount();
 
+    isClicking = true;
     isPressing = true;
 
     debugSelectPoint.x = e.getX();
     debugSelectPoint.y = e.getY();
-
-    if (selectedGeom != null)
-    {
-      selectedGeom.handleClick();
-    }
   }
 
   @Override
@@ -538,10 +623,6 @@ public class MouseHandler extends MouseAdapter
 
     isReleasing = true;
 
-    if (selectedGeom != null)
-    {
-      selectedGeom.handleRelease();
-    }
   }
 
   @Override
@@ -554,9 +635,10 @@ public class MouseHandler extends MouseAdapter
 
     mousePixel.setLocation(mx, my);
 
+    lastTimeMoved = Utils.now();
     isMoving.set(true);
 
-   
+
   }
 
   @Override
