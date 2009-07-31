@@ -58,18 +58,30 @@ import utils.MatrixUtils;
  * manage the idividual state of *none* of them 
  * (and let the layer itself set the state for all geoms in the layer).  
  *
+ * NOTE: this has been fixed-- if a geom overwrites a layer state, we push the layer state
+ * before changing to geoms State, and then pop back to the layer state
+ * once we are done rendering the geom.
  * @author angus
  */
 abstract public class RendererLayer 
 {
-  public List<Geom> attachedGeoms = new ArrayList<Geom>();
+  public boolean isSortable = true;
+  //can't sort a f'ing CopyOnWriteArrayList!!!!
+  final public List<Geom> attachedGeoms = Collections.synchronizedList(new ArrayList<Geom>());
+  //public List<Geom> attachedGeoms = new CopyOnWriteArrayList<Geom>();
   public State state = new State();
 
   /**
    * Sorts the geoms attached to this layer according to the specified sorting algorithm-- 
    * This method must be overridden to define a sorting method.  
    */
-  abstract public void sortGeomsInLayer();
+  public void sortGeomsInLayer()
+  {
+    if (isSortable == true)
+    {
+      System.err.println("ERROR in " + getClass() + ", this Layer is Sortable and must define a sort method.");
+    }
+  }
   
   //Static implementations of sorting algorithms (to be used by RendererLayer subclasses)
     

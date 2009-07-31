@@ -81,8 +81,8 @@ public class GeomRect extends Geom
     this.h = -this.h;
     translate.z = 0f;
 
-    System.out.println("in adjustWidth A : x/y/w/h = " + x + "/"+ y + "/" + w + "/" + h + " name: " + name);
-    System.out.println("in adjustWidth B : this.w/this.h = " + translate.x + "/"+ translate.y + "/" + this.w + "/" + this.h + " name: " + name);
+    System.out.println("in adjustWidth A : x/y/w/h = " + x + "/" + y + "/" + w + "/" + h + " name: " + name);
+    System.out.println("in adjustWidth B : this.w/this.h = " + translate.x + "/" + translate.y + "/" + this.w + "/" + this.h + " name: " + name);
   }
 
   public GeomRect(int x, int y, int w, int h)
@@ -118,85 +118,6 @@ public class GeomRect extends Geom
     this.w = w;
     this.h = h;
   }
-  /* Sets an translate point connected to the Geom to be rotated around.
-   * This rotateAnchor point is not attached to the scene graph, so attaching behaviors will have
-   * no effect. Use determineRotateAnchor(Point3f p) to set an arbitrary point.
-   * Or attach it yourself by grabbing it from the Geom itself
-   * and calling addGeom(rotateAnchor.translate);
-   */
-  /*
-  @Override
-  public void determineRotateAnchor(RotateEnum rotatePosition)
-  {
-  switch (rotatePosition)
-  {
-  case CENTER:
-  this.rotateAnchor = new GeomPoint(w / 2f, h / 2f, 0f);
-  break;
-  case NE:
-  this.rotateAnchor = new GeomPoint(w, h, 0f);
-  break;
-  case NW:
-  this.rotateAnchor = new GeomPoint(0f, h, 0f);
-  break;
-  case SE:
-  this.rotateAnchor = new GeomPoint(w, 0f, 0f);
-  break;
-  case SW:
-  this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
-  break;
-  case S:
-  this.rotateAnchor = new GeomPoint(w / 2f, 0f, 0f);
-  break;
-  case N:
-  this.rotateAnchor = new GeomPoint(w / 2f, h, 0f);
-  break;
-  case E:
-  this.rotateAnchor = new GeomPoint(w, h / 2f, 0f);
-  break;
-  case W:
-  this.rotateAnchor = new GeomPoint(0f, h / 2f, 0f);
-  break;
-  default:
-  this.rotateAnchor = new GeomPoint(0f, 0f, 0f);
-  break;
-  }
-  }
-
-  public void determineScaleAnchor(ScaleEnum scaleDirection)
-  {
-  switch (scaleDirection)
-  {
-  case CENTER:
-  scaleAnchor = new Point3f(w / 2f, h / 2f, 0f);
-  break;
-  case S:
-  scaleAnchor = new Point3f(-w / 2f, -h, 0f);
-  break;
-  case N:
-  scaleAnchor = new Point3f(-w / 2f, 0f, 0f);
-  break;
-  case E:
-  scaleAnchor = new Point3f(0f, -h / 2f, 0f);
-  break;
-  case W:
-  scaleAnchor = new Point3f(-w, -h / 2f, 0f);
-  break;
-  case SW:
-  scaleAnchor = new Point3f(-w, -h, 0f);
-  break;
-  case SE:
-  scaleAnchor = new Point3f(0f, -h, 0f);
-  break;
-  case NW:
-  scaleAnchor = new Point3f(-w, 0f, 0f);
-  break;
-  case NE:
-  scaleAnchor = new Point3f(0f, 0f, 0f);
-  break;
-  }
-  }
-   */
 
   public void debugPackingAlgorithm(GL gl)
   {
@@ -253,48 +174,100 @@ public class GeomRect extends Geom
   @Override
   public void draw(GL gl)
   {
-    //   RenderUtils.getWorldCoordsForScreenCoord(300, 200);
 
+    //this should go into the inivs. picking method
+    /*
     boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
-
 
     if (depthTest == false && isSelectable == true)
     {
-      gl.glEnable(GL.GL_DEPTH_TEST);
+    gl.glEnable(GL.GL_DEPTH_TEST);
 
-      gl.glColor4f(0f, 0f, 0f, 0f);
-      gl.glBegin(gl.GL_QUADS);
+    gl.glColor4f(0f, 0f, 0f, 0f);
 
-      gl.glVertex3f(0f, 0f, offset);
-      gl.glVertex3f(w, 0f, offset);
-      gl.glVertex3f(w, h, offset);
-      gl.glVertex3f(0f, h, offset);
+    drawRect(gl, 0f, 0f, offset, w, h);
 
-      gl.glDisable(GL.GL_DEPTH_TEST);
+    gl.glDisable(GL.GL_DEPTH_TEST);
     }
-
+     */
 
     gl.glColor4fv(color.array(), 0);
+
+    drawRect(gl, 0f, 0f, offset, w, h);
+  }
+
+  public void drawRect(GL gl, float x, float y, float z, float w, float h)
+  {
     gl.glBegin(gl.GL_QUADS);
 
-    gl.glVertex3f(0f, 0f, offset);
-    gl.glVertex3f(w, 0f, offset);
-    gl.glVertex3f(w, h, offset);
-    gl.glVertex3f(0f, h, offset);
+    gl.glVertex3f(x, y, z);
+    gl.glVertex3f(x + w, y, z);
+    gl.glVertex3f(x + w, y + h, z);
+    gl.glVertex3f(x, y + h, z);
 
     gl.glEnd();
   }
 
-  public void normalizeSizeByWidth(int fw, int fh, float normalized)
+  public void drawRect(GL gl, float x, float y, float z, float w, float h,
+    float left, float right, float bottom, float top)
   {
-    this.w = normalized;
-    this.h = ((float) fh / (float) fw) * normalized;
+    gl.glBegin(gl.GL_QUADS);
+
+    gl.glTexCoord2f(left, bottom);
+    gl.glVertex3f(x, y, z);
+    gl.glTexCoord2f(right, bottom);
+    gl.glVertex3f(x + w, y, z);
+    gl.glTexCoord2f(right, top);
+    gl.glVertex3f(x + w, y + h, z);
+    gl.glTexCoord2f(left, top);
+    gl.glVertex3f(x, y + h, z);
+
+    gl.glEnd();
   }
 
-  public void normalizeSizeByHeight(int fw, int fh, float normalized)
+
+  /**
+   * Scales the current width and height so that the largest size is maxSize.
+   * @param maxSize
+   */
+  public void normalizeSize(float maxSize)
+  {
+    normalizeSize(this.w, this.h, maxSize);
+  }
+
+  /**
+   * Scales and sets the width and height so that the largest size is maxSize. 
+   * @param fw
+   * @param fh
+   * @param maxSize
+   */
+ public void normalizeSize(float fw, float fh, float maxSize)
+  {
+    if (fw == fh)
+    {
+      this.w = maxSize;
+      this.h = maxSize;
+    }
+    else if (fw > fh)
+    {
+      normalizeSizeByWidth(fw, fh, maxSize);
+    }
+    else
+    {
+      normalizeSizeByHeight(fw, fh, maxSize);
+    }
+  }
+
+  public void normalizeSizeByWidth(float fw, float fh, float normalized)
+  {
+    this.w = normalized;
+    this.h = (fh / fw) * normalized;
+  }
+
+  public void normalizeSizeByHeight(float fw, float fh, float normalized)
   {
     this.h = normalized;
-    this.w = ((float) fw / (float) fh) * normalized;
+    this.w = (fw / fh) * normalized;
   }
 
   // get this and all packing algorithm bullshit the fuck out of this class!!!!!!!!!!

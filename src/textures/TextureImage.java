@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class TextureImage
 {
+  String name = "none"; //either original url or file
   public List<Geom> attachedGeoms = new ArrayList<Geom>();
   public TextureData textureData = null;
   public Texture texture = null;
@@ -91,6 +92,7 @@ public class TextureImage
 
   public void generateTextureData(URL url, boolean useMipMaps)
   {
+    this.name = url.toString();
     //setColor(1f, 1f, 1f, 1f);
     String imageType = TextureIO.JPG;
 
@@ -112,11 +114,13 @@ public class TextureImage
 
   public void generateTextureData(File file, boolean useMipMaps)
   {
+    this.name = file.toString();
     //setColor(1f, 1f, 1f, 1f);
     String imageType = TextureIO.JPG;
 
     try
     {
+      System.err.println("file = " + file);
       this.textureData = TextureIO.newTextureData(file, useMipMaps, imageType);
     }
     catch (IOException ioe)
@@ -167,4 +171,9 @@ public class TextureImage
     }
   }
    */
+
+  public String toString()
+  {
+    return name;
+  }
 }

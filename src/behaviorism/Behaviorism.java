@@ -4,15 +4,15 @@
 package behaviorism;
 
 import behaviors.Behavior;
+import com.sun.opengl.util.Animator;
 import com.sun.opengl.util.texture.TextureIO;
-import renderers.SceneGraph;
+import handlers.FontHandler;
 import renderers.Renderer;
 import handlers.MouseHandler;
 import handlers.KeyboardHandler;
-import handlers.FontHandler;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
@@ -20,13 +20,14 @@ import java.awt.Toolkit;
 import javax.media.opengl.*;
 import java.awt.event.*;
 import java.awt.image.MemoryImageSource;
-import javax.swing.*;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import javax.swing.*;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+import renderers.SceneGraph;
 import utils.Utils;
 import worlds.World;
 
@@ -50,6 +51,10 @@ import worlds.World;
 public class Behaviorism
 {
 
+  public int prevCanvasWidth = 600;
+  public int prevCanvasHeight = 400;
+  public int prevLocX = -1;
+  public int prevLocY = -1;
   public int canvasWidth = 600;
   public int canvasHeight = 400;
   public boolean fullScreen = false;
@@ -58,8 +63,13 @@ public class Behaviorism
   public String applicationName = "Untitled behaviorism project";
   public AtomicBoolean isShutdown = new AtomicBoolean(false);
   public AtomicBoolean doneShutdown = new AtomicBoolean(false);
+  private JFrame frame;
+  private GLCanvas canvas;
+  private Cursor cursor;
+  private GraphicsDevice device = null;
+  public boolean centerFrame = true;
 
-   /**
+  /**
    * Singleton instance of Behaviorism. The only way to use this class is via the static getInstance() method.
    */
   private static Behaviorism instance = null;
@@ -78,14 +88,16 @@ public class Behaviorism
     return instance;
   }
 
-
+  /**
+   * Private constructor to create the single instance of this class.
+   */
   private Behaviorism()
-  {}
+  {
+  }
 
   //I think I want to automatically load the default prop file (from jar)
   //and then overwrite various properites if another prop file
   //is specified.
-
   /**
    * This is the entrance to the behaviorism framework...
    * @param world
@@ -102,25 +114,30 @@ public class Behaviorism
    */
   public static void installWorld(World world, Properties properties)
   {
-    Behaviorism.getInstance().initialize(properties);
+    Behaviorism.getInstance().installProperties(properties);
+
+    Behaviorism.getInstance().initialize();
 
     if (properties != null)
     {
       world.setWorldParams(properties);
     }
+
     Renderer.getInstance().installWorld(world);
-    Utils.sleep(2000); //give it a sec, later make it wait explicitly until opengl setup is complete
 
     world.setUpWorld();
   }
 
-  public void initialize(Properties properties)
+  public void printSystemInfo()
   {
-    String osName = System.getProperty("os.name");
-    String osVersion = System.getProperty("os.version");
+    //print runtime info
+    int mb = 1024 * 1024;
+    Runtime rt = Runtime.getRuntime();
+    System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ", " + rt.availableProcessors() + " processors, " + ((rt.totalMemory() - rt.freeMemory()) / mb) + "MB out of " + (rt.totalMemory() / mb) + "MB used.");
+  }
 
-    System.out.println("osName = " + osName + " version = " + osVersion);
-
+  public void installProperties(Properties properties)
+  {
     //load properties
     if (properties != null)
     {
@@ -130,77 +147,189 @@ public class Behaviorism
       //setWorldParams(properties);
       setFontParams(properties);
     }
+  }
 
-    //set up openGL canvas        
+  public void initialize()
+  {
+    printSystemInfo();
+
+    //set up canvas
+    canvas = makeCanvas();
+
+    //set up frame
+    frame = new JFrame(this.applicationName);
+    frame.add(canvas, BorderLayout.CENTER);
+
+    //grab device
+    device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+    if (fullScreen)
+    {
+      makeFullScreen(frame);
+    }
+    else
+    {
+      makeNormalScreen(frame, canvas);
+    }
+
+    //add listeners
+    addListeners(canvas);
+
+    canvas.requestFocus();
+
+    frame.setVisible(true);
+
+    centerFrame = false;
+  }
+
+  private GLCanvas makeCanvas()
+  {
+    //set up openGL canvas
     GLCapabilities caps = new GLCapabilities();
     GLCapabilitiesChooser chooser = new DefaultGLCapabilitiesChooser();
     caps.setSampleBuffers(true);
     //caps.setNumSamples(4); //16
-    GLCanvas canvas = new GLCanvas(caps, chooser, null, null);
+    return new GLCanvas(caps, chooser, null, null);
+  }
 
-    //set up frame
-    JFrame frame = new JFrame(this.applicationName);
-    frame.add(canvas, BorderLayout.CENTER);
+  private void addListeners(GLCanvas can)
+  {
+    can.addGLEventListener(Renderer.getInstance());
+    can.addKeyListener(KeyboardHandler.getInstance());
+    can.addMouseListener(MouseHandler.getInstance());
+    can.addMouseMotionListener(MouseHandler.getInstance());
+    can.addMouseWheelListener(MouseHandler.getInstance());
+  }
+
+  private void removeListeners(GLCanvas can)
+  {
+    can.removeMouseListener(MouseHandler.getInstance());
+    can.removeMouseMotionListener(MouseHandler.getInstance());
+    can.removeMouseWheelListener(MouseHandler.getInstance());
+    can.removeKeyListener(KeyboardHandler.getInstance());
+    can.removeGLEventListener(Renderer.getInstance());
+  }
+
+  private void makeFullScreen(JFrame f)
+  {
+    f.setUndecorated(true);
+    device.setFullScreenWindow(f);
+  }
+
+  private void makeNormalScreen(JFrame f, GLCanvas c)
+  {
+    f.setUndecorated(false);
+    c.setSize(prevCanvasWidth, prevCanvasHeight);
     int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
     int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 
-    if (this.useCursor == false)
+    int xLocation;
+    int yLocation;
+    if (prevCanvasWidth > screenWidth)
     {
-      Image cursorImg = canvas.createImage(new MemoryImageSource(16, 16, new int[16 * 16], 0, 16));
-      Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "Custom Cursor");
-      frame.setCursor(cursor);
+      xLocation = 0;
+      yLocation = 0;
+    }
+    else if (centerFrame == true)//center
+    {
+      xLocation = (screenWidth - prevCanvasWidth) >> 1;
+      yLocation = (screenHeight - prevCanvasHeight) >> 1;
+    }
+    else
+    {
+      xLocation = prevLocX;
+      yLocation = prevLocY;
     }
 
-    if (!this.fullScreen)
+    f.setLocation(xLocation, yLocation);
+
+    f.pack();
+    f.setVisible(true);
+    f.addWindowListener(new WindowAdapter()
     {
-      int xLocation, yLocation;
-      if (canvasWidth > screenWidth)
-      {
-        xLocation = 0;
-      }
-      else //center
-      {
-        xLocation = (screenWidth - canvasWidth) >> 1;
-      }
-      yLocation = (screenHeight - canvasHeight) >> 1;
-
-      frame.setLocation(xLocation, yLocation);
-      canvas.setSize(new Dimension(canvasWidth, canvasHeight));
-
-      frame.setUndecorated(frameUndecorated);
-
-    }
-    else //this.fullScreen==true
-    {
-      frame.setUndecorated(true);
-      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(frame);
-    }
-
-    frame.pack();
-    frame.requestFocus();
-    frame.addWindowListener(new WindowAdapter()
-    {
-
       @Override
       public void windowClosing(WindowEvent e)
       {
         shutDown();
       }
     });
-
-
-    //add listeners
-    canvas.addMouseListener(MouseHandler.getInstance());
-    canvas.addMouseMotionListener(MouseHandler.getInstance());
-    canvas.addMouseWheelListener(MouseHandler.getInstance());
-    canvas.addKeyListener(KeyboardHandler.getInstance());
-    canvas.addGLEventListener(Renderer.getInstance());
-    canvas.requestFocus();
-
-    frame.setVisible(true);
   }
 
-  
+  public void toggleFullScreen()
+  {
+    this.fullScreen = !this.fullScreen;
+
+    try
+    {
+      Renderer.getInstance().animator.stop();
+      Utils.sleep(500); //seems to be necessary to wait because animator.isAnimating() always = true!
+
+      removeListeners(canvas);
+
+      JFrame tmpFrame = new JFrame(this.applicationName);
+
+      GLCanvas tmpCanvas = new GLCanvas(
+        canvas.getChosenGLCapabilities(),
+        new DefaultGLCapabilitiesChooser(),
+        canvas.getContext(),
+        null);
+      tmpFrame.add(tmpCanvas);
+
+      addListeners(tmpCanvas);
+
+      if (fullScreen == true)
+      {
+        prevCanvasWidth = canvas.getWidth();
+        prevCanvasHeight = canvas.getHeight();
+        prevLocX = (int) frame.getLocation().getX();
+        prevLocY = (int) frame.getLocation().getY();
+        makeFullScreen(tmpFrame);
+      }
+      else
+      {
+        makeNormalScreen(tmpFrame, tmpCanvas);
+      }
+
+      tmpCanvas.display();
+
+      tmpFrame.requestFocus();
+      tmpCanvas.requestFocus();
+ 
+      frame.dispose();
+
+      frame = tmpFrame;
+      canvas = tmpCanvas;
+
+      Renderer.getInstance().animator = new Animator(canvas);
+      Renderer.getInstance().animator.start();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+      System.exit(-1);
+    }
+  }
+
+  public void toggleCursor()
+  {
+    useCursor = !useCursor;
+    setCursor();
+  }
+
+  public void setCursor()
+  {
+    if (useCursor == true && frame.getCursor().getType() == Cursor.DEFAULT_CURSOR)
+    {
+      Image cursorImg = canvas.createImage(new MemoryImageSource(16, 16, new int[16 * 16], 0, 16));
+      this.cursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "Custom Cursor");
+      frame.setCursor(cursor);
+    }
+    else if (useCursor == false && frame.getCursor().getType() != Cursor.DEFAULT_CURSOR)
+    {
+      frame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }
+  }
+
   private void setFontParams(Properties properties)
   {
     boolean updateDefaultFont = false;
@@ -245,6 +374,8 @@ public class Behaviorism
       {
         canvasWidth = Integer.parseInt(properties.getProperty("main.canvasWidth"));
         canvasHeight = Integer.parseInt(properties.getProperty("main.canvasHeight"));
+        prevCanvasWidth = canvasWidth;
+        prevCanvasHeight = canvasHeight;
       }
       catch (NumberFormatException e)
       {
@@ -254,14 +385,6 @@ public class Behaviorism
     //opengl.isTexRectEnabled : support for non-power-of-two cards
     TextureIO.setTexRectEnabled(Boolean.parseBoolean(properties.getProperty("opengl.isTexRectEnabled")));
   }
-
-  /*
-  private void setWorldParams(Properties properties)
-  {
-
-  
-  }
-  */
 
   private void setBehaviorParams(Properties properties)
   {
@@ -293,7 +416,7 @@ public class Behaviorism
   {
     File file = new File("build/classes/worlds/");
 
-    Class cls = null;
+    Class<?> cls = null;
     try
     {
       // Convert File to a URL
@@ -321,7 +444,7 @@ public class Behaviorism
     catch (ClassNotFoundException e)
     {
       System.out.println("class not found..." + cls);
-    //System.exit(0);
+      //System.exit(0);
     }
     catch (InstantiationException e)
     {

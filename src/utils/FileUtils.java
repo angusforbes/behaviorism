@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import textures.TextureImage;
 
 /**
  *
@@ -29,6 +30,11 @@ public class FileUtils
   public static String toCrossPlatformFilename(String filename)
   {
     return filename.replaceAll("//", File.separator);
+  }
+
+  public static String getUserDirectoryName()
+  {
+    return System.getProperty("user.home");
   }
 
   public static List<String> getFilenamesFromDirectory(String dirName)
@@ -191,6 +197,39 @@ public class FileUtils
       }
     });
 
+  }
+
+
+  public static List<TextureImage> loadTexturesFromDirectory(String directory, int max)
+  {
+    List<TextureImage> photos = new ArrayList<TextureImage>();
+
+    List<File> files = FileUtils.getFilesFromDirectory(directory, "jpg");
+
+    Collections.shuffle(files);
+
+    int idx = 0;
+    for (File f : files)
+    {
+      //System.err.println("file = " + f);
+
+      try
+      {
+        photos.add(new TextureImage(f));
+        idx++;
+      }
+      catch (IllegalArgumentException iae)
+      {
+        //iae.printStackTrace();
+      }
+
+      if (idx >= max)
+      {
+        break;
+      }
+    }
+
+    return photos;
   }
 
   public static BufferedImage loadBufferedImageFromFile(String filename)

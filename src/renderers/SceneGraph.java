@@ -13,6 +13,7 @@ import java.util.List;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
 import handlers.FontHandler;
+import handlers.MouseHandler;
 import java.util.Map;
 import utils.RenderUtils;
 import static utils.RenderUtils.*;
@@ -62,6 +63,7 @@ public class SceneGraph
   {
   }
 
+  /*
   private void processBehaviors(Geom g)
   {
     for (int i = g.behaviors.size() - 1; i >= 0; i--)
@@ -72,7 +74,7 @@ public class SceneGraph
 
       if (b.isActive == true && b.isPaused == false)
       {
-         // b.updateGeom(g);
+        // b.updateGeom(g);
         if (b instanceof GeomUpdater)
         {
           ((GeomUpdater) b).updateGeom(g);
@@ -86,7 +88,7 @@ public class SceneGraph
     if (b.isDone == true && Behavior.debugBehaviors == false) //don't remove if just stepping...
     {
       g.behaviors.remove(b);
-      b.isActive =(false);
+      b.isActive = (false);
       b.dispose();
       return;
     }
@@ -122,33 +124,35 @@ public class SceneGraph
       }
     }
   }
-
+  */
 
   public void processScheduledBehaviors()
   {
     /////testing new scheduler////////////
-   // System.out.println(" global behaviors size : " + RenderUtils.getWorld().behaviors2.size() );
+    // System.out.println(" global behaviors size : " + RenderUtils.getWorld().behaviors2.size() );
     for (Behavior b : RenderUtils.getWorld().behaviors2)
     {
       b.tick();
 
-     // System.out.println("attached geoms size : " + b.attachedGeoms);
+      b.update(); //generic update
+
+      // System.out.println("attached geoms size : " + b.attachedGeoms);
       for (Geom g : b.attachedGeoms)
       {
-       // System.out.println("updating Geom " + g);
-       // System.out.println("is g done? " + g.isDone);
+        // System.out.println("updating Geom " + g);
+        // System.out.println("is g done? " + g.isDone);
         if (g.isDone == true)
         {
           b.attachedGeoms.remove(g);
         }
         else if (b.isActive == true) //g.isActive?
         {
-          ((GeomUpdater)b).updateGeom(g);
+          ((GeomUpdater) b).updateGeom(g);
         }
       }
 
       //System.out.println("attached behaviors size : " + b.attachedGeoms);
-      for (Behavior b2: b.attachedBehaviors)
+      for (Behavior b2 : b.attachedBehaviors)
       {
         if (b2.isDone == true)
         {
@@ -156,26 +160,25 @@ public class SceneGraph
         }
         else if (b.isActive == true)
         {
-          ((BehaviorUpdater)b).updateBehavior(b2);
+          ((BehaviorUpdater) b).updateBehavior(b2);
         }
       }
 
       if (b.autoRemove == true && b.isScheduled == true && b.attachedBehaviors.size() == 0 && b.attachedGeoms.size() == 0)
       {
-       ///// NEED TO THINK ABOUT THIS... sometimes removes before they've even started!
         b.isDone = (true);
       }
 
       if (b.isDone == true)
       {
 
-          System.out.println("REMOVING behavior from scheduler");
+        //System.out.println("REMOVING behavior " + b.getClass() + " from scheduler");
         RenderUtils.getWorld().behaviors2.remove(b);
         b.isActive = (false);
         b.dispose();
       }
     }
-    /////end testing new scheduler////////////
+  /////end testing new scheduler////////////
   }
 
   /**
@@ -200,7 +203,7 @@ public class SceneGraph
     //Sequence.executeSequences(RenderUtils.getWorld().sequences, this.currentNano);
     //getWorld().sequence.execute(currentNano);
 
-    // clear layers -- bleh (think about...)
+    // clear layers -- bleh (think about...), else more complicated when removing a Geom...
     for (Map.Entry<Integer, RendererLayer> entry : getWorld().layers.entrySet())
     {
       RendererLayer layer = entry.getValue();
@@ -211,7 +214,7 @@ public class SceneGraph
 //    traverseGeoms(gl, BehaviorismDriver.renderer.currentWorld.geoms,
 //      BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed,
 //      offset);
-    List worldGeom = new ArrayList();
+    List<Geom> worldGeom = new ArrayList<Geom>();
     worldGeom.add(getWorld());
     traverseGeoms(gl, worldGeom,
       getWorld().isTransformed || getCamera().isTransformed,
@@ -234,6 +237,7 @@ public class SceneGraph
 
     if (getWorld().isPaused != true)
     {
+      /*
       for (int i = cam.behaviors.size() - 1; i >= 0; i--)
       {
         Behavior b = cam.behaviors.get(i);
@@ -253,6 +257,7 @@ public class SceneGraph
           b = null;
         }
       }
+       */
     }
 
     getRenderer().setPerspective3D();
@@ -264,7 +269,7 @@ public class SceneGraph
 
     for (Geom g : geoms)
     {
-      processBehaviors(g);
+      //processBehaviors(g);
 
       offset = prevOffset + vizOffset; //.00001f; //ideal, works good on my nvidia card
 
@@ -274,11 +279,10 @@ public class SceneGraph
       }
 
       g.transform();
-      getWorld().layers.get(g.layerNum).attachedGeoms.add(g);
+      getLayer(g.layerNum).attachedGeoms.add(g);
       traverseGeoms(gl, g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
 
       g.isTransformed = false;
-
 
       if (g.isDone == true)
       {
@@ -301,106 +305,56 @@ public class SceneGraph
     gl.glLoadMatrixd(getCamera().projection, 0);
     gl.glMatrixMode(gl.GL_MODELVIEW);
 
-    //gl.glPushMatrix();
-
-
     invisiblePickingGeoms.clear();
+
     for (Map.Entry<Integer, RendererLayer> entry : getWorld().layers.entrySet())
     {
       //System.out.println("layer at pos " + entry.getKey() + " has " + entry.getValue().attachedGeoms.size() + " entries.");
       RendererLayer layer = entry.getValue();
 
-      layer.sortGeomsInLayer();
-
-
-      layer.state.state(gl);
-
-
-
-      int idx = 0;
-      for (Geom g : layer.attachedGeoms)
+      synchronized (layer.attachedGeoms)
       {
-        //System.out.println("idx " + idx + " : g is a " + g.getClass());
-
-        if (!g.isActive)
+        if (layer.isSortable == true)
         {
-          continue;
-        }
-        if (!g.isVisible)
-        {
-          continue;
-        }
-        if (g.isDone)
-        {
-          continue;
+          layer.sortGeomsInLayer();
         }
 
-//        if (g instanceof GeomTextOutset)
-//        {
-//          System.out.println("huhuhuhu?");
-//        }
+        layer.state.state(gl);
 
-        if (g.hasState == true) //individual geoms can still override layer... should this be allowed???
+        for (Geom g : layer.attachedGeoms)
         {
-          g.getState().state(gl);
+          if (!g.isActive || !g.isVisible || g.isDone) //then ignore
+          {
+            continue;
+          }
+       
+          if (g.hasState == true) //then override the layer's State
+          {
+            gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+            g.getState().state(gl);
+          }
+          
+          gl.glLoadMatrixd(g.modelview, 0);
+
+          //think about this... Only if geom isSelectable...
+          //if ((layer.state.DEPTH_TEST == false && g.state == null) || (g.state != null && g.state.DEPTH_TEST == false))
+          {
+            invisiblePickingGeoms.add(g);
+          }
+
+          g.draw(gl);
+
+          if (g.hasState == true) //reset to Layer's State if we just overrode it...
+          {
+            //layer.state.state(gl);
+            gl.glPopAttrib();
+          }
         }
-
-        /*
-        if (g instanceof GeomPoint)
-        {
-        //System.out.println("g : " + idx + " : " + g);
-        System.out.println("modelview matrix = :");
-        MatrixUtils.printMatrix(RendererJogl.modelviewMatrix);
-        System.out.println("projection matrix = :");
-        MatrixUtils.printMatrix(RendererJogl.projectionMatrix);
-        System.out.println("point modelview matrix = :");
-        MatrixUtils.printMatrix(g.modelview);
-        }
-         */
-        gl.glLoadMatrixd(g.modelview, 0);
-
-        /*
-        if (g instanceof GeomPoint)
-        {
-        MatrixUtils.printVector(MatrixUtils.pointToHomogenousCoords(g.translate));
-        Point3f windowVec = MatrixUtils.project(g.translate);
-        System.out.println("windowVec = " + windowVec);
-
-
-        //          //object coords --> view coords
-        //          double[] eyeVec = MatrixUtils.objectCoordsToEyeCoords(
-        //            g.translate,
-        //            RendererJogl.modelviewMatrix);
-        //
-        //          double[] clipVec = MatrixUtils.eyeCoordsToClipCoords(eyeVec, RendererJogl.projectionMatrix);
-        //
-        //          double[] deviceVec = MatrixUtils.clipCoordsToDeviceCoords(clipVec);
-        //
-        //          double[] windowVec = MatrixUtils.deviceCoordsToWindowCoords(deviceVec, RendererJogl.viewportBounds);
-        //
-        //           System.out.println("windowVec by hand = ");
-        //   MatrixUtils.printVector(windowVec);
-        //System.out.println("projected = " + BehaviorismDriver.renderer.projectPoint(g.translate, RendererJogl.modelviewMatrix));
-        }
-         */
-        //if ((layer.state.DEPTH_TEST == false && g.state == null) || (g.state != null && g.state.DEPTH_TEST == false))
-        {
-          invisiblePickingGeoms.add(g);
-        }
-        //g.draw(gl, glu, 0f);
-        g.draw(gl);
-
-        if (g.hasState == true) //individual geoms can still override layer... should this be allowed??? this is slow
-        {
-          layer.state.state(gl); //have to revert to normal layer state if the geom has overridden it
-        }
-
-        idx++;
       }
     }
 
     //draw invisiblePickingGeoms
-
+    //hmm is it slower to reload a matrix or to change the depth testing?
     if (invisiblePickingGeoms.size() > 0)
     {
       gl.glEnable(GL.GL_DEPTH_TEST);
@@ -434,7 +388,7 @@ public class SceneGraph
     }
 
     /*
-    if (MouseHandler.selectedGeom == g)
+    if (MouseHandler.getInstance().selectedGeom == g)
     {
     System.out.println("you selcted g " + g);
     State.printCurrentState(gl);
@@ -561,19 +515,19 @@ public class SceneGraph
 
   /** 
    * Draws the current pixel position of the mouse as a green point. This position is returned from the MouseMotionListener,
-   * as handled by the MouseHandler.
+   * as handled by the MouseHandler.getInstance().
    * 
    * @param gl
    */
   private void drawDebugMousePoint(GL gl)
   {
-    if (MouseHandler.debugMousePoint != null)
+    if (MouseHandler.getInstance().debugMousePoint != null)
     {
       gl.glColor4f(0f, 1f, 0f, 1f);
       gl.glPointSize(10f);
 
       gl.glBegin(gl.GL_POINTS);
-      gl.glVertex2f(MouseHandler.debugMousePoint.x, MouseHandler.debugMousePoint.y);
+      gl.glVertex2f(MouseHandler.getInstance().debugMousePoint.x, MouseHandler.getInstance().debugMousePoint.y);
       gl.glEnd();
     }
   }
@@ -581,19 +535,19 @@ public class SceneGraph
   /**
    * Draws the pixel position of the last point the mouse was clicked as a red point.
    * This position is returned from the MouseMotionListener,
-   * as handled by the MouseHandler.
+   * as handled by the MouseHandler.getInstance().
    *
    * @param gl
    */
   private void drawDebugSelectPoint(GL gl)
   {
-    if (MouseHandler.debugSelectPoint != null)
+    if (MouseHandler.getInstance().debugSelectPoint != null)
     {
       gl.glColor4f(1f, 0f, 0f, 1f);
       gl.glPointSize(10f);
 
       gl.glBegin(gl.GL_POINTS);
-      gl.glVertex2f(MouseHandler.debugSelectPoint.x, MouseHandler.debugSelectPoint.y);
+      gl.glVertex2f(MouseHandler.getInstance().debugSelectPoint.x, MouseHandler.getInstance().debugSelectPoint.y);
       gl.glEnd();
     }
   }
@@ -612,7 +566,9 @@ public class SceneGraph
 
     TextRenderer debugTextRenderer = FontHandler.getInstance().getDefaultFont(18);
 
-    debugTextRenderer.beginRendering(Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
+    debugTextRenderer.beginRendering(
+      RenderUtils.getCamera().viewport[2],
+      RenderUtils.getCamera().viewport[3]);
     debugTextRenderer.setColor(1f, 1f, 1f, 1f);
     debugTextRenderer.draw("fps: " + this.fps, 5, 5);
     debugTextRenderer.endRendering();

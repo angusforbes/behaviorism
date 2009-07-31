@@ -3,6 +3,7 @@
 package behaviors.behavior;
 
 import behaviors.*;
+import java.util.Arrays;
 
 /**
  * BehaviorSimple is a basic Behavior that updates the Geom every frame.
@@ -11,7 +12,7 @@ import behaviors.*;
  * is after the start time and it hasn't been explicitly interrupted.
  * @author angus
  */
-public class BehaviorSpeed extends BehaviorSimple implements BehaviorUpdater
+public class BehaviorSpeed extends BehaviorDiscrete implements BehaviorUpdater
 {
   float mult;
   public BehaviorSpeed(long startTime, float mult)
@@ -19,6 +20,19 @@ public class BehaviorSpeed extends BehaviorSimple implements BehaviorUpdater
     super(startTime);
     this.mult = mult;
   }
+
+  public BehaviorSpeed(long startTime, long pulse, float mult)
+  {
+    super(startTime, new long[]{0, pulse});
+    this.mult = mult;
+  }
+
+  public BehaviorSpeed(long startTime, long[] pulses, float mult)
+  {
+    super(startTime, pulses);
+    this.mult = mult;
+  }
+
 
   public void updateBehavior(Behavior b)
   {

@@ -68,6 +68,10 @@ public class Utils
   {
     return nano + millisToNanos(millis);
   }
+  public static long nanoPlusMillis(long nano, long minMillis, long maxMillis)
+  {
+    return nano + millisToNanos(randomLong(minMillis, maxMillis));
+  }
 
   /**
    * A convenience method for when I need to add some milliseconds to
@@ -611,11 +615,22 @@ public class Utils
     }
   }
 
+  /*
   public static void removeAllFrom(List list, Object... objs)
   {
     for (Object o : objs)
     {
       list.removeAll((List) o);
+    }
+  }
+  */
+
+
+  public static <T> void removeAllFrom(List<? extends T> list, List<? extends T>... objs)
+  {
+    for (List<? extends T> o : objs)
+    {
+      list.removeAll(o);
     }
   }
 
@@ -624,11 +639,12 @@ public class Utils
    * @param list
    * @param objs
    */
+  //public static <T> void addAllTo(List<T> list, List<? extends T>... listsToAdd)
   public static <T> void addAllTo(List<T> list, List<? extends T>... listsToAdd)
   {
     for (List<? extends T> listToAdd : listsToAdd)
     {
-      list.addAll((List<? extends T>) listToAdd);
+      list.addAll(listToAdd);
     }
   }
 

@@ -10,6 +10,7 @@ import utils.Utils;
 
 public class BehaviorActivateGeom extends BehaviorSimple implements GeomUpdater
 {
+
   public boolean updateChildren = true;
 
   /**
@@ -39,61 +40,73 @@ public class BehaviorActivateGeom extends BehaviorSimple implements GeomUpdater
   /*
   public static BehaviorActivateGeom activateBetweenMillis(Geom geom, long baseNano, long onMS, long offMS)
   {
-    geom.isActive = false;
+  geom.isActive = false;
 
-    List<Long> mss = new ArrayList<Long>();
-    Utils.addTo(mss, onMS, offMS);
+  List<Long> mss = new ArrayList<Long>();
+  Utils.addTo(mss, onMS, offMS);
 
-    BehaviorActivateGeom bia = new BehaviorActivateGeom(
-      new DiscreteBehaviorBuilder(baseNano, mss).loop(LoopEnum.LOOP));
+  BehaviorActivateGeom bia = new BehaviorActivateGeom(
+  new DiscreteBehaviorBuilder(baseNano, mss).loop(LoopEnum.LOOP));
 
-    geom.attachBehavior(bia);
-    return bia;
+  geom.attachBehavior(bia);
+  return bia;
   }
 
   public static BehaviorActivateGeom activateBetweenMillis(Geom geom, long baseNano, List<Long> mss)
   {
-    geom.isActive = false;
+  geom.isActive = false;
 
-    BehaviorActivateGeom bia = new BehaviorActivateGeom(
-      new DiscreteBehaviorBuilder(baseNano, mss).loop(LoopEnum.LOOP));
+  BehaviorActivateGeom bia = new BehaviorActivateGeom(
+  new DiscreteBehaviorBuilder(baseNano, mss).loop(LoopEnum.LOOP));
 
-    geom.attachBehavior(bia);
-    return bia;
+  geom.attachBehavior(bia);
+  return bia;
   }
-  */
-
+   */
   public BehaviorActivateGeom(long startTime)
   {
     super(startTime);
+
+    //System.out.println("we will activate in " + Utils.nanosToMillis((startTime - Utils.now())));
   }
 
   public void updateGeom(Geom g)
   {
+    if (isActive == true)
+    {
+      activate(g);
+    }
+  }
+
+  public void activate(Geom g)
+  {
+    //System.out.println("WE HAVE BEEN ACTIVATED!");
     g.isActive = true;
 
     if (updateChildren == true)
     {
       for (Geom child : g.geoms)
       {
-        updateChildGeom(child, g.isActive);
+        activate(child);
       }
     }
+
   }
 
+  /*
   //might want to put this in super Behavior class, or maybe a BehaviorUtils
   protected void updateChildGeom(Geom g, boolean isParentActive)
   {
-    //System.out.println("isGeomActive = " + isGeomActive);
-    g.isActive = isParentActive;
+  //System.out.println("isGeomActive = " + isGeomActive);
+  g.isActive = isParentActive;
 
-    //prob want to make sure children are active as well...
-    for (Geom child : g.geoms)
-    {
-      updateChildGeom(child, isParentActive);
-    }
+  //prob want to make sure children are active as well...
+  for (Geom child : g.geoms)
+  {
+  updateChildGeom(child, isParentActive);
   }
-
+  }
+   */
   public String toString()
   {
     return "in BehaviorIsActive : class = " + getClass();

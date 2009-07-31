@@ -19,33 +19,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import utils.MatrixUtils;
-import utils.RenderUtils;
-import utils.Utils;
+import java.util.concurrent.atomic.AtomicBoolean;
+import static utils.MatrixUtils.*;
+import static utils.RenderUtils.*;
+import static utils.Utils.*;
 import worlds.World;
 
 public class Renderer implements GLEventListener
 {
+
   public Map<World, Boolean> worlds = new ConcurrentHashMap<World, Boolean>();
   public World currentWorld = null;
   public SceneGraph sceneGraph = null;
   public static GLUT glut;
   public static GLU glu;
   public GL gl;
-  public GLAutoDrawable glDrawable;
   public Animator animator;
   public TessellationCallback tessellationCallback = null;
   public GLUtessellator tessellationObject = null;
   public GLUnurbs nurbsRenderer = null;
   public GLUquadric quadricRenderer = null;
   public Cam cam = null;
-  
   public static double frustum[][] = null;
-  public static Rectangle2D.Float screenBounds = null;
+  public static Rectangle2D.Float screenBounds = null;//don't need this one, just use viewport
   public static Rectangle2D.Float screenBoundsInWorldCoords = null;
   public static List<GeomPoint> worldBoundaryPoints = null;
   public static boolean boundsHaveChanged = true;
-
+  public AtomicBoolean togglingFullScreen = new AtomicBoolean(false);
+  private boolean isInstalled = false;
   private static Renderer instance = null;
 
   /**
@@ -92,7 +93,13 @@ public class Renderer implements GLEventListener
     }
 
     this.cam = currentWorld.cam;
+
     boundsHaveChanged = true;
+
+    while (isInstalled == false) //we need to wait until the reshape method is called via the gl context.
+    {
+      sleep(10);
+    }
   }
 
   public void activateWorld(World world, boolean isCurrent)
@@ -116,47 +123,11 @@ public class Renderer implements GLEventListener
    */
   public void setPerspective3D()
   {
-    //can these conditions ever occur?
-    if (cam == null)
-    {
-      return;
-    }
-    if (currentWorld == null)
-    {
-      return;
-    }
-
     cam.projection();
     cam.perspective();
-    
-    if(boundsHaveChanged == true)
-    {
-      //System.out.println("boundsHaveChanged!!!");
-      Point3f lowerleft = MatrixUtils.toPoint3f(
-        RenderUtils.rayIntersect(currentWorld, 0, (int) screenBounds.getHeight(), new Point3d()));
-      Point3f upperright = MatrixUtils.toPoint3f(
-        RenderUtils.rayIntersect(currentWorld, (int) screenBounds.getWidth(), 0, new Point3d()));
 
-      screenBoundsInWorldCoords = new Rectangle2D.Float(
-        lowerleft.x, lowerleft.y, upperright.x - lowerleft.x, upperright.y - lowerleft.y);
-
-
-      worldBoundaryPoints.get(0).setTranslate(lowerleft.x, lowerleft.y, 0f);
-      worldBoundaryPoints.get(1).setTranslate(upperright.x, lowerleft.y, 0f);
-      worldBoundaryPoints.get(2).setTranslate(upperright.x, upperright.y, 0f);
-      worldBoundaryPoints.get(3).setTranslate(lowerleft.x, upperright.y, 0f);
-    }
-
-  //extractFrustum();
-  //System.out.println("leaving setPerspective3D()...");
-  }
-
-  //this is only being called by GeomText2... rethink...
-  @Deprecated //delete me soon! (being used by GeomText2 and GeomTextPath
-  public void resetPerspective3D()
-  {
-    //projectionMatrix = MatrixUtils.perspective(cam.fovy, (float) BehaviorismDriver.canvasWidth / BehaviorismDriver.canvasHeight, Renderer.nearPlane, Renderer.farPlane);
-    //modelviewMatrix = cam.resetPerspective();
+    //extractFrustum();
+    //System.out.println("leaving setPerspective3D()...");
   }
 
   /**
@@ -166,7 +137,7 @@ public class Renderer implements GLEventListener
   {
     gl.glMatrixMode(gl.GL_PROJECTION);
     gl.glLoadIdentity();
-    glu.gluOrtho2D(0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight, 0);
+    glu.gluOrtho2D(0, cam.viewport[2], cam.viewport[3], 0);
 
     gl.glMatrixMode(gl.GL_MODELVIEW);
     gl.glLoadIdentity();
@@ -191,6 +162,8 @@ public class Renderer implements GLEventListener
 
     //make sure we have the right GL context
     gl = drawable.getGL();
+
+    Behaviorism.getInstance().setCursor(); //make sure we have the proper cursor
 
     return true;
   }
@@ -232,6 +205,13 @@ public class Renderer implements GLEventListener
   @Override
   public void display(GLAutoDrawable drawable)
   {
+    if (togglingFullScreen.get() == true)
+    {
+      togglingFullScreen.set(false);
+      Behaviorism.getInstance().toggleFullScreen();
+      return;
+    }
+
     if (!isReady(drawable))
     {
       return;
@@ -244,8 +224,6 @@ public class Renderer implements GLEventListener
     processInputs();
 
     processDebugs();
-    //gl.glFlush(); //is this necessary?
-
 
     //set this false here so that geoms that need to recalc if bounds have changed will know
     //that screen has been reshaped.
@@ -260,27 +238,17 @@ public class Renderer implements GLEventListener
   @Override
   public void init(GLAutoDrawable drawable)
   {
-    //init worldBoundaryPoints with 4 blank points...
-    worldBoundaryPoints = new ArrayList<GeomPoint>();
-    Utils.addTo(worldBoundaryPoints, new GeomPoint(), new GeomPoint(), new GeomPoint(), new GeomPoint());
-
-    glDrawable = drawable;
-    //gl = glDrawable.getGL();
-
     this.gl = drawable.getGL();
+    drawable.setGL(new DebugGL(gl));
 
-    glDrawable.setGL(new DebugGL(gl));
+    System.out.println(
+      "GL v" + gl.glGetString(GL.GL_VERSION) + ", " +
+      "GLSL v" + gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION)
+      );
+
     glu = new GLU();
     glut = new GLUT();
 
-
-    //debugTextRenderer = FontHandler.getInstance().getFont("Arial", Font.PLAIN, 18);
-    
-    //print out version info..
-    System.out.println("GLSL version = " + gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION));
-
-    //gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);                    // Black Background
-  //  gl.glClearColor(currentWorld.r, currentWorld.g, currentWorld.b, currentWorld.a);                    // Black Background
 
 //    gl.glEnable(gl.GL_LIGHT0);					// Enable Default Light (Quick And Dirty)	( NEW )
 //    //gl.glEnable(gl.GL_LIGHTING);				// Enable Lighting				( NEW )
@@ -338,40 +306,66 @@ public class Renderer implements GLEventListener
     // 0 = do *not* synch with refresh rate (ie fast as possible), 1 = synch with refresh rate (ie always 60fps)
     gl.setSwapInterval(1); //0
 
+
     //animator = new FPSAnimator(glDrawable, 60, false);
     //animator = new FPSAnimator(glDrawable, 5, true);
-    animator = new Animator(glDrawable);
-    animator.setRunAsFastAsPossible(true);
-    //animator.setRunAsFastAsPossible(false);
+    //animator = new Animator(glDrawable);
+    animator = new Animator(drawable);
+    //animator.setRunAsFastAsPossible(true);
+    animator.setRunAsFastAsPossible(false);
 
     animator.start();
+
+
   }
 
   @Override
   public void reshape(GLAutoDrawable drawable, int xstart, int ystart, int width, int height)
   {
-    height = (height == 0) ? 1 : height;
-
-    //don't really want to bother with this... just update the viewport...
-    Behaviorism.getInstance().canvasWidth = width;
-    Behaviorism.getInstance().canvasHeight = height;
-
-    this.cam.setViewport(0,0,width, height);
+    this.cam.setViewport(0, 0, width, height);
 
     Renderer.screenBounds = new Rectangle2D.Float(0, 0, width, height);
 
-    boundsHaveChanged = true;
     if (cam != null)
     {
       cam.setAspectRatio(width, height);
     }
 
     setPerspective3D();
+
+    setBoundaries();
+
+    isInstalled = true;
   }
 
   @Override
   public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged)
   {
+  }
+
+  private void setBoundaries()
+  {
+    Point3f lowerleft = toPoint3f(
+     rayIntersect(currentWorld, 0, (int) screenBounds.getHeight(), new Point3d()));
+    Point3f upperright = toPoint3f(
+     rayIntersect(currentWorld, (int) screenBounds.getWidth(), 0, new Point3d()));
+
+    screenBoundsInWorldCoords = new Rectangle2D.Float(
+      lowerleft.x, lowerleft.y, upperright.x - lowerleft.x, upperright.y - lowerleft.y);
+
+    if (worldBoundaryPoints == null)
+    {
+      worldBoundaryPoints = new ArrayList<GeomPoint>();
+      addTo(worldBoundaryPoints, new GeomPoint(), new GeomPoint(), new GeomPoint(), new GeomPoint());
+    }
+
+    worldBoundaryPoints.get(0).setTranslate(lowerleft.x, lowerleft.y, 0f);
+    worldBoundaryPoints.get(1).setTranslate(upperright.x, lowerleft.y, 0f);
+    worldBoundaryPoints.get(2).setTranslate(upperright.x, upperright.y, 0f);
+    worldBoundaryPoints.get(3).setTranslate(lowerleft.x, upperright.y, 0f);
+
+    boundsHaveChanged = true;
+
   }
 }
 

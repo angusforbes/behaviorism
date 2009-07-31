@@ -1,6 +1,5 @@
 package geometry;
 
-import behaviorism.Behaviorism;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +9,8 @@ import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3f;
 import utils.GeomUtils;
 import utils.RenderUtils;
-import utils.Utils;
 
+//This needs a lot of work!
 public class GeomPoly extends Geom
 {
   public List<GeomPoint> vertices = new ArrayList<GeomPoint>();
@@ -58,6 +57,7 @@ public class GeomPoly extends Geom
   }
   */
 
+  /*
   public GeomPoly(Point3f ... p3fs)
   {
     //this.isSelectable = true;
@@ -74,8 +74,9 @@ public class GeomPoly extends Geom
 //    }
 
   }
+   */
   /// goddamned erasure!!! won't let me have a constructor with List<point3f> and List<GeomPoint> !!! 
-  
+  /*
   public GeomPoly(List<Point3f> lst)
   {
     this.isSelectable = true;
@@ -95,10 +96,12 @@ public class GeomPoly extends Geom
     
     //selectableBoundary = verts;
   }
-  
+  */
   
   public GeomPoly(List<Point3f> lst, Point3f rel)
   {
+    super(rel);
+
     this.isSelectable = true;
     for(int i=0; i < lst.size(); i++)
     {
@@ -107,7 +110,7 @@ public class GeomPoly extends Geom
       vertices.add(new GeomPoint(p3f.x, p3f.y, p3f.z));
     }
     
-    this.translate.set(rel.x, rel.y, rel.z);
+    //this.translate.set(rel.x, rel.y, rel.z);
     
     //add each GeomPoint to scene hierarchy
     for(int i=0; i<vertices.size(); i++)
@@ -137,7 +140,7 @@ public class GeomPoly extends Geom
     for(int i=0; i < lst.size(); i++)
     {
       Point3f p3f = lst.get(i);
-      System.out.printf("adding %f %f %f\n", p3f.x, p3f.y, p3f.z);
+   //   System.out.printf("adding %f %f %f\n", p3f.x, p3f.y, p3f.z);
       vertices.add(new GeomPoint(p3f.x, p3f.y, p3f.z));
     }
     
@@ -147,7 +150,8 @@ public class GeomPoly extends Geom
       for(int i=0; i<vertices.size(); i++)
       {
         //verts.get(i).isActive = true;
-        this.geoms.add(vertices.get(i));
+        //this.geoms.add(vertices.get(i));
+        addGeom(vertices.get(i));
       }
     }
 
@@ -288,12 +292,11 @@ public class GeomPoly extends Geom
         //double[] dubArr = new double[]{(float)(p3f.translate.x + translate.x),
         //(float)(p3f.translate.y + translate.y),
         //(float)(p3f.translate.z + translate.z + offset)};
-        double[] dubArr = new double[]{(float)(p3f.translate.x),
-        (float)(p3f.translate.y),
-        (float)(p3f.translate.z + offset),
-				color.r, color.g, color.b
-				
-				
+        double[] dubArr = new double[]{
+          (p3f.translate.x),
+          (p3f.translate.y),
+          (p3f.translate.z + offset),
+          color.r, color.g, color.b
 				};
         
         geomInfo[i] = dubArr;

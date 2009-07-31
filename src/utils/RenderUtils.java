@@ -13,6 +13,7 @@ import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUnurbs;
@@ -24,6 +25,7 @@ import renderers.Renderer;
 import renderers.SceneGraph;
 import renderers.TessellationCallback;
 import renderers.cameras.Cam;
+import renderers.layers.RendererLayer;
 import worlds.World;
 
 /**
@@ -174,6 +176,16 @@ public class RenderUtils
     return getRenderer().currentWorld;
   }
 
+  public static SortedMap<Integer, RendererLayer> getLayers()
+  {
+    return getWorld().layers;
+  }
+
+  public static RendererLayer getLayer(int layer)
+  {
+    return getLayers().get(layer);
+  }
+
   public static Cam getCamera()
   {
     return getWorld().cam;
@@ -203,6 +215,7 @@ public class RenderUtils
   {
     return getRenderer().glu;
   }
+
 
   public static GL getGL()
   {
@@ -311,7 +324,7 @@ public class RenderUtils
     viewport = RenderUtils.getCamera().viewport;
 
     //invert y value properly
-    y = (int) ((float) viewport[3] - (float) y);
+    y = (int) (viewport[3] - y);
 
     wcsN = MatrixUtils.unproject(
       new double[]

@@ -43,6 +43,11 @@ abstract public class Behavior
     schedule(true);
   }
 
+  public void update()
+  {
+    //generic updater... can be override for meta-type behavior. or not.
+  }
+
   //returns if it was already scheduled.
   //the idea is that this one is for manually scheduling,
   //so autoRemove is turned off.

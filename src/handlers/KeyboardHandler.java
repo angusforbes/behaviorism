@@ -8,6 +8,7 @@ import behaviorism.Behaviorism;
 import renderers.SceneGraph;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import renderers.Renderer;
 import renderers.cameras.Cam;
 import utils.RenderUtils;
 
@@ -20,8 +21,8 @@ import utils.RenderUtils;
 public class KeyboardHandler implements KeyListener
 {
 
-  public static final boolean keys[] = new boolean[1024];  // Array Used For The Keyboard Routine
-  public static final boolean keysPressing[] = new boolean[1024];  // Used if an action should only be activated once per press
+  public final boolean keys[] = new boolean[1024];  // Array Used For The Keyboard Routine
+  public final boolean keysPressing[] = new boolean[1024];  // Used if an action should only be activated once per press
   
   public float rotationInc = 1f;
   public float rotateAnchorInc = .0125f;
@@ -37,12 +38,12 @@ public class KeyboardHandler implements KeyListener
     MODE_FONT, MODE_PACK, MODE_DEBUG, MODE_CAM, MODE_STEP
   }
 
-  public static ModeEnum g_keyMode = ModeEnum.MODE_ZOOM;
+  public ModeEnum g_keyMode = ModeEnum.MODE_ZOOM;
   private static KeyboardHandler instance = null;
 
   /**
-   * Gets (or creates then gets) the singleton MouseHandler object.
-   * @return the singleton MouseHandler
+   * Gets (or creates then gets) the singleton MouseHandler.getInstance() object.
+   * @return the singleton MouseHandler.getInstance()
    */
   public static KeyboardHandler getInstance()
   {
@@ -72,7 +73,7 @@ public class KeyboardHandler implements KeyListener
       return;
     }
 
-    //System.out.println("pressed : " + KeyEvent.getKeyText(evt.getKeyCode()));
+    System.out.println("pressed : " + KeyEvent.getKeyText(evt.getKeyCode()));
     keys[evt.getKeyCode()] = true;
   }
 
@@ -146,14 +147,15 @@ public class KeyboardHandler implements KeyListener
   public /*static*/ void checkKeys()
   {
 
+   // System.out.println("in checkKeys...");
     //check global keys. if any global keys were pressed, return so that we don't try to
     //apply that key to a world-specific or mode-specifc action.
-    if (keys[KeyEvent.VK_C])
-    {
-      System.err.println("********* RESET **********");
-      RenderUtils.getWorld().reset();
-      return;
-    }
+//    if (keys[KeyEvent.VK_C])
+//    {
+//      System.err.println("********* RESET **********");
+//      RenderUtils.getWorld().reset();
+//      return;
+//    }
     if (keys[KeyEvent.VK_ESCAPE])
     {
       Behaviorism.getInstance().shutDown();
@@ -174,6 +176,26 @@ public class KeyboardHandler implements KeyListener
       }
       return;
     }
+
+    if (keys[KeyEvent.VK_C])
+    {
+      if (keysPressing[KeyEvent.VK_C] == false)
+      {
+        keysPressing[KeyEvent.VK_C] = true;
+        Behaviorism.getInstance().toggleCursor();
+      }
+      return;
+    }
+    if (keys[KeyEvent.VK_F])
+    {
+      if (keysPressing[KeyEvent.VK_F] == false)
+      {
+        keysPressing[KeyEvent.VK_F] = true;
+        Renderer.getInstance().togglingFullScreen.set(true);
+      }
+      return;
+    }
+
     if (keys[KeyEvent.VK_R])
     {
       if (keysPressing[KeyEvent.VK_R] == false)
@@ -299,7 +321,7 @@ public class KeyboardHandler implements KeyListener
 
   public /*static*/ void check_keyPressedCam()
   {
-    //MouseHandler.handleCam = true;
+    //MouseHandler.getInstance().handleCam = true;
     Cam cam = RenderUtils.getCamera();
 
     if (keys[KeyEvent.VK_UP])
@@ -433,7 +455,7 @@ public class KeyboardHandler implements KeyListener
     //float inc = .00125f;
     //float inc = .005f;
 
-    if (MouseHandler.selectedGeom == null)
+    if (MouseHandler.getInstance().getInstance().selectedGeom == null)
     {
       /*if(keys[KeyEvent.VK_LEFT])
       BehaviorismDriver.xzoom+= inc;
@@ -457,28 +479,28 @@ public class KeyboardHandler implements KeyListener
     {
       if (keys[KeyEvent.VK_LEFT])
       {
-        MouseHandler.selectedGeom.translateX(-translateInc);
+        MouseHandler.getInstance().selectedGeom.translateX(-translateInc);
       }
       if (keys[KeyEvent.VK_RIGHT])
       {
-        MouseHandler.selectedGeom.translateX(+translateInc);
-      //MouseHandler.selectedGeom.translate.x += translateInc;
+        MouseHandler.getInstance().selectedGeom.translateX(+translateInc);
+      //MouseHandler.getInstance().selectedGeom.translate.x += translateInc;
       }
       if (keys[KeyEvent.VK_DOWN])
       {
-        MouseHandler.selectedGeom.translateY(-translateInc);
+        MouseHandler.getInstance().selectedGeom.translateY(-translateInc);
       }
       if (keys[KeyEvent.VK_UP])
       {
-        MouseHandler.selectedGeom.translateY(+translateInc);
+        MouseHandler.getInstance().selectedGeom.translateY(+translateInc);
       }
       if (keys[KeyEvent.VK_PAGE_DOWN])
       {
-        MouseHandler.selectedGeom.translateZ(-translateInc);
+        MouseHandler.getInstance().selectedGeom.translateZ(-translateInc);
       }
       if (keys[KeyEvent.VK_PAGE_UP])
       {
-        MouseHandler.selectedGeom.translateZ(+translateInc);
+        MouseHandler.getInstance().selectedGeom.translateZ(+translateInc);
       }
 
     }
@@ -486,8 +508,10 @@ public class KeyboardHandler implements KeyListener
 
   public /*static*/ void check_keyPressedRotate()
   {
-    if (MouseHandler.selectedGeom == null)
+    System.out.println("in check_keyPressedRotate...");
+    if (MouseHandler.getInstance().selectedGeom == null)
     {
+      System.out.println("selectedGeom = null!");
       /*if(keys[KeyEvent.VK_LEFT])
       BehaviorismDriver.zrot-=rotationInc;
 
@@ -510,27 +534,28 @@ public class KeyboardHandler implements KeyListener
     {
       if (keys[KeyEvent.VK_LEFT])
       {
-        MouseHandler.selectedGeom.rotateY(-rotationInc);
+        MouseHandler.getInstance().selectedGeom.rotateY(-rotationInc);
       }
       if (keys[KeyEvent.VK_RIGHT])
       {
-        MouseHandler.selectedGeom.rotateY(+rotationInc);
+        System.out.println("rotating right...");
+        MouseHandler.getInstance().selectedGeom.rotateY(+rotationInc);
       }
       if (keys[KeyEvent.VK_DOWN])
       {
-        MouseHandler.selectedGeom.rotateX(+rotationInc);
+        MouseHandler.getInstance().selectedGeom.rotateX(+rotationInc);
       }
       if (keys[KeyEvent.VK_UP])
       {
-        MouseHandler.selectedGeom.rotateX(-rotationInc);
+        MouseHandler.getInstance().selectedGeom.rotateX(-rotationInc);
       }
       if (keys[KeyEvent.VK_PAGE_DOWN])
       {
-        MouseHandler.selectedGeom.rotateZ(-rotationInc);
+        MouseHandler.getInstance().selectedGeom.rotateZ(-rotationInc);
       }
       if (keys[KeyEvent.VK_PAGE_UP])
       {
-        MouseHandler.selectedGeom.rotateZ(+rotationInc);
+        MouseHandler.getInstance().selectedGeom.rotateZ(+rotationInc);
       }
     }
 
@@ -595,36 +620,36 @@ public class KeyboardHandler implements KeyListener
 
   public /*static*/ void check_keyPressedScale()
   {
-    if (MouseHandler.selectedGeom != null)
+    if (MouseHandler.getInstance().selectedGeom != null)
     {
       if (keys[KeyEvent.VK_LEFT])
       {
-        MouseHandler.selectedGeom.scaleX(-scaleInc);
+        MouseHandler.getInstance().selectedGeom.scaleX(-scaleInc);
       }
       if (keys[KeyEvent.VK_RIGHT])
       {
-        MouseHandler.selectedGeom.scaleX(+scaleInc);
+        MouseHandler.getInstance().selectedGeom.scaleX(+scaleInc);
       }
       if (keys[KeyEvent.VK_DOWN])
       {
-        MouseHandler.selectedGeom.scaleY(-scaleInc);
+        MouseHandler.getInstance().selectedGeom.scaleY(-scaleInc);
       }
       if (keys[KeyEvent.VK_UP])
       {
-        MouseHandler.selectedGeom.scaleY(+scaleInc);
+        MouseHandler.getInstance().selectedGeom.scaleY(+scaleInc);
       }
       if (keys[KeyEvent.VK_PAGE_DOWN])
       {
-        //MouseHandler.selectedGeom.scale.z-=scaleInc;
-        MouseHandler.selectedGeom.scaleY(-scaleInc);
-        MouseHandler.selectedGeom.scaleX(-scaleInc);
+        //MouseHandler.getInstance().selectedGeom.scale.z-=scaleInc;
+        MouseHandler.getInstance().selectedGeom.scaleY(-scaleInc);
+        MouseHandler.getInstance().selectedGeom.scaleX(-scaleInc);
       }
 
       if (keys[KeyEvent.VK_PAGE_UP])
       {
-        //MouseHandler.selectedGeom.scale.z+=scaleInc;
-        MouseHandler.selectedGeom.scaleY(+scaleInc);
-        MouseHandler.selectedGeom.scaleX(+scaleInc);
+        //MouseHandler.getInstance().selectedGeom.scale.z+=scaleInc;
+        MouseHandler.getInstance().selectedGeom.scaleY(+scaleInc);
+        MouseHandler.getInstance().selectedGeom.scaleX(+scaleInc);
       }
 
     }
@@ -632,88 +657,88 @@ public class KeyboardHandler implements KeyListener
 
   public /*static*/ void check_keyPressedScaleAnchor()
   {
-    if (MouseHandler.selectedGeom != null)
+    if (MouseHandler.getInstance().selectedGeom != null)
     {
       if (keys[KeyEvent.VK_LEFT])
       {
-        MouseHandler.selectedGeom.scaleAnchorX(-scaleAnchorInc);
+        MouseHandler.getInstance().selectedGeom.scaleAnchorX(-scaleAnchorInc);
       }
       if (keys[KeyEvent.VK_RIGHT])
       {
-        MouseHandler.selectedGeom.scaleAnchorX(+scaleAnchorInc);
+        MouseHandler.getInstance().selectedGeom.scaleAnchorX(+scaleAnchorInc);
       }
       if (keys[KeyEvent.VK_DOWN])
       {
-        MouseHandler.selectedGeom.scaleAnchorY(-scaleAnchorInc);
+        MouseHandler.getInstance().selectedGeom.scaleAnchorY(-scaleAnchorInc);
       }
       if (keys[KeyEvent.VK_UP])
       {
-        MouseHandler.selectedGeom.scaleAnchorY(+scaleAnchorInc);
+        MouseHandler.getInstance().selectedGeom.scaleAnchorY(+scaleAnchorInc);
       }
       if (keys[KeyEvent.VK_PAGE_DOWN])
       {
-        MouseHandler.selectedGeom.scaleAnchorZ(-scaleAnchorInc);
+        MouseHandler.getInstance().selectedGeom.scaleAnchorZ(-scaleAnchorInc);
       }
       if (keys[KeyEvent.VK_PAGE_UP])
       {
-        MouseHandler.selectedGeom.scaleAnchorZ(+scaleAnchorInc);
+        MouseHandler.getInstance().selectedGeom.scaleAnchorZ(+scaleAnchorInc);
       }
     }
   }
 
   public /*static*/ void check_keyPressedRotateAnchor()
   {
-    if (MouseHandler.selectedGeom != null &&
-      MouseHandler.selectedGeom.rotateAnchor != null)
+    if (MouseHandler.getInstance().selectedGeom != null &&
+      MouseHandler.getInstance().selectedGeom.rotateAnchor != null)
     {
       if (keys[KeyEvent.VK_LEFT])
       {
-        MouseHandler.selectedGeom.rotateAnchorX(-rotateAnchorInc);
+        MouseHandler.getInstance().selectedGeom.rotateAnchorX(-rotateAnchorInc);
       }
       if (keys[KeyEvent.VK_RIGHT])
       {
-        MouseHandler.selectedGeom.rotateAnchorX(+rotateAnchorInc);
+        MouseHandler.getInstance().selectedGeom.rotateAnchorX(+rotateAnchorInc);
       }
       if (keys[KeyEvent.VK_DOWN])
       {
-        MouseHandler.selectedGeom.rotateAnchorY(-rotateAnchorInc);
+        MouseHandler.getInstance().selectedGeom.rotateAnchorY(-rotateAnchorInc);
       }
       if (keys[KeyEvent.VK_UP])
       {
-        MouseHandler.selectedGeom.rotateAnchorY(+rotateAnchorInc);
+        MouseHandler.getInstance().selectedGeom.rotateAnchorY(+rotateAnchorInc);
       }
       if (keys[KeyEvent.VK_PAGE_DOWN])
       {
-        MouseHandler.selectedGeom.rotateAnchorZ(-rotateAnchorInc);
+        MouseHandler.getInstance().selectedGeom.rotateAnchorZ(-rotateAnchorInc);
       }
       if (keys[KeyEvent.VK_PAGE_UP])
       {
-        MouseHandler.selectedGeom.rotateAnchorZ(+rotateAnchorInc);
+        MouseHandler.getInstance().selectedGeom.rotateAnchorZ(+rotateAnchorInc);
       }
     /*
     if (keys[KeyEvent.VK_LEFT])
     {
-    MouseHandler.selectedGeom.rotateAnchor.translate.x -= rotateAnchorInc;
+    MouseHandler.getInstance().selectedGeom.rotateAnchor.translate.x -= rotateAnchorInc;
     }
     if (keys[KeyEvent.VK_RIGHT])
     {
-    MouseHandler.selectedGeom.rotateAnchor.translate.x += rotateAnchorInc;
+    MouseHandler.getInstance().selectedGeom.rotateAnchor.translate.x += rotateAnchorInc;
     }
     if (keys[KeyEvent.VK_DOWN])
     {
-    MouseHandler.selectedGeom.rotateAnchor.translate.y -= rotateAnchorInc;
+    MouseHandler.getInstance().selectedGeom.rotateAnchor.translate.y -= rotateAnchorInc;
     }
     if (keys[KeyEvent.VK_UP])
     {
-    MouseHandler.selectedGeom.rotateAnchor.translate.y += rotateAnchorInc;
+    MouseHandler.getInstance().selectedGeom.rotateAnchor.translate.y += rotateAnchorInc;
     }
     if (keys[KeyEvent.VK_PAGE_DOWN])
     {
-    MouseHandler.selectedGeom.rotateAnchor.translate.z -= rotateAnchorInc;
+    MouseHandler.getInstance().selectedGeom.rotateAnchor.translate.z -= rotateAnchorInc;
     }
     if (keys[KeyEvent.VK_PAGE_UP])
     {
-    MouseHandler.selectedGeom.rotateAnchor.translate.z += rotateAnchorInc;
+    MouseHandler.getInstance().selectedGeom.rotateAnchor.translate.z += rotateAnchorInc;
     }
      */
     }

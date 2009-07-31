@@ -22,12 +22,17 @@ public class EasingSpline extends Easing
 
   public EasingSpline(double[] t, double[] y)
   {
-    new EasingSpline(EasingEnum.OUT, t, y);
+    super(EasingEnum.OUT);
+    this.t = t;
+    this.y = y;
+    initSpline();
   }
 
   public EasingSpline(int pts, double minY, double maxY)
   {
-    new EasingSpline(EasingEnum.OUT, pts, minY, maxY);
+    super(EasingEnum.OUT);
+    initRandomPoints(pts, minY, maxY);
+    initSpline();
   }
 
   public EasingSpline(EasingEnum ease, double[] t, double[] y)
@@ -41,7 +46,13 @@ public class EasingSpline extends Easing
   public EasingSpline(EasingEnum ease, int pts, double minY, double maxY)
   {
     super(ease);
-  
+
+    initRandomPoints(pts, minY, maxY);
+    initSpline();
+  }
+
+  public void initRandomPoints(int pts, double minY, double maxY)
+  {
     t = new double[pts];
     y = new double[pts];
 
@@ -56,7 +67,6 @@ public class EasingSpline extends Easing
     t[pts-1] = 1;
     y[pts-1] = 1;
 
-    initSpline();
   }
 
   public void initSpline()

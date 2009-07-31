@@ -6,13 +6,17 @@ import com.sun.opengl.util.texture.TextureCoords;
 import geometry.GeomRect;
 import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
+import textures.TextureImage;
 
 /**
  *
  * @author angus
  */
+//mayeb should extends from a superclass called GeomTexture?
 public class GeomVideo extends GeomRect
 {
+
+   public float maxSize = -1f;
 
 //  TrackControl tc;
 //  AudioControl ac;
@@ -32,49 +36,91 @@ public class GeomVideo extends GeomRect
   //mp.getMediaTime() -- gets the current time of playback in sec.ms
   //mp.getDuration() --gets total time of playback in sec.ms
   
-  public GeomVideo(TextureVideo ti, Point3f p3f, float w, float h)
+  public GeomVideo(Point3f p3f, float w, float h, TextureVideo ti)
   {
     super(p3f, w, h);
-    attachTexture(ti);
+    setTexture(ti);
+
+   
   }
 
   public GeomVideo(TextureVideo ti)
   {
     super(new Point3f(), 1f, 1f);
-    attachTexture(ti);
+    setTexture(ti);
+
+
+  }
+
+  //set the w/h using dimensions of texture
+  public GeomVideo(Point3f p3f, float maxSize, TextureVideo ti)
+  {
+    super(p3f, 1f, 1f);
+    setTexture(ti);
+    this.maxSize = maxSize;
+  }
+
+
+  //assuming there is only one texture attached...
+  public void setTexture(TextureImage ti2)
+  {
+    if (this.textures == null || this.textures.size() == 0)
+    {
+      attachTexture(ti2);
+    }
+    else
+    {
+      TextureImage ti1 = this.textures.get(0);
+      attachTexture(ti2);
+      detachTexture(ti1);
+    }
+  }
+
+  public TextureImage getTexture()
+  {
+    if (this.textures == null)
+    {
+      return null;
+    }
+    return this.textures.get(0);
   }
 
   @Override
   public void draw(GL gl)
   {
-    if (!updateTextures())
+    if (updateTextures())
     {
-      gl.glColor4fv(color.array(), 0);
+      if (maxSize > 0f)
+      {
+        normalizeSize(getTexture().w, getTexture().h, maxSize);
+      }
 
-    //  gl.glColor4f(r, g, b, a);
+      gl.glColor4fv(color.array(), 0);
       this.textures.get(0).texture.bind();
-      //this.texture.bind();
+      TextureCoords tc = this.textures.get(0).texture.getImageTexCoords();
 
       gl.glEnable(GL.GL_TEXTURE_2D);
-     
-      //gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
-      gl.glBegin(gl.GL_QUADS);
 
-      TextureCoords textureCoords = this.textures.get(0).texture.getImageTexCoords();
-
-      float x = translate.x;
-      float y = translate.y;
-
-      gl.glTexCoord2f(textureCoords.left(), textureCoords.bottom());
-      gl.glVertex2f(x, y);
-      gl.glTexCoord2f(textureCoords.right(), textureCoords.bottom());
-      gl.glVertex2f(x + w, y);
-      gl.glTexCoord2f(textureCoords.right(), textureCoords.top());
-      gl.glVertex2f(x + w, y + h);
-      gl.glTexCoord2f(textureCoords.left(), textureCoords.top());
-      gl.glVertex2f(x, y + h);
-
-      gl.glEnd();
+      drawRect(gl, 0f, 0f, 0f, w, h, tc.left(), tc.right(), tc.bottom(), tc.top());
+//
+//      //gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
+//      gl.glBegin(gl.GL_QUADS);
+//
+//      TextureCoords textureCoords = this.textures.get(0).texture.getImageTexCoords();
+//
+//      float x = translate.x;
+//      float y = translate.y;
+//
+//      gl.glTexCoord2f(textureCoords.left(), textureCoords.bottom());
+//      gl.glVertex2f(x, y);
+//      gl.glTexCoord2f(textureCoords.right(), textureCoords.bottom());
+//      gl.glVertex2f(x + w, y);
+//      gl.glTexCoord2f(textureCoords.right(), textureCoords.top());
+//      gl.glVertex2f(x + w, y + h);
+//      gl.glTexCoord2f(textureCoords.left(), textureCoords.top());
+//      gl.glVertex2f(x, y + h);
+//
+//      gl.glEnd();
       gl.glDisable(GL.GL_TEXTURE_2D);
     }
   }

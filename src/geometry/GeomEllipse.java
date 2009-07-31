@@ -186,11 +186,6 @@ public class GeomEllipse extends GeomPoly
   public void draw(GL gl)
   {
     GLU glu = Renderer.getInstance().glu;
-    
-    if (this == MouseHandler.selectedGeom)
-    {
-      //System.out.println("offset = " + offset);
-    }
    
 	//	gl.glRotatef(30f,0f,0f,1f);
     //get Tesselator object

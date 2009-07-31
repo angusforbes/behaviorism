@@ -16,5 +16,4 @@ public interface BehaviorUpdater
 {
 
   public void updateBehavior(Behavior g);
-
 }

@@ -539,11 +539,12 @@ public class GeomText extends GeomRect
     gl.glEnd();
   }
 
+  //have to think about this...
   @Override
   public void drawPickingBackground(GL gl)
   {
-    gl.glColor4f(0f, 0f, 0f, 0f);
-    drawRect(gl, 0f);
+//    gl.glColor4f(0f, 0f, 0f, 0f);
+//    drawRect(gl, 0f);
   }
 
   /*

@@ -107,7 +107,6 @@ public class BehaviorInterpolated extends Behavior
       {
         continueBehavior();
       }
-    //loopBehavior(); //no sense of loop in abstract version, add in Range...
 
     }
     else

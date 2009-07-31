@@ -4,8 +4,6 @@
  */
 package handlers;
 
-import behaviorism.Behaviorism;
-import renderers.Renderer;
 import geometry.Geom;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -33,30 +31,31 @@ import utils.RenderUtils;
 public class MouseHandler extends MouseAdapter
 {
 
-  public static Point mousePixel = new Point();
-  public static Point3f mouseWorld = new Point3f();
-  public static Point3f mouseGeom = new Point3f();
-  public static Point3f debugWorldPoint = new Point3f(0f, 0f, 0f);
-  public static Point3f debugSelectPoint = new Point3f(0f, 0f, 0f);
-  public static Point3f debugMousePoint = new Point3f(0f, 0f, 0f);
-  public static Point3f zeroPt = new Point3f(0f, 0f, 0f);
-  public static Point3d offsetPt = new Point3d(0, 0, 0);
-  public static AtomicBoolean isMoving = new AtomicBoolean(false);
-  public static boolean isDragging = false;
-  public static boolean isPressing = false;
-  public static boolean isProcessing = false;
-  public static boolean isReleasing = false;
-  public static int pre_abs_mx = 0;
-  public static int pre_abs_my = 0;
-  public static int abs_mx = 0;
-  public static int abs_my = 0;
-  public static int mx = 0;
-  public static int my = 0;
-  public static int button = 0;
-  public static int pre_mx = 0;
-  public static int pre_my = 0;
-  public static Geom selectedGeom = null;
-  public static Geom mouseOverGeom = null;
+  public Point mousePixel = new Point();
+  public Point3f mouseWorld = new Point3f();
+  public Point3f mouseGeom = new Point3f();
+  public Point3f debugWorldPoint = new Point3f(0f, 0f, 0f);
+  public Point3f debugSelectPoint = new Point3f(0f, 0f, 0f);
+  public Point3f debugMousePoint = new Point3f(0f, 0f, 0f);
+  public Point3f zeroPt = new Point3f(0f, 0f, 0f);
+  public Point3d offsetPt = new Point3d(0, 0, 0);
+  public AtomicBoolean isMoving = new AtomicBoolean(false);
+  public AtomicBoolean wasMoving = new AtomicBoolean(false);
+  public boolean isDragging = false;
+  public boolean isPressing = false;
+  public boolean isProcessing = false;
+  public boolean isReleasing = false;
+  public int pre_abs_mx = 0;
+  public int pre_abs_my = 0;
+  public int abs_mx = 0;
+  public int abs_my = 0;
+  public int mx = 0;
+  public int my = 0;
+  public int button = 0;
+  public int pre_mx = 0;
+  public int pre_my = 0;
+  public Geom selectedGeom = null;
+  public Geom mouseOverGeom = null;
 
   private static MouseHandler instance = null;
 
@@ -93,8 +92,14 @@ public class MouseHandler extends MouseAdapter
     }
     else if (isMoving.get() == true)
     {
-      processMouseMoving();
       isMoving.set(false);
+      wasMoving.set(true);
+      processMouseMoving();
+    }
+    else if (wasMoving.get() == true)
+    {
+      wasMoving.set(false);
+      processMouseStoppedMoving();
     }
     else if (isDragging == true)
     {
@@ -113,7 +118,7 @@ public class MouseHandler extends MouseAdapter
     }
   }
 
-  private /*static*/ void processMouseMoving()
+  private Geom getMouseOverGeom()
   {
     //double coords[] = RenderUtils.getWorldCoordsForScreenCoord(mx, my);
     //Point3d ptWorld = new Point3d(coords[0], coords[1], coords[2]);
@@ -128,7 +133,31 @@ public class MouseHandler extends MouseAdapter
     if (testMouseOverGeom != null)
     {
       mouseOverGeom = testMouseOverGeom.mouseoverableObject;
+      //System.out.println("mouse over : " + mouseOverGeom);
       mouseGeom = worldPtToSelctedGeomPt(mouseWorld, mouseOverGeom);
+      return mouseOverGeom;
+    }
+    return null;
+
+  }
+
+  private void processMouseMoving()
+  {
+    Geom mog = getMouseOverGeom();
+    if (mog != null)
+    {
+        mouseOverGeom.handleMouseOver();
+    }
+  }
+
+  private void processMouseStoppedMoving()
+  {
+    System.out.println("in processMouseStoppedMoving");
+    Geom mog = getMouseOverGeom();
+    if (mog != null)
+    {
+      System.out.println("mog = " + mog);
+        mouseOverGeom.handleMouseStoppedMoving();
     }
   }
 
@@ -178,7 +207,7 @@ public class MouseHandler extends MouseAdapter
       //be called as soon as the correct selectGeom is chosen
       if (selectedGeom != null && button == 1)
       {
-        selectedGeom.handleClick(null);
+        selectedGeom.handleClick();
       }
     }
   }
@@ -210,7 +239,7 @@ public class MouseHandler extends MouseAdapter
         mouseGeom = worldPtToSelctedGeomPt(mouseWorld, selectedGeom.clickableObject);
       }
       /** end temp **/
-      selectedGeom.handleDrag(null);
+      selectedGeom.handleDrag();
     }
   }
 
@@ -431,7 +460,7 @@ public class MouseHandler extends MouseAdapter
       System.out.println("in MouseHandler : double click : button = " + button);
       if (selectedGeom != null)
       {
-        selectedGeom.handleDoubleClick(e);
+        selectedGeom.handleDoubleClick();
 
       /*
       Point3f ps = new Point3f();
@@ -455,7 +484,7 @@ public class MouseHandler extends MouseAdapter
         my = e.getY();
         mousePixel.setLocation(mx, my);
 
-        selectedGeom.handleClick(e);
+        selectedGeom.handleClick();
       }
     }
 
@@ -482,7 +511,7 @@ public class MouseHandler extends MouseAdapter
 
     if (selectedGeom != null)
     {
-      selectedGeom.handleClick(e);
+      selectedGeom.handleClick();
     }
   }
 
@@ -511,7 +540,7 @@ public class MouseHandler extends MouseAdapter
 
     if (selectedGeom != null)
     {
-      selectedGeom.handleRelease(e);
+      selectedGeom.handleRelease();
     }
   }
 
@@ -527,10 +556,7 @@ public class MouseHandler extends MouseAdapter
 
     isMoving.set(true);
 
-    if (mouseOverGeom != null)
-    {
-      mouseOverGeom.handleMouseOver(e);
-    }
+   
   }
 
   @Override

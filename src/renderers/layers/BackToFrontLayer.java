@@ -12,6 +12,8 @@ public class BackToFrontLayer extends RendererLayer
   @Override
   public void sortGeomsInLayer()
   {
-    sortGeomsByAnchorDepth(attachedGeoms, true);
+    {
+      sortGeomsByAnchorDepth(attachedGeoms, true);
+    }
   }
 }

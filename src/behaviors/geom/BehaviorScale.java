@@ -52,12 +52,13 @@ public class BehaviorScale extends BehaviorRange implements GeomUpdater
   {
     Point3f ranges = GeomUtils.subtractPoint3f(endPt, MatrixUtils.toPoint3f(g.scale));
 
-    BehaviorScale bt = new BehaviorScale(
-      new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(ranges)));
+    BehaviorScale bs = new BehaviorScale(
+      new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(ranges)).
+      isReversing(true) );
        
-    bt.attachGeom(g);
+    bs.attachGeom(g);
 
-    return bt;
+    return bs;
   }
 
   public BehaviorScale(ContinuousBehaviorBuilder builder)

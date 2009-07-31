@@ -316,7 +316,7 @@ public class GeomTextPath extends GeomPoly
 		//System.out.println("world_z for child = " + world_z);
 		}
 
-		Renderer.getInstance().resetPerspective3D();
+//		Renderer.getInstance().resetPerspective3D();
 
 		translate(gl, -w / 2f, -h / 2f, (float) (world_z));
 

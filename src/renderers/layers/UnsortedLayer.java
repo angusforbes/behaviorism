@@ -7,9 +7,10 @@ package renderers.layers;
  */
 public class UnsortedLayer extends RendererLayer
 {
-  @Override
-  public void sortGeomsInLayer()
+  public UnsortedLayer()
   {
-    //don't sort me!
+    isSortable = false;
   }
+
+  
 }

@@ -9,6 +9,7 @@ import utils.Utils;
 
 public class BehaviorDeactivateGeom extends BehaviorActivateGeom implements GeomUpdater
 {
+
   /**
    * Sets the specified Geom to be activated at the specfied time. The Behavior
    * is returned so that it can be interrupted if necessary.
@@ -37,20 +38,44 @@ public class BehaviorDeactivateGeom extends BehaviorActivateGeom implements Geom
     super(startTime);
   }
 
-  @Override
   public void updateGeom(Geom g)
   {
+    if (isActive == true)
+    {
+      deactivate(g);
+    }
+  }
+
+  public void deactivate(Geom g)
+  {
+    System.out.println("WE HAVE BEEN ACTIVATED!");
     g.isActive = false;
 
     if (updateChildren == true)
     {
       for (Geom child : g.geoms)
       {
-        updateChildGeom(child, false);
+        deactivate(child);
       }
     }
+
   }
 
+  /*
+  @Override
+  public void updateGeom(Geom g)
+  {
+  g.isActive = false;
+
+  if (updateChildren == true)
+  {
+  for (Geom child : g.geoms)
+  {
+  updateGeom(child);
+  }
+  }
+  }
+   */
   public String toString()
   {
     return "in BehaviorDeactivate : class = " + getClass();

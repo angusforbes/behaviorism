@@ -11,8 +11,9 @@ import utils.Utils;
 public class BehaviorDiscrete extends Behavior
 {
 
-  protected long[] lengths = null;
-  protected long[] pulses = null;
+  public long[] lengths = null;
+  //protected long[] pulses = null;
+  public long[] pulses = null;
   protected int index = 0;
   public int repeats = 1;
   public int repeat = 0;
@@ -27,6 +28,13 @@ public class BehaviorDiscrete extends Behavior
     super(startTime);
     this.pulses = pulses;
     pulsesToLengths();
+  }
+
+  public BehaviorDiscrete(long startTime)
+  {
+    super(startTime);
+    this.pulses = null;
+    this.lengths = null;
   }
 
   public void setPulses(long[] pulses)
@@ -67,33 +75,41 @@ public class BehaviorDiscrete extends Behavior
 
     isActive = true;
 
+    if (lengths == null) //simple
+    {
+      this.isDone = true;
+      return;
+    }
+
     if (index >= lengths.length || index < 0)
     {
       repeat++;
       timeToLoop = true;
 
-      if (repeat < repeats)
+      if (repeats > -1) //-1 is our code for repeating forever
       {
-        if (isReversing == true)
+        repeat++;
+        if (repeat >= repeats)
         {
-          reverseBehavior();
+          this.isDone = (true);
+          return;
         }
-        else
-        {
-          loopBehavior();
-        }
+      }
+
+      if (isReversing == true)
+      {
+        reverseBehavior();
       }
       else
       {
-        this.isDone = (true);
-        return;
+        loopBehavior();
       }
     }
 
 //    System.out.println("\n dir = " + dir);
 //    System.out.println("index = " + index + ", we will sleep for " + lengths[index] + " ms");
     nextTime += Utils.millisToNanos(lengths[index]);
-    index+=dir;
+    index += dir;
   }
 
   public void loopBehavior()
@@ -104,14 +120,14 @@ public class BehaviorDiscrete extends Behavior
   public void reverseBehavior()
   {
     dir *= -1;
-    index += dir;;
+    index += dir;
   }
 
   @Override
   public void changeSpeed(float increase)
   {
     //update pulses
-    float ratio = 1f/increase;
+    float ratio = 1f / increase;
     for (int i = 0; i < pulses.length; i++)
     {
       pulses[i] *= ratio;
@@ -121,7 +137,7 @@ public class BehaviorDiscrete extends Behavior
     pulsesToLengths();
 
     //and we can't forget to correctly update speed of current cycle
-    nextTime = getTick() + (long)((nextTime - getTick()) * ratio);
+    nextTime = getTick() + (long) ((nextTime - getTick()) * ratio);
   }
 
   @Override
@@ -130,5 +146,4 @@ public class BehaviorDiscrete extends Behavior
     dir *= -1;
     nextTime = getTick() + (Utils.millisToNanos(lengths[index]) - (nextTime - getTick()));
   }
-
 }

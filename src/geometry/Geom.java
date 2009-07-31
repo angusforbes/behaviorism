@@ -3,11 +3,10 @@ package geometry;
 
 import behaviorism.Behaviorism;
 import renderers.State;
-import behaviors.Behavior;
 import behaviors.geom.BehaviorActivateGeom;
+import behaviors.geom.BehaviorRemoveGeom;
 import data.Data;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.media.opengl.GL;
@@ -16,9 +15,9 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import textures.TextureImage;
 import utils.MatrixUtils;
-import utils.RenderUtils;
-import utils.Utils;
-import worlds.World;
+import static utils.MatrixUtils.*;
+import static utils.RenderUtils.*;
+import static utils.Utils.*;
 
 public abstract class Geom
 {
@@ -38,7 +37,7 @@ public abstract class Geom
   /**
    * A List of all Behaviors attached to this Geom.
    */
-  public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
+ // public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
   /**
    * A root Data node that can hold various types of Data attached to this Geom.
    * This should be NULL by default, only used if needed!!!
@@ -49,7 +48,7 @@ public abstract class Geom
   //don't think it makes sense to have both (think about this...)
   //public Point3f translateAnchor = new Point3f(0f, 0f, 0f);
   /**
-   * The relative point (in referenceGeom's coordinates) around which the object is to rotate.
+   * The relative point (in parent's coordinates) around which the object is to rotate.
    * By default it is set to be the lower left corner of the object
    */
   public Point3f rotateAnchor = new Point3f(0f, 0f, 0f); //new GeomPoint(.5f, .5f, 0f);
@@ -58,7 +57,7 @@ public abstract class Geom
    */
   public Point3d rotate = new Point3d(0, 0, 0);
   /**
-   * The relative point (in referenceGeom's coordinates) around which the object is to scale.
+   * The relative point (in parent's coordinates) around which the object is to scale.
    * By default it is set to be the lower left corner of the object
    */
   public Point3f scaleAnchor = new Point3f(0f, 0f, 0f);
@@ -71,7 +70,7 @@ public abstract class Geom
   //if rotateAnchor is relative to current Geom - Then -
   //  update modelview with translate
   //  then update modelview with rotateAnchor, rotate, then update modelview with -rotateAnchor
-  //if rotateAnchor is relative to referenceGeom Geom - Then -
+  //if rotateAnchor is relative to parent Geom - Then -
   //  put the translation AFTER the rotation
   //
   //same with scale setTranslate...
@@ -112,14 +111,14 @@ public abstract class Geom
   /**
    * A 4x4 double array representing the Geom's openGL modelview matrix within the scenegraph hierarchy.
    */
-  public double[] modelview = MatrixUtils.getIdentity();
+  public double[] modelview = getIdentity();
   //public Matrix4d modelview2 = new Matrix4d(MatrixUtils.getIdentity());
   //public double[] modelview3 = MatrixUtils.getIdentity(); //(MatrixUtils.getIdentity());
   //.setIdentity();
   /**
    * An object representing the current set of openGL states of this Geom.
-   * If null, the renderer will automatically inheret it's referenceGeom's states
-   * (ie, either the referenceGeom Geom, or the current world iteself).
+   * If null, the renderer will automatically inheret it's parent's states
+   * (ie, either the parent Geom, or the current world iteself).
    */
   private State state = null;
   public boolean hasState = false;
@@ -133,7 +132,7 @@ public abstract class Geom
   public Geom releasableObject = this;
   public Geom mouseoverableObject = this;
   /**
-   * The referenceGeom of this Geom. Is either the Geom it is attached to, or null if the Geom is attached directly to the current world.
+   * The parent of this Geom. Is either the Geom it is attached to, or null if the Geom is attached directly to the current world.
    * This is used by the MouseHandler to determine object selection, etc.
    */
   public Geom parent = null;
@@ -152,7 +151,7 @@ public abstract class Geom
    */
   public Geom(int x, int y)
   {
-    setTranslate(MatrixUtils.pixelToWorld(x, y));
+    setTranslate(pixelToWorld(x, y));
   }
 
   /**
@@ -162,7 +161,7 @@ public abstract class Geom
    * position of this reference Geom. Note that we don't actually have to
    * attach this Geom to the indicated reference, we are just using it
    * as a reference to position the Geom.
-   * @param referenceGeom
+   * @param upperLeft
    * @param x
    * @param y
    */
@@ -170,7 +169,7 @@ public abstract class Geom
   {
     if (upperLeft == true)
     {
-      setTranslate(MatrixUtils.pixelToWorld(x, y));
+      setTranslate(pixelToWorld(x, y));
     }
     else
     {
@@ -178,7 +177,7 @@ public abstract class Geom
       int pxY = y + Behaviorism.getInstance().canvasHeight / 2;
 
       setTranslate(
-        MatrixUtils.pixelToWorld(pxX, pxY));
+        pixelToWorld(pxX, pxY));
     }
   }
 
@@ -195,6 +194,7 @@ public abstract class Geom
   public void setState(State state)
   {
     this.state = state;
+    this.hasState = true;// (this.state != null);
   }
 
   /**
@@ -208,6 +208,7 @@ public abstract class Geom
     if (this.state == null)
     {
       this.state = new State();
+      this.hasState = true;
     }
     return this.state;
   }
@@ -216,7 +217,7 @@ public abstract class Geom
   {
     System.out.println("PIXEL ");
 
-    this.w = MatrixUtils.pixelToWorld(
+    this.w = pixelToWorld(
         Behaviorism.getInstance().canvasWidth / 2 + w,
         Behaviorism.getInstance().canvasHeight / 2 - 0).x;
 
@@ -227,6 +228,32 @@ public abstract class Geom
   public void setWidth(float w)
   {
     this.w = w;
+  }
+
+  public void setHeight(float h)
+  {
+    this.h = h;
+  }
+
+  public void setDepth(float d)
+  {
+    this.d = d;
+  }
+
+
+  public void setDimensions(float w, float h, float d)
+  {
+    this.w = w;
+    this.h = h;
+    this.d = d;
+  }
+
+
+  public void setDimensions(float w, float h)
+  {
+    this.w = w;
+    this.h = h;
+    this.d = 0f;
   }
   /**
    * Instructions for the Geom to draw itself within the openGL context. Called during each frame of the openGL display loop.
@@ -317,9 +344,9 @@ public abstract class Geom
   //seems useful, but it's not being used
   public Point3f geomPointToWorldPoint(Point3f geomPt)
   {
-    return MatrixUtils.toPoint3f(
+    return toPoint3f(
       //MatrixUtils.getGeomPointInWorldCoordinates(MatrixUtils.toPoint3d(geomPt), modelview, RendererJogl.modelviewMatrix));
-      MatrixUtils.getGeomPointInWorldCoordinates(MatrixUtils.toPoint3d(geomPt), modelview, RenderUtils.getCamera().modelview));
+      getGeomPointInWorldCoordinates(toPoint3d(geomPt), modelview, getCamera().modelview));
 
   }
 
@@ -336,6 +363,13 @@ public abstract class Geom
   {
     if (!isTransformed)
     {
+      return;
+    }
+
+    //System.err.println("in transform for Geom of type " + getClass());
+    if (parent == null)
+    {
+      System.err.println("is transform() : WHY IS PARENT NULL??????");
       return;
     }
 
@@ -495,7 +529,7 @@ public abstract class Geom
   {
     addGeomToLayer(g, false, 0);
 
-    BehaviorActivateGeom.activateAtMillis(g, System.nanoTime(), millisInFuture);
+    BehaviorActivateGeom.activateAtMillis(g, now(), millisInFuture);
   }
 
   public void addGeomToLayer(Geom g, long millisInFuture, int layerNum)
@@ -624,9 +658,9 @@ public abstract class Geom
 //  public void addGeom(Geom g, long baseNano, long millisInFuture)
 //  {
 //    g.isActive = false;
-//    g.referenceGeom = this;
+//    g.parent = this;
 //    geoms.add(g);
-//      
+//
 //	  BehaviorActivateGeom bia = BehaviorActivateGeom.activateAtMillis(g, baseNano, millisInFuture);
 //		//g.attachBehavior(bia);
 //  }
@@ -641,8 +675,8 @@ public abstract class Geom
 //  
   public void addGeomToLayer(Geom g, boolean isActive, int layerNum)
   {
-    RenderUtils.getWorld().addGeomToSceneGraph(g, this.geoms, isActive, this);
-    RenderUtils.getWorld().addGeomToRendererLayer(g, layerNum);
+    getWorld().addGeomToSceneGraph(g, this.geoms, isActive, this);
+    getWorld().addGeomToRendererLayer(g, layerNum);
   }
 
   /**
@@ -658,7 +692,7 @@ public abstract class Geom
 
     while (g.isAttached == false)
     {
-      Utils.sleep(30); //could make this less I guess
+      sleep(30); //could make this less I guess
     }
 
     g.isActive = isActive;
@@ -668,7 +702,7 @@ public abstract class Geom
 //					List<Long> timesMSs)
 //  {
 //      g.isActive = false;
-//			g.referenceGeom = this;
+//			g.parent = this;
 //			geoms.add(g);
 //
 //	  BehaviorActivateGeom bia = BehaviorActivateGeom.activateBetweenMillis(g, baseNano, timesMSs);
@@ -676,36 +710,63 @@ public abstract class Geom
 //  }
 //	
   /**
-   * Adds a child Geom to this referenceGeom Geom. By default the Geom is immediately activated.
+   * Adds a child Geom to this parent Geom. By default the Geom is immediately activated.
    * @param g The child Geom being added.
    */
 //  public void addGeom(Geom g)
 //  {
 //      geoms.add(g);
-//      g.referenceGeom = this;
+//      g.parent = this;
 //			g.isActive = true;
 //  }
 //  
   /**
-   * adds a child Geom to this referenceGeom Geom object, and optionally flagging it to be immediately activated.
+   * adds a child Geom to this parent Geom object, and optionally flagging it to be immediately activated.
    * @param g
    * @param isActive
    */
 //  public void addGeom(Geom g, boolean isActive)
 //  {
 //      geoms.add(g);
-//      g.referenceGeom = this;
+//      g.parent = this;
 //      g.isActive = isActive;
 //  }
 //	
   /**
-   * removeGeom flags the Geom to be deactivated and removed from its referenceGeom during the next display loop.
+   * removeGeom flags the Geom to be deactivated and removed from its parent during the next display loop.
    * @param g
    */
   public void removeGeom(Geom g)
   {
-    g.isActive = false;
-    g.isDone = true;
+    BehaviorRemoveGeom.removeAtMillis(g, now(), 0L);
+
+   // g.isActive = false;
+   // g.isDone = true;
+  }
+
+  public void removeGeom(Geom g, long millisInFuture)
+  {
+    BehaviorRemoveGeom.removeAtMillis(g, now(), millisInFuture);
+
+   // g.isActive = false;
+   // g.isDone = true;
+  }
+
+
+  public void removeGeom(Geom g, long nano, long millisInFuture)
+  {
+    BehaviorRemoveGeom.removeAtMillis(g, nano, millisInFuture);
+
+   // g.isActive = false;
+   // g.isDone = true;
+  }
+
+  public void removeGeoms(List<Geom> geoms)
+  {
+    for (Geom g : geoms)
+    {
+      removeGeom(g);
+    }
   }
 
   public void clearGeoms()
@@ -714,9 +775,10 @@ public abstract class Geom
     {
       for (Geom g : geoms)
       {
-        g.parent = null;
+        removeGeom(g);
+        //      g.parent = null;
       }
-      geoms.clear();
+   //   geoms.clear();
     }
   }
 
@@ -822,7 +884,7 @@ public abstract class Geom
 
   public void setScale(float x, float y, float z)
   {
-    if (x != scale.x && y != scale.y && z != scale.z)
+    if (x != scale.x || y != scale.y || z != scale.z)
     {
       scale.set(x, y, z);
       isTransformed = true;
@@ -923,6 +985,7 @@ public abstract class Geom
 //    this.a = 1f;
   }
 
+  /*
   public void detachBehavior(Behavior b)
   {
     //synchronized(behaviors)
@@ -939,7 +1002,8 @@ public abstract class Geom
       behaviors.add(b);
     }
   }
-
+  */
+  
   /**
    * Handles initialization and update of textures.
    * If textureData is not yet available, return false.
@@ -984,17 +1048,19 @@ public abstract class Geom
   {
     if (textures == null)
     {
-      textures = new ArrayList<TextureImage>();
+      //System.out.println("in attachTexture : texures is null");
+      //textures = new ArrayList<TextureImage>();
+      textures = new CopyOnWriteArrayList<TextureImage>();
     }
 
     textures.add(ti);
-    ti.attachedGeoms.add(this);
+    //ti.attachedGeoms.add(this);
   }
 
   final public void detachTexture(TextureImage ti)
   {
     textures.remove(ti);
-    ti.attachedGeoms.remove(this);
+    //ti.attachedGeoms.remove(this);
   }
 
 //  
@@ -1350,71 +1416,90 @@ public abstract class Geom
   }
 
   /** these "action" methods SHOULD be overridden! */
-  public void clickAction(MouseEvent e)
+  public void clickAction()
   {
     //System.out.println("Geom superclass clickAction : I shouldn't be here... i should be with my children!");
     //System.out.println("you clicked a " + getClass());
   }
 
-  public void dragAction(MouseEvent e)
+  public void dragAction()
   {
     //System.out.println("Geom superclass clickAction : I shouldn't be here... i should be with my children!");
     //System.out.println("you dragged a " + getClass());
   }
 
-  public void doubleClickAction(MouseEvent e)
+  public void doubleClickAction()
   {
     //System.out.println("Geom superclass doubleClickAction : I shouldn't be here... i should be with my children!");
   }
 
-  public void releaseAction(MouseEvent e)
+  public void releaseAction()
   {
     //System.out.println("Geom superclass releaseAction : I shouldn't be here... i should be with my children!");
   }
 
-  public void mouseOverAction(MouseEvent e)
+  public void mouseOverAction()
   {
-    //System.out.println("Geom superclass releaseAction : I shouldn't be here... i should be with my children!");
+  //  System.out.println("i am a " + getClass());
+   // System.out.println("Geom superclass mouseOverAction : I shouldn't be here... i should be with my children!");
   }
 
-  public final void handleDrag(MouseEvent e)
+  public void mouseStoppedMovingAction()
+  {
+  //  System.out.println("i am a " + getClass());
+   // System.out.println("Geom superclass mouseOverAction : I shouldn't be here... i should be with my children!");
+  }
+
+  public final void handleDrag()
   {
     if (draggableObject != null)
     {
-      draggableObject.dragAction(e);
+      draggableObject.dragAction();
     }
   }
 
-  public final void handleClick(MouseEvent e)
+  public final void handleClick()
   {
     if (clickableObject != null)
     {
-      clickableObject.clickAction(e);
+      clickableObject.clickAction();
     }
   }
 
-  public final void handleDoubleClick(MouseEvent e)
+  public final void handleDoubleClick()
   {
     //System.out.println("in Geom:handleDoubleClick()");
     if (clickableObject != null)
     {
-      clickableObject.doubleClickAction(e);
+      clickableObject.doubleClickAction();
     }
   }
 
-  public final void handleRelease(MouseEvent e)
+  public final void handleRelease()
   {
     if (releasableObject != null)
     {
-      releasableObject.releaseAction(e);
+      releasableObject.releaseAction();
     }
   }
 
-  public final void handleMouseOver(MouseEvent e)
+  public final void handleMouseOver()
   {
+    System.out.println("n handleMouseOver : mouseoverableObject = " + mouseoverableObject);
     if (mouseoverableObject != null)
     {
-      mouseoverableObject.mouseOverAction(e);
+      mouseoverableObject.mouseOverAction();
+    }
+
+  }
+
+  public final void handleMouseStoppedMoving()
+  {
+    System.out.println("in handleMouseStoppedMoving : mouseoverableObject = " + mouseoverableObject);
+    if (mouseoverableObject != null)
+    {
+      System.out.println("mouseoverableObject != null");
+      mouseoverableObject.mouseStoppedMovingAction();
     }
 
   }

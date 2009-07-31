@@ -155,11 +155,6 @@ public class GeomCircle extends GeomPoly
 
   public void draw(GL gl)
   {
-    if (this == MouseHandler.selectedGeom)
-    {
-      //System.out.println("offset = " + offset);
-    }
-
     if (!updateTextures())
     {
       return;
