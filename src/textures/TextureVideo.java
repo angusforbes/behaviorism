@@ -476,7 +476,6 @@ public class TextureVideo extends TextureImage
     {
 
       this.mp.play();
-      //setRate(0);
       this.mp.setMediaTime(time);
     }
   }

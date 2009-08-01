@@ -521,13 +521,13 @@ public class SceneGraph
    */
   private void drawDebugMousePoint(GL gl)
   {
-    if (MouseHandler.getInstance().debugMousePoint != null)
+    if (MouseHandler.getInstance().debugMouseMovePoint != null)
     {
       gl.glColor4f(0f, 1f, 0f, 1f);
       gl.glPointSize(10f);
 
       gl.glBegin(gl.GL_POINTS);
-      gl.glVertex2f(MouseHandler.getInstance().debugMousePoint.x, MouseHandler.getInstance().debugMousePoint.y);
+      gl.glVertex2f(MouseHandler.getInstance().debugMouseMovePoint.x, MouseHandler.getInstance().debugMouseMovePoint.y);
       gl.glEnd();
     }
   }
@@ -541,13 +541,13 @@ public class SceneGraph
    */
   private void drawDebugSelectPoint(GL gl)
   {
-    if (MouseHandler.getInstance().debugSelectPoint != null)
+    if (MouseHandler.getInstance().debugMouseClickPoint != null)
     {
       gl.glColor4f(1f, 0f, 0f, 1f);
       gl.glPointSize(10f);
 
       gl.glBegin(gl.GL_POINTS);
-      gl.glVertex2f(MouseHandler.getInstance().debugSelectPoint.x, MouseHandler.getInstance().debugSelectPoint.y);
+      gl.glVertex2f(MouseHandler.getInstance().debugMouseClickPoint.x, MouseHandler.getInstance().debugMouseClickPoint.y);
       gl.glEnd();
     }
   }

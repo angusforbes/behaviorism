@@ -6,7 +6,7 @@ import renderers.State;
 import behaviors.geom.BehaviorActivateGeom;
 import behaviors.geom.BehaviorRemoveGeom;
 import data.Data;
-import java.awt.event.MouseEvent;
+import handlers.MouseHandler;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.media.opengl.GL;
@@ -1419,6 +1419,13 @@ public abstract class Geom
   }
 
   /** these "action" methods SHOULD be overridden! */
+  public void selectedAction()
+  {
+  }
+
+  public void unselectedAction()
+  {
+  }
   //pressing and holding down
   public void pressAction()
   {
@@ -1481,12 +1488,30 @@ public abstract class Geom
   }
 
   //combo mouse pressed and mouse moved
+  //default is to move/scale/rotate the geom (depending on with button combo is being used).
+  //this can be overidden if you want different behavior.
   public void dragAction()
   {
-    //System.out.println("Geom superclass clickAction : I shouldn't be here... i should be with my children!");
+    MouseHandler.getInstance().dragGeom();
     //System.out.println("you dragged a " + getClass());
   }
 
+
+  public final void handleSelected()
+  {
+    if (selectableObject != null)
+    {
+      selectableObject.selectedAction();
+    }
+  }
+
+  public final void handleUnselected()
+  {
+    if (selectableObject != null)
+    {
+      selectableObject.unselectedAction();
+    }
+  }
 
   public final void handleDrag()
   {
