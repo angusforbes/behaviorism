@@ -3,13 +3,16 @@
  */
 package behaviorism;
 
-import behaviors.Behavior;
+import behaviorism.behaviors.Behavior;
+import behaviorism.handlers.FontHandler;
+import behaviorism.handlers.KeyboardHandler;
+import behaviorism.handlers.MouseHandler;
+import behaviorism.renderers.Renderer;
+import behaviorism.renderers.SceneGraph;
+import behaviorism.utils.Utils;
+import behaviorism.worlds.World;
 import com.sun.opengl.util.Animator;
 import com.sun.opengl.util.texture.TextureIO;
-import handlers.FontHandler;
-import renderers.Renderer;
-import handlers.MouseHandler;
-import handlers.KeyboardHandler;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
@@ -27,9 +30,6 @@ import java.net.URLClassLoader;
 import javax.swing.*;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
-import renderers.SceneGraph;
-import utils.Utils;
-import worlds.World;
 
 /**
  * This is the main driver for the application using the behaviorism framework.
@@ -68,7 +68,7 @@ public class Behaviorism
   private Cursor cursor;
   private GraphicsDevice device = null;
   public boolean centerFrame = true;
-
+  public boolean isApplet = false;
   /**
    * Singleton instance of Behaviorism. The only way to use this class is via the static getInstance() method.
    */
@@ -128,6 +128,22 @@ public class Behaviorism
     world.setUpWorld();
   }
 
+  public static void installWorld(World world, Properties properties, JApplet applet)
+  {
+    Behaviorism.getInstance().installProperties(properties);
+
+    Behaviorism.getInstance().initialize(applet);
+
+    if (properties != null)
+    {
+      world.setWorldParams(properties);
+    }
+
+    Renderer.getInstance().installWorld(world);
+
+    world.setUpWorld();
+  }
+
   public void printSystemInfo()
   {
     //print runtime info
@@ -147,6 +163,43 @@ public class Behaviorism
       //setWorldParams(properties);
       setFontParams(properties);
     }
+  }
+
+  public void initialize(JApplet applet)
+  {
+    printSystemInfo();
+
+    //set up canvas
+    canvas = makeCanvas();
+
+    applet.add(canvas, BorderLayout.CENTER);
+    //set up frame
+    //frame = new JFrame(this.applicationName);
+    //frame.add(canvas, BorderLayout.CENTER);
+
+    //grab device
+    device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+    canvas.setSize(300, 300);
+
+    //   makeAppletScreen(applet);
+//    if (fullScreen)
+//    {
+//      makeFullScreen(frame);
+//    }
+//    else
+//    {
+//      makeNormalScreen(frame, canvas);
+//    }
+
+    //add listeners
+    addListeners(canvas);
+
+    canvas.requestFocus();
+
+    //frame.setVisible(true);
+
+    centerFrame = false;
   }
 
   public void initialize()
@@ -247,6 +300,7 @@ public class Behaviorism
     f.setVisible(true);
     f.addWindowListener(new WindowAdapter()
     {
+
       @Override
       public void windowClosing(WindowEvent e)
       {
@@ -294,7 +348,7 @@ public class Behaviorism
 
       tmpFrame.requestFocus();
       tmpCanvas.requestFocus();
- 
+
       frame.dispose();
 
       frame = tmpFrame;
@@ -318,13 +372,13 @@ public class Behaviorism
 
   public void setCursor()
   {
-    if (useCursor == true && frame.getCursor().getType() == Cursor.DEFAULT_CURSOR)
+    if (useCursor == false && frame.getCursor().getType() == Cursor.DEFAULT_CURSOR)
     {
       Image cursorImg = canvas.createImage(new MemoryImageSource(16, 16, new int[16 * 16], 0, 16));
       this.cursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "Custom Cursor");
       frame.setCursor(cursor);
     }
-    else if (useCursor == false && frame.getCursor().getType() != Cursor.DEFAULT_CURSOR)
+    else if (useCursor == true && frame.getCursor().getType() != Cursor.DEFAULT_CURSOR)
     {
       frame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
@@ -363,6 +417,8 @@ public class Behaviorism
     }
 
     this.useCursor = Boolean.parseBoolean(properties.getProperty("main.useCursor"));
+
+    System.out.println("this.useCursor = " + useCursor);
 
     this.frameUndecorated = Boolean.parseBoolean(properties.getProperty("main.frameUndecorated"));
 
