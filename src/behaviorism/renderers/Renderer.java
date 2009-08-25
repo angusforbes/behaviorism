@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.grlea.log.SimpleLogger;
 import static behaviorism.utils.MatrixUtils.*;
 import static behaviorism.utils.RenderUtils.*;
 import static behaviorism.utils.Utils.*;
@@ -54,6 +55,8 @@ public class Renderer implements GLEventListener
   //hack for cell tango 2009
   public List<Data> texturesToDispose = new CopyOnWriteArrayList<Data>();
   public AtomicBoolean isDisposing = new AtomicBoolean(false);
+
+  public static final SimpleLogger log = new SimpleLogger(Renderer.class);
 
   /**
    * Gets (or creates then gets) the singleton Renderer object.
@@ -199,13 +202,21 @@ public class Renderer implements GLEventListener
 
   private void shutdown()
   {
-    System.err.println("in RendererJogl : cleaning up resources... ");
+    log.entry("in shutdown() : cleaning up resources... ");
+
     for (World w : worlds.keySet())
     {
+      log.info("cleaning up world " + w.getClass());
       w.cleanUp();
+      log.info("cleaned up world " + w.getClass());
     }
-    System.err.println("in RendererJogl : we have disposed of all resources... ");
+
+    log.info("disposing of all textures");
+    TextureManager.getInstance().disposeTextures();
+
+    log.info("we have disposed of all resources... ");
     Behaviorism.getInstance().doneShutdown.set(true);
+    log.entry("out shutdown()");
   }
 
   @Override

@@ -1,5 +1,5 @@
 /* TextureVideo.java ~ May 17, 2009 */
-package behaviorism. textures;
+package behaviorism.textures;
 
 import behaviorism.geometry.Colorf;
 import behaviorism.utils.Utils;
@@ -18,6 +18,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.net.URI;
+import org.grlea.log.SimpleLogger;
 
 /**
  * Transfers a video frame rendered via JMC to a TextureData.
@@ -25,9 +26,11 @@ import java.net.URI;
  * Default behaviors can be overwritten for custom behavior (see paintVideoOnImage()).
  * @author angus
  */
-public class TextureVideo extends TextureImage 
+public class TextureVideo extends TextureImage
   implements VideoRendererListener, BufferDownloadListener
 {
+
+  public boolean isTextureWaiting = false;
 
   TrackControl tc;
   AudioControl ac;
@@ -47,9 +50,10 @@ public class TextureVideo extends TextureImage
   public double bounceStop;
   public boolean forward = true;
   public boolean stopVideoAfterBouncing = true;
-
   public double progress = 0f;
   public int imageType = BufferedImage.TYPE_INT_RGB;
+
+  public static final SimpleLogger log = new SimpleLogger(TextureVideo.class);
 
   /**
    * Use FileUtils.toURI to pass in Files or URLs.
@@ -70,7 +74,7 @@ public class TextureVideo extends TextureImage
       mp.setPlayCount(PlayControl.REPEAT_FOREVER);
     }
   }
- 
+
   public void initializeVideo(URI uri)
   {
     this.mp = new MediaProvider();
@@ -106,13 +110,21 @@ public class TextureVideo extends TextureImage
 
     paintBufferedImage();
 
+//    if (textureData != null)
+//    {
+//      textureData.flush();
+//    }
+
     textureData = TextureIO.newTextureData(bufferedImage, false); //mipmapping=false
     isTextureWaiting = true;
+
+    //bufferedImage.flush();
   }
 
   public void paintBufferedImage()
   {
     if (bufferedImage == null || videoSize == null || w <= 0 || h <= 0)
+    //if ( videoSize == null || w <= 0 || h <= 0)
     {
       videoSize = vrc.getFrameSize();
       w = (int) videoSize.getWidth();
@@ -146,11 +158,11 @@ public class TextureVideo extends TextureImage
       forward = true;
       bounces++;
     }
- 
+
     if (numBounces != PlayControl.REPEAT_FOREVER && bounces > numBounces)
     {
       this.isBouncing = false;
-      
+
       if (stopVideoAfterBouncing == true)
       {
         stop();
@@ -208,8 +220,7 @@ public class TextureVideo extends TextureImage
     return format(minutes, 2) + ":" + format(seconds, 2) + "." + format(milli, 3);
   }
 
-
-    /**
+  /**
    * Gets a nicely formatted version of the current playback position of the video.
    * @return The playback position.
    */
@@ -231,7 +242,6 @@ public class TextureVideo extends TextureImage
   {
     return format(getProgress());
   }
-
 
   /**
    * Gets info about the loop settings.
@@ -364,6 +374,7 @@ public class TextureVideo extends TextureImage
     mp.setStopTime(stop);
     loop(numRepeats);
   }
+
   /**
    * Begins video playback, playing forwards and then backwards forever if backward playback is supported.
    */
@@ -376,7 +387,7 @@ public class TextureVideo extends TextureImage
   {
     this.isBouncing = true;
     this.numBounces = numBounces;
-    
+
     mp.play();
     waitUntilReady();
 
@@ -397,7 +408,7 @@ public class TextureVideo extends TextureImage
     this.numBounces = numBounces;
     this.bounceStart = bounceStart;
     this.bounceStop = bounceStop;
-    
+
     waitUntilReady();
 
     //mp.play();
@@ -414,10 +425,8 @@ public class TextureVideo extends TextureImage
 
   public boolean isReady()
   {
-    if (
-      mp.getDuration() == PlayControl.TIME_ETERNITY ||
-      mp.getDuration() == PlayControl.TIME_UNKNOWN
-      )
+    if (mp.getDuration() == PlayControl.TIME_ETERNITY ||
+      mp.getDuration() == PlayControl.TIME_UNKNOWN)
     {
       return false;
     }
@@ -524,7 +533,6 @@ public class TextureVideo extends TextureImage
     return this.ac.getFader();
   }
 
-
   /**
    * Gets the current video playback position.
    * @return The current time.
@@ -599,7 +607,6 @@ public class TextureVideo extends TextureImage
     return mp.getCurrentPlayCount();
   }
 
-
   /**
    * Stops and rewinds the movie to the beginning.
    */
@@ -609,18 +616,63 @@ public class TextureVideo extends TextureImage
     this.setCurrentTime(0);
   }
 
+  @Override
+  public boolean updateTexture()
+  {
+    log.entry("in updateTexture()");
+    if (isDone() == true)
+    {
+      log.debug("textureImage isDone = true, needs to be disposed of...");
+      disposeTexture();
+      log.exit("out updateTexture()");
+      return false;
+    }
+
+    if (textureData == null) //no data loaded
+    {
+      log.exit("in updateTexture() : GL textureData has not been loaded yet!");
+      return false;
+    }
+
+    if (texture == null) //texture needs to be intialized
+    {
+      log.debug("GL texture = null, needs to be initialized");
+      initializeTexture();
+    }
+
+    if (isTextureWaiting == true) //texture needs to be updated
+    {
+      log.debug("texture is waiting");
+      copyDataToTexture();
+    }
+
+    log.exit("out updateTexture()");
+    return true;
+  }
+
+  protected void copyDataToTexture()
+  {
+    texture.updateImage(textureData);
+    isTextureWaiting = false;
+  }
+
   /**
    * Dispose of native resources.
    */
   @Override
-  public void dispose()
+  protected void disposeTexture()
   {
+    log.entry("in disposeTexture()");
+
+    log.info("disposing of JMC video " + this);
 
     pause();
+
     if (vrc != null)
     {
       vrc.removeVideoRendererListener(this);
     }
+
     if (mp != null)
     {
       mp.removeBufferDownloadListener(this);
@@ -628,12 +680,20 @@ public class TextureVideo extends TextureImage
       mp.setSource(null); //this will call mp.close()
     }
 
+    if (bufferedImage != null)
+    {
+      bufferedImage.flush();
+      bufferedImage = null;
+    }
+
+    super.disposeTexture();
+    log.exit("out disposeTexture()");
+
   }
 
   public void setVideo(URI uri)
   {
     mp.setSource(uri);
   }
-
 }
 

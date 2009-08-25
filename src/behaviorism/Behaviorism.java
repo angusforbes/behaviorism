@@ -30,6 +30,7 @@ import java.net.URLClassLoader;
 import javax.swing.*;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.grlea.log.SimpleLogger;
 
 /**
  * This is the main driver for the application using the behaviorism framework.
@@ -69,6 +70,9 @@ public class Behaviorism
   private GraphicsDevice device = null;
   public boolean centerFrame = true;
   public boolean isApplet = false;
+
+  public static final SimpleLogger log = new SimpleLogger(Behaviorism.class);
+
   /**
    * Singleton instance of Behaviorism. The only way to use this class is via the static getInstance() method.
    */
@@ -114,6 +118,7 @@ public class Behaviorism
    */
   public static void installWorld(World world, Properties properties)
   {
+    log.entry("in installWorld()");
     Behaviorism.getInstance().installProperties(properties);
 
     Behaviorism.getInstance().initialize();
@@ -126,6 +131,7 @@ public class Behaviorism
     Renderer.getInstance().installWorld(world);
 
     world.setUpWorld();
+    log.exit("out installWorld()");
   }
 
   public static void installWorld(World world, Properties properties, JApplet applet)
@@ -154,6 +160,7 @@ public class Behaviorism
 
   public void installProperties(Properties properties)
   {
+    log.entry("in installProperties()");
     //load properties
     if (properties != null)
     {
@@ -163,6 +170,7 @@ public class Behaviorism
       //setWorldParams(properties);
       setFontParams(properties);
     }
+    log.entry("out installProperties()");
   }
 
   public void initialize(JApplet applet)
@@ -204,6 +212,8 @@ public class Behaviorism
 
   public void initialize()
   {
+    log.entry("in initialize()");
+
     printSystemInfo();
 
     //set up canvas
@@ -233,6 +243,7 @@ public class Behaviorism
     frame.setVisible(true);
 
     centerFrame = false;
+    log.exit("out initialize()");
   }
 
   private GLCanvas makeCanvas()
@@ -516,12 +527,13 @@ public class Behaviorism
 
   public void shutDown()
   {
+    log.entry("in shutDown()");
     new Thread(new Runnable()
     {
 
       public void run()
       {
-        System.err.println("DISPOSING OF RESOURCES...");
+        log.info("disposing of resources...");
         isShutdown.set(true);
 
         while (doneShutdown.get() == false)
@@ -529,11 +541,11 @@ public class Behaviorism
           Utils.sleep(10);
         }
 
-        System.err.println("STOPPING GL THREAD...");
+        log.info("stopping GL thread...");
 
         Renderer.getInstance().animator.stop();
 
-        System.err.println("EXITING...");
+        log.info("goodbye!");
 
         System.exit(0);
       }

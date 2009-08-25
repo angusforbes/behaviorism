@@ -115,7 +115,6 @@ public class GeomVideo extends GeomRect
 
       gl.glEnable(GL.GL_TEXTURE_2D);
 
-      System.out.println("about to draw Rect... w/h = " + w + "/" + h);
       drawRect(gl, 0f, 0f, 0f, w, h, tc.left(), tc.right(), tc.bottom(), tc.top());
 //
 //      //gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);

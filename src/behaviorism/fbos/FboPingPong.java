@@ -5,6 +5,7 @@ import behaviorism.Behaviorism;
 import behaviorism.renderers.Renderer;
 import behaviorism.shaders.Program;
 import behaviorism.textures.TextureImage;
+import behaviorism.utils.RenderUtils;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
 import java.util.List;
@@ -225,7 +226,7 @@ public class FboPingPong
     gl.glPushMatrix();
     {
       gl.glLoadIdentity();
-      Renderer.getInstance().glu.gluOrtho2D(0, fboWidth, fboHeight, 0);
+      RenderUtils.getGLU().gluOrtho2D(0, fboWidth, fboHeight, 0);
 
       gl.glMatrixMode(gl.GL_MODELVIEW);
 

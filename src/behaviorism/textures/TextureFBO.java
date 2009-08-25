@@ -1,64 +1,83 @@
 /* TextureFBO.java ~ Jun 4, 2009 */
-package behaviorism. textures;
+package behaviorism.textures;
 
 import behaviorism.Behaviorism;
 import com.sun.opengl.util.texture.TextureIO;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
+import org.grlea.log.SimpleLogger;
 import static javax.media.opengl.GL.*;
 
 /**
  *
  * @author angus
  */
-public class TextureFBO extends TextureImage
+public class TextureFBO extends Texture
 {
+
   public int offScreenWidth;
   public int offScreenHeight;
   public int fboId = -1;
   public int rboId = -1;
 
+  public static final SimpleLogger log = new SimpleLogger(TextureFBO.class);
+
   public TextureFBO(int offScreenWidth, int offScreenHeight)
   {
+    log.entry("in TextureFBO("+ offScreenWidth + ", " + offScreenHeight + ") constructor");
     this.offScreenWidth = offScreenWidth;
     this.offScreenHeight = offScreenHeight;
+    log.exit("out TextureFBO() constructor");
   }
 
-  @Override
   public boolean updateTexture()
   {
-    System.err.println("in TextureFBO.updateTexture()");
-    //if (Behaviorism.renderer.boundsHaveChanged == true || texture == null) //texture needs to be intialized
-    if ( texture == null) //texture needs to be intialized
+    log.entry("TextureFBO : in updateTexture()");
+
+    if (isDone() == true)
     {
-      System.out.println("reinitialize!!!!!!!!!");
-      //dispose(); //if we are recreating because bounds have changed
+      log.debug("isDone = true, needs to be disposed of...");
+      disposeTexture();
+      log.exit("out updateTexture()");
+      return false;
+    }
+
+    //if (Behaviorism.renderer.boundsHaveChanged == true || texture == null) //texture needs to be intialized
+    if (texture == null) //texture needs to be intialized
+    {
+      log.debug("texture = null, so we need to initialize it.");
       initializeTexture();
     }
 
-    //if (isTextureWaiting == true) //texture needs to be updated
-    {
-      //System.out.println("texture is waiting");
-      applyImage();
-    }
-
+    log.exit("TextureFBO : out updateTexture()");
     return true;
+  }
+
+  public void bindFBO(GL gl)
+  {
+    //0. bind our FBO and start drawing on it
+    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+    gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    gl.glViewport(0, 0, offScreenWidth, offScreenHeight);
+  }
+
+  public void unbindFBO(GL gl)
+  {
+    // we are finished drawing to our FBO, so unbind it and return to our original viewport, etc
+    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
   }
 
   /**
    * This is just a template,
    * obviously you need to override this and make it actually draw something into the FBO!
    */
-  @Override
-  public void applyImage()
+  public void applyFBO()
   {
-    System.err.println("in TextureFBO.applyImage()");
+    log.warn("in applyFBO() : uh-oh... this method should be overridden!");
     GL gl = GLU.getCurrentGL();
 
-    //0. bind our FBO and start drawing on it
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-    gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    gl.glViewport(0, 0, offScreenWidth, offScreenHeight);
+    bindFBO(gl);
 
     gl.glPushMatrix();
     {
@@ -66,55 +85,66 @@ public class TextureFBO extends TextureImage
     }
     gl.glPopMatrix();
 
-    // we are finished drawing to our FBO, so unbind it and return to our original viewport, etc
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight); //(int) renderHeight);
+    unbindFBO(gl);
   }
 
-  @Override
-  public void initializeTexture()
+  protected void initializeTexture()
   {
+    log.entry("in initializeTexture()");
     GL gl = GLU.getCurrentGL();
 
     if (!generateFBO(gl))
     {
-      System.err.println("in TextureFBO : couldn't create FBO");
-      System.exit(0);
-      return;
+      log.error("in TextureFBO : couldn't create FBO");
+      //System.exit(0);
+      //return;
     }
+
+    log.exit("in initializeTexture()");
   }
 
-  public void dispose()
+  protected void copyDataToTexture(){}
+  
+  protected void disposeTexture()
   {
-    System.err.println("disposing of FBO!!!");
+    log.entry("in disposeTexture()");
     GL gl = GLU.getCurrentGL();
 
-    if (!(this.fboId < 0))
+    if (this.fboId >= 0)
     {
-      System.err.println("deleting FBO");
-    gl.glDeleteFramebuffersEXT(1, new int[]
-      {
-        this.fboId
-      }, 0);
+      log.info("deleting FBO");
+      gl.glDeleteFramebuffersEXT(1, new int[]
+        {
+          this.fboId
+        }, 0);
 
       this.fboId = -1;
     }
-    if (!(this.rboId < 0))
-    {
-      System.err.println("deleting RBO");
-    gl.glDeleteRenderbuffersEXT(1, new int[]
-      {
-        this.rboId
-      }, 0);
 
-    this.rboId = -1;
+    if (this.rboId >= 0)
+    {
+      log.info("deleting RBO");
+      gl.glDeleteRenderbuffersEXT(1, new int[]
+        {
+          this.rboId
+        }, 0);
+
+      this.rboId = -1;
     }
-    System.err.println("disposed of FBO!!!");
+
+    if (texture != null)
+    {
+      log.info("disposing of GL texture...");
+      texture.dispose();
+      texture = null;
+    }
+
+    log.exit("out disposeTexture()");
   }
 
   public boolean generateFBO(GL gl)
   {
-    System.err.println("(********* in generateFBO...");
+    log.entry("in generateFBO()");
     boolean fboUsed;
 
     this.texture = TextureIO.newTexture(GL_TEXTURE_2D);
@@ -155,21 +185,21 @@ public class TextureFBO extends TextureImage
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
     {
       fboUsed = false;
-      System.out.println("GL_FRAMEBUFFER_COMPLETE_EXT failed, CANNOT use FBO\n");
+      log.warn("GL_FRAMEBUFFER_COMPLETE_EXT failed, CANNOT use FBO\n");
     }
     else
     {
       fboUsed = true;
-      System.out.printf("GL_FRAMEBUFFER_COMPLETE_EXT OK, using FBO\n");
-      System.out.printf("fbo offScreenWidth =%d\n", offScreenWidth);
-      System.out.printf("fbo offScreenHeight =%d\n", offScreenHeight);
-      System.out.printf("fbo texture id=%d\n", this.texture.getTextureObject());
-      System.out.printf("fbo id=%d\n", fboId);
-      System.out.printf("fbo's rbo id=%d\n", rboId);
+      log.info("GL_FRAMEBUFFER_COMPLETE_EXT OK, using FBO");
+      log.info("fbo offScreenWidth/Height = " + offScreenWidth + "/" + offScreenHeight);
+      log.info("fbo texture id=" + this.texture.getTextureObject());
+      log.info("fbo id=" + fboId);
+      log.info("fbo's rbo id="+rboId);
     }
 
     // switch back to window-system-provided framebuffer
     gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    log.exit("out generateFBO()");
 
     return fboUsed;
   }

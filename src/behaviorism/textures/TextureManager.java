@@ -1,5 +1,5 @@
 /* TextureManager.java ~ Aug 16, 2009 */
-package behaviorism. textures;
+package behaviorism.textures;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +12,10 @@ import org.grlea.log.SimpleLogger;
  */
 public class TextureManager
 {
-  private List<TextureImage> textures;
-  private static TextureManager instance = null;
 
- public static final SimpleLogger log = new SimpleLogger(TextureManager.class);
+  private List<Texture> textures;
+  private static TextureManager instance = null;
+  public static final SimpleLogger log = new SimpleLogger(TextureManager.class);
 
   /**
    * Gets (or creates then gets) the singleton TextureManager object.
@@ -35,7 +35,7 @@ public class TextureManager
 
   private TextureManager()
   {
-    textures = new CopyOnWriteArrayList<TextureImage>();
+    textures = new CopyOnWriteArrayList<Texture>();
   }
 
   /**
@@ -44,9 +44,9 @@ public class TextureManager
   public void updateTextures()
   {
     log.entry("in updateTextures() : textures.size = " + textures.size());
-    List<TextureImage> keeps = new ArrayList<TextureImage>();
+    List<Texture> keeps = new ArrayList<Texture>();
 
-    for (TextureImage t : textures)
+    for (Texture t : textures)
     {
       t.updateTexture();
       if (t.isDone() == false)
@@ -61,21 +61,35 @@ public class TextureManager
     log.exit("out updateTextures() : textures.size = " + textures.size());
   }
 
-  public void addTexture(TextureImage ti)
+  /**
+   * Disposes all textures immediately. This gets called when the application shuts down. To remove textures
+   * during the life of the application use removeTexture().
+   */
+  public void disposeTextures()
+  {
+    for (Texture t : textures)
+    {
+      t.disposeTexture();
+    }
+
+    textures.clear();
+  }
+
+  public void addTexture(Texture ti)
   {
     log.debug("in addTexture() : adding texture of type " + ti.getClass());
     this.textures.add(ti);
 
+
   }
 
-  public void removeTexture(TextureImage ti)
+  public void removeTexture(Texture ti)
   {
     log.debug("in removeTexture() : removing texture of type " + ti.getClass());
     if (ti != null)
     {
       ti.destroy();
     }
-    //this.textures.remove(ti);
   }
 
   public int numActiveTextures()
