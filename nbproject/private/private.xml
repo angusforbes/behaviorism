@@ -3,8 +3,21 @@
     <data xmlns="http://www.netbeans.org/ns/profiler/1" version="0.9.1"/>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1">
         <file>
+            <url>src/algorithms/PackingAlgorithm.java</url>
+            <line>1534</line>
+        </file>
+        <file>
+            <url>src/renderers/Renderer.java</url>
+            <line>111</line>
+        </file>
+        <file>
             <url>src/handlers/MouseHandler.java</url>
             <line>234</line>
+        </file>
+        <file>
+            <url>src/worlds/celltango/WorldCellTango.java</url>
+            <line>186</line>
+            <line>417</line>
         </file>
         <file>
             <url>src/worlds/celltango/WorldCellTangoFireworks.java</url>
@@ -23,25 +36,16 @@
             <line>485</line>
         </file>
         <file>
+            <url>src/geometry/GeomText2.java</url>
+            <line>265</line>
+        </file>
+        <file>
             <url>src/worlds/CebProject/GeomCoilTree.java</url>
             <line>518</line>
         </file>
         <file>
-            <url>src/renderers/Renderer.java</url>
-            <line>111</line>
-        </file>
-        <file>
-            <url>src/algorithms/PackingAlgorithm.java</url>
-            <line>1534</line>
-        </file>
-        <file>
-            <url>src/worlds/celltango/WorldCellTango.java</url>
-            <line>186</line>
-            <line>417</line>
-        </file>
-        <file>
-            <url>src/geometry/GeomText2.java</url>
-            <line>265</line>
+            <url>src/renderers/RendererJogl.java</url>
+            <line>126</line>
         </file>
         <file>
             <url>src/worlds/celltango/GeomTextFlowForcedFontSize.java</url>
@@ -49,10 +53,6 @@
             <line>0</line>
             <line>0</line>
             <line>0</line>
-        </file>
-        <file>
-            <url>src/renderers/RendererJogl.java</url>
-            <line>126</line>
         </file>
         <file>
             <url>src/worlds/CebProject/GeomDigramSlider.java</url>

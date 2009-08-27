@@ -271,10 +271,15 @@ public class Renderer implements GLEventListener
     this.gl = drawable.getGL();
     drawable.setGL(new DebugGL(gl));
 
-    System.out.println(
-      "GL v" + gl.glGetString(GL.GL_VERSION) + ", " +
-      "GLSL v" + gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION));
-
+    log.info("GL v" + gl.glGetString(GL.GL_VERSION) );
+    log.info("GLSL v" + gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION) );
+    System.err.println("1.3??? " + gl.isExtensionAvailable("GL_VERSION_1_3"));
+    System.err.println("1.4??? " + gl.isExtensionAvailable("GL_VERSION_1_4"));
+    System.err.println("2.0??? " + gl.isExtensionAvailable("GL_VERSION_2_0"));
+    System.err.println("3.0??? " + gl.isExtensionAvailable("GL_VERSION_3_0"));
+    System.err.println("3.1??? " + gl.isExtensionAvailable("GL_VERSION_3_1"));
+    System.err.println("3.2??? " + gl.isExtensionAvailable("GL_VERSION_3_2"));
+    
     glu = new GLU();
     glut = new GLUT();
 

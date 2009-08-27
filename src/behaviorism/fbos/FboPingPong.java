@@ -1,8 +1,7 @@
 /* TextureFBO.java ~ Jun 4, 2009 */
-package behaviorism. fbos;
+package behaviorism.fbos;
 
 import behaviorism.Behaviorism;
-import behaviorism.renderers.Renderer;
 import behaviorism.shaders.Program;
 import behaviorism.textures.TextureImage;
 import behaviorism.utils.RenderUtils;
@@ -11,6 +10,7 @@ import com.sun.opengl.util.texture.TextureIO;
 import java.util.List;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
+import org.grlea.log.SimpleLogger;
 import static javax.media.opengl.GL.*;
 
 /**
@@ -33,10 +33,10 @@ public class FboPingPong
   public Texture inputTexture;
   public Texture outputTexture; //pointer to output texture
   List<Program> programs = null;
+  public static final SimpleLogger log = new SimpleLogger(FboPingPong.class);
 
   public FboPingPong()
   {
-
   }
 
   public FboPingPong(int fboWidth, int fboHeight)
@@ -89,7 +89,7 @@ public class FboPingPong
     gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     gl.glViewport(0, 0, fboWidth, fboHeight);
 
-   return true;
+    return true;
   }
 
   public Texture process(GL gl, Texture input)
@@ -201,7 +201,6 @@ public class FboPingPong
     writeTextureId = tmpTex;
   }
 
-
   public void drawTextureToOffScreenTexture(int texId, int attachment)
   //public void drawTextureToOffScreenTextureUsingShader(Texture tex, int attachment, Program program)
   {
@@ -273,7 +272,7 @@ public class FboPingPong
     gl.glPushMatrix();
     {
       gl.glLoadIdentity();
-      Renderer.getInstance().glu.gluOrtho2D(0, fboWidth, fboHeight, 0);
+      RenderUtils.getGLU().gluOrtho2D(0, fboWidth, fboHeight, 0);
 
       gl.glMatrixMode(gl.GL_MODELVIEW);
 
