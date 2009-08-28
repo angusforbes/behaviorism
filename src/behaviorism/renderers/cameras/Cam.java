@@ -75,11 +75,11 @@ public abstract class Cam extends GeomPoint
   }
 
   @Deprecated
-  public void resetPerspective(GL gl, GLU glu)
+  public void resetPerspective()
   {
   }
 
-  public void setPerspective(GL gl, GLU glu)
+  public void setPerspective()
   {
   }
 
@@ -106,10 +106,10 @@ public abstract class Cam extends GeomPoint
   }
 
   //should be abstract
-  public double[] resetPerspective()
-  {
-    return MatrixUtils.getIdentity();
-  }
+//  public double[] resetPerspective()
+//  {
+//    return MatrixUtils.getIdentity();
+//  }
 
   /*
   public void moveX(float x)

@@ -12,9 +12,8 @@ import behaviorism.handlers.MouseHandler;
 import behaviorism.renderers.cameras.Cam;
 import behaviorism.textures.TextureManager;
 import behaviorism.worlds.World;
-import javax.media.opengl.*;
-import javax.media.opengl.glu.*;
-import com.sun.opengl.util.*;
+import com.sun.opengl.util.Animator;
+import com.sun.opengl.util.gl2.GLUT;
 import java.awt.geom.Rectangle2D;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
@@ -24,6 +23,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+//import javax.media.opengl.GL;
+import javax.media.opengl.DebugGL2;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLEventListener;
+import javax.media.opengl.glu.GLU;
+import javax.media.opengl.glu.GLUnurbs;
+import javax.media.opengl.glu.GLUquadric;
+import javax.media.opengl.glu.GLUtessellator;
+import javax.media.opengl.glu.gl2.GLUgl2;
 import org.grlea.log.SimpleLogger;
 import static behaviorism.utils.MatrixUtils.*;
 import static behaviorism.utils.RenderUtils.*;
@@ -36,8 +46,8 @@ public class Renderer implements GLEventListener
   public World currentWorld = null;
   public SceneGraph sceneGraph = null;
   public static GLUT glut;
-  public static GLU glu;
-  public GL gl;
+  public static GLUgl2 glu;
+  public GL2 gl;
   public Animator animator;
   public TessellationCallback tessellationCallback = null;
   public GLUtessellator tessellationObject = null;
@@ -55,7 +65,6 @@ public class Renderer implements GLEventListener
   //hack for cell tango 2009
   public List<Data> texturesToDispose = new CopyOnWriteArrayList<Data>();
   public AtomicBoolean isDisposing = new AtomicBoolean(false);
-
   public static final SimpleLogger log = new SimpleLogger(Renderer.class);
 
   /**
@@ -170,7 +179,8 @@ public class Renderer implements GLEventListener
     }
 
     //make sure we have the right GL context
-    gl = drawable.getGL();
+    //gl = drawable.getGL();
+    gl = drawable.getGL().getGL2();
 
     Behaviorism.getInstance().setCursor(); //make sure we have the proper cursor
 
@@ -180,7 +190,7 @@ public class Renderer implements GLEventListener
   //no reason for this to be in scene graph... move it here or to renderutils.
   private void processDebugs()
   {
-    sceneGraph.drawDebuggingInfo(gl);
+    sceneGraph.drawDebuggingInfo();
   }
 
   private void processInputs()
@@ -197,7 +207,7 @@ public class Renderer implements GLEventListener
       currentWorld.color.g,
       currentWorld.color.b,
       currentWorld.color.a); //background color of world
-    gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+    gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
   private void shutdown()
@@ -249,7 +259,7 @@ public class Renderer implements GLEventListener
 
     TextureManager.getInstance().updateTextures();
 
-    sceneGraph.draw(gl);
+    sceneGraph.draw();
 
     processInputs();
 
@@ -268,14 +278,17 @@ public class Renderer implements GLEventListener
   @Override
   public void init(GLAutoDrawable drawable)
   {
-    this.gl = drawable.getGL();
-    drawable.setGL(new DebugGL(gl));
+    drawable.setGL(new DebugGL2(drawable.getGL().getGL2()));
+    this.gl = drawable.getGL().getGL2();
+
+    //this.gl = drawable.getGL();
+    //drawable.setGL(new DebugGL(gl));
 
     System.out.println(
-      "GL v" + gl.glGetString(GL.GL_VERSION) + ", " +
-      "GLSL v" + gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION));
+      "GL v" + gl.glGetString(GL_VERSION) + ", " +
+      "GLSL v" + gl.glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    glu = new GLU();
+    glu = new GLUgl2();
     glut = new GLUT();
 
 
@@ -285,48 +298,48 @@ public class Renderer implements GLEventListener
     gl.glShadeModel(gl.GL_SMOOTH);                              // Enable Smooth Shading
     //gl.glShadeModel(gl.GL_FLAT);
 
-    gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, new float[]
+    gl.glLightfv(GL_LIGHT0, GL_AMBIENT, new float[]
       {
         0.2f, 0.2f, 0.2f, 1f
       }, 0);
-    gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, new float[]
+    gl.glLightfv(GL_LIGHT0, GL_POSITION, new float[]
       {
         0f, 0f, 2f, 1f
       }, 0);
 
     // setup the material properties
     //gl.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE);
-    gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, new float[]
+    gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, new float[]
       {
         .6f, .6f, .6f, 1.0f
       }, 0);
-    gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, new float[]
+    gl.glMaterialfv(GL_FRONT, GL_SPECULAR, new float[]
       {
         1f, 1f, 1f, 1.0f
       }, 0);
-    gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, new float[]
+    gl.glMaterialfv(GL_FRONT, GL_SHININESS, new float[]
       {
         50f
       }, 0);
 
 
     //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-    gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
+    gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     //gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE);
 
     //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
     //gl.glBlendFunc(GL.GL_DST_COLOR, GL.GL_ZERO);
-    gl.glDepthFunc(GL.GL_LEQUAL);							//Type of Depth test
+    gl.glDepthFunc(GL_LEQUAL);							//Type of Depth test
     //gl.glDepthFunc(GL.GL_LESS);							//Type of Depth test
 
-    gl.glEnable(GL.GL_DEPTH_TEST);  //this breaks my ATI card?
+    gl.glEnable(GL_DEPTH_TEST);  //this breaks my ATI card?
 
-    gl.glEnable(GL.GL_POINT_SMOOTH);
-    gl.glEnable(GL.GL_LINE_SMOOTH);
-    gl.glHint(GL.GL_POINT_SMOOTH_HINT, GL.GL_NICEST);	// Make round points, not square points
-    gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);		// Antialias the lines
+    gl.glEnable(GL_POINT_SMOOTH);
+    gl.glEnable(GL_LINE_SMOOTH);
+    gl.glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);	// Make round points, not square points
+    gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);		// Antialias the lines
 
-    gl.glEnable(GL.GL_AUTO_NORMAL);
+    gl.glEnable(GL_AUTO_NORMAL);
 
     //gl.glDepthMask(false); //may have to futz with for overlays!
     gl.glDepthMask(true); //may have to futz with for overlays!
@@ -365,11 +378,10 @@ public class Renderer implements GLEventListener
     }
   }
 
-  @Override
-  public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged)
-  {
-  }
-
+//  @Override
+//  public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged)
+//  {
+//  }
   private void setBoundaries()
   {
     Point3f lowerleft = toPoint3f(
@@ -393,6 +405,11 @@ public class Renderer implements GLEventListener
 
     boundsHaveChanged = true;
 
+  }
+
+  @Override
+  public void dispose(GLAutoDrawable arg0)
+  {
   }
 }
 

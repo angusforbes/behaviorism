@@ -1,8 +1,10 @@
 /* GeomGrid.java (created on Jul 21, 2008) */
 package behaviorism. geometry;
 
-import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import static behaviorism.utils.RenderUtils.*;
 
 /**
  *
@@ -69,14 +71,15 @@ public class GeomGrid extends GeomRect
   }
 
   @Override
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = getGL();
     //super.draw(gl, glu, offset - (offset * .5f));
 
-    gl.glDisable(GL.GL_BLEND);
+    gl.glDisable(GL_BLEND);
     gl.glLineWidth(.5f);
 
-    gl.glBegin(gl.GL_LINES);
+    gl.glBegin(GL_LINES);
 
     for (int i = 0; i < (xLines); i++)
     {
@@ -129,7 +132,7 @@ public class GeomGrid extends GeomRect
      */
     gl.glEnd();
 
-    gl.glEnable(GL.GL_BLEND);
+    gl.glEnable(GL_BLEND);
 
   }
 

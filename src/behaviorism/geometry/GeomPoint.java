@@ -12,8 +12,12 @@ package behaviorism. geometry;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-import javax.media.opengl.GL;
+import behaviorism.utils.RenderUtils;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
 import javax.media.opengl.glu.GLU;
+import static behaviorism.utils.RenderUtils.*;
+
 import javax.vecmath.Point3f;
 
 /**
@@ -57,13 +61,14 @@ public class GeomPoint extends Geom
     this.pointSize = pointSize;
   }
   
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = getGL();
     gl.glColor4fv(color.array(), 0);
 
     gl.glPointSize(this.pointSize);
     
-    gl.glBegin(gl.GL_POINTS);
+    gl.glBegin(GL_POINTS);
     //gl.glVertex3f(translate.x, translate.y , translate.z);  //draws the point, it should be the point plus translate
     gl.glVertex3f(0f, 0f, 0f);  //draws the point, it should be the point plus translate
     gl.glEnd();

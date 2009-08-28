@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import static behaviorism.utils.RenderUtils.*;
+
 
 /**
  * Program is a wrapper for a GLSL Shader Program. It contains a List of
@@ -85,8 +88,9 @@ public class Program
    * to their variable ids.
    * @param gl
    */
-  public void install(GL gl)
+  public void install()
   {
+    GL2 gl = getGL();
     //System.out.println("in super install..");
     //System.out.println("there are " + shaders.size() + " shaders available... ");
 
@@ -98,22 +102,22 @@ public class Program
     {
       if (shader.shaderId <= 0) //then we need to load & compile
       {
-        shader.install(gl);
+        shader.install();
         System.out.println("loaded a shader with id = " + shader.shaderId + " and type = " + shader.shaderType.type());
       }
 
       //attach shader to this program
-      attach(gl, shader);
+      attach(shader);
 
-      shader.define(gl, programId);
+      shader.define(programId);
 
     }
 
     //link this program
-    link(gl);
+    link();
 
     System.out.println("ABOUT TO CHECK LINK");
-    checkLinkAndValidationErrors(gl);
+    checkLinkAndValidationErrors();
     System.out.println("DONE CHECK LINK");
 
     System.out.println("programId = " + programId);
@@ -121,8 +125,8 @@ public class Program
 
     gl.glUseProgram(programId); //bind
 
-    mapUniforms(gl);
-    mapAttributes(gl);
+    mapUniforms();
+    mapAttributes();
 
     gl.glUseProgram(0); //unbind
   }
@@ -142,7 +146,7 @@ public class Program
    * by Program subclasses. See ConvolutionProgram for an example. 
    * @param gl
    */
-  public void uniforms(GL gl)
+  public void uniforms()
   {
   }
 
@@ -166,9 +170,11 @@ public class Program
    * shader for it to be seen.
    * @param gl
    */
-  public void mapUniforms(GL gl)
+  public void mapUniforms()
   {
     System.out.println("IN mapUniforms()");
+
+    GL2 gl = getGL();
     int[] length = new int[1];
     int[] size = new int[1];
     int[] type = new int[1];
@@ -176,7 +182,7 @@ public class Program
     int[] count = new int[1];
 
     System.out.println("count[0] = " + count[0]);
-    gl.glGetProgramiv(programId, GL.GL_ACTIVE_UNIFORMS, count, 0);
+    gl.glGetProgramiv(programId, GL_ACTIVE_UNIFORMS, count, 0);
     for (int i = 0; i < count[0]; i++)
     {
       gl.glGetActiveUniform(programId, i, 100,
@@ -203,15 +209,16 @@ public class Program
    *
    * @param gl
    */
-  public void mapAttributes(GL gl)
+  public void mapAttributes()
   {
+    GL2 gl = getGL();
     int[] length = new int[1];
     int[] size = new int[1];
     int[] type = new int[1];
     byte[] name = new byte[256];
     int[] count = new int[1];
 
-    gl.glGetProgramiv(programId, GL.GL_ACTIVE_ATTRIBUTES, count, 0);
+    gl.glGetProgramiv(programId, GL_ACTIVE_ATTRIBUTES, count, 0);
     for (int i = 0; i < count[0]; i++)
     {
       gl.glGetActiveAttrib(programId, i, 100,
@@ -232,18 +239,18 @@ public class Program
    * @param gl
    * @param shader
    */
-  public void attach(GL gl, Shader shader)
+  public void attach(Shader shader)
   {
-    gl.glAttachShader(programId, shader.shaderId);
+    getGL().glAttachShader(programId, shader.shaderId);
   }
 
   /**
    * Links this Program to the GL context.
    * @param gl
    */
-  public void link(GL gl)
+  public void link()
   {
-    gl.glLinkProgram(programId);
+    getGL().glLinkProgram(programId);
   }
 
   /**
@@ -252,34 +259,36 @@ public class Program
    * before we set any of the uniform variables for its attached shaders.
    * @param gl
    */
-  public void bind(GL gl)
+  public void bind()
   {
-    gl.glUseProgram(programId);
-    uniforms(gl);
+    getGL().glUseProgram(programId);
+    uniforms();
   }
 
   /**
    * Unbinds all Programs so that we use the regular openGL pipeline.
    * @param gl
    */
-  public void unbind(GL gl)
+  public void unbind()
   {
-    gl.glUseProgram(0);
+    getGL().glUseProgram(0);
   }
 
-  private void checkLinkAndValidationErrors(GL gl)
+  private void checkLinkAndValidationErrors()
   {
-		IntBuffer status = BufferUtil.newIntBuffer(1);
-		gl.glGetProgramiv(programId, GL.GL_LINK_STATUS, status);
+    GL2 gl = getGL();
 
-		if (status.get() == GL.GL_FALSE) {
-			getInfoLog(gl);
+		IntBuffer status = BufferUtil.newIntBuffer(1);
+		gl.glGetProgramiv(programId, GL_LINK_STATUS, status);
+
+		if (status.get() == GL_FALSE) {
+			getInfoLog();
 		} else {
 			status.rewind();
 			gl.glValidateProgram(programId);
-			gl.glGetProgramiv(programId, GL.GL_VALIDATE_STATUS, status);
-			if (status.get() == GL.GL_FALSE) {
-				getInfoLog(gl);
+			gl.glGetProgramiv(programId, GL_VALIDATE_STATUS, status);
+			if (status.get() == GL_FALSE) {
+				getInfoLog();
 			} else {
 				System.out.println("Successfully linked program " + programId);
 			}
@@ -287,13 +296,13 @@ public class Program
 	}
 
 
-    private void getInfoLog(GL gl)
+    private void getInfoLog()
     {
         IntBuffer infoLogLength = BufferUtil.newIntBuffer(1);
-        gl.glGetProgramiv(programId, GL.GL_INFO_LOG_LENGTH, infoLogLength);
+        getGL().glGetProgramiv(programId, GL_INFO_LOG_LENGTH, infoLogLength);
 
         ByteBuffer infoLog = BufferUtil.newByteBuffer(infoLogLength.get(0));
-        gl.glGetProgramInfoLog(programId, infoLogLength.get(0), null, infoLog);
+        getGL().glGetProgramInfoLog(programId, infoLogLength.get(0), null, infoLog);
 
         String infoLogString =
                 Charset.forName("US-ASCII").decode(infoLog).toString();

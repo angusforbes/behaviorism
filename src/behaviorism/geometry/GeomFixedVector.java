@@ -1,7 +1,6 @@
 /* GeomFixedVector.java ~ Aug 20, 2008 */
-package behaviorism. geometry;
+package behaviorism.geometry;
 
-import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
 
 /**
@@ -18,19 +17,20 @@ import javax.vecmath.Point3f;
  */
 public class GeomFixedVector extends GeomSimpleLine
 {
+
   public float angle;
   public float radius;
 
   public GeomFixedVector(Point3f anchor, float angle, float radius)
   {
-    this.angle=angle;
-    this.radius=radius;
+    this.angle = angle;
+    this.radius = radius;
 
     this.translate = anchor;
     //ends[0] = new GeomPoint(translate);
     ends[0] = new GeomPoint();
     ends[1] = new GeomPoint(); //unfixed point
-  
+
     addGeom(ends[0], false);
     addGeom(ends[1], false);
 
@@ -51,11 +51,11 @@ public class GeomFixedVector extends GeomSimpleLine
   }
 
   @Override
-  public void draw(GL gl)
+  public void draw()
   {
     calculateUnfixedPoint();
     //super.draw(gl, glu, offset);
-    super.draw(gl);
+    super.draw();
   }
 
   @Override
@@ -63,5 +63,4 @@ public class GeomFixedVector extends GeomSimpleLine
   {
     return super.toString() + ", angle=" + this.angle + ", radius=" + this.radius + "\n";
   }
-
 }

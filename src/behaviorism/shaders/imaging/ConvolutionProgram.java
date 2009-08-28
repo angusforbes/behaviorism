@@ -5,7 +5,10 @@ import behaviorism.shaders.FragmentShader;
 import behaviorism.shaders.Program;
 import behaviorism.shaders.Shader;
 import behaviorism.shaders.VertexShader;
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import behaviorism.utils.RenderUtils;
+import static behaviorism.utils.RenderUtils.*;
 
 /**
  *
@@ -234,8 +237,9 @@ abstract public class ConvolutionProgram extends Program
   }
 
   @Override
-  public void uniforms(GL gl)
+  public void uniforms()
   {
+    GL2 gl = getGL();
     //System.out.println("A : kernelSize = " + kernelSize);
     gl.glUniform4f(uniform("ScaleFactor"), scaleFactor, scaleFactor, scaleFactor, scaleFactor);
     gl.glUniform1i(uniform("KernelSize"), kernelSize);

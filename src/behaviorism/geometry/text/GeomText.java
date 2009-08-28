@@ -8,16 +8,18 @@ import behaviorism.geometry.GeomRect;
 import behaviorism.handlers.FontHandler;
 import behaviorism.renderers.Renderer;
 import behaviorism.utils.MatrixUtils;
-import behaviorism.utils.RenderUtils;
-import com.sun.opengl.util.j2d.TextRenderer;
+import com.sun.opengl.util.awt.TextRenderer;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
-import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
 import java.awt.font.LineMetrics;
 import java.util.List;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import behaviorism.utils.RenderUtils;
+import static behaviorism.utils.RenderUtils.*;
 
 public class GeomText extends GeomRect
 {
@@ -413,7 +415,7 @@ public class GeomText extends GeomRect
     }
   }
 
-  protected void calculateUnrotatedPixelWidthAndHeight(GL gl)
+  protected void calculateUnrotatedPixelWidthAndHeight()
   {
     Point3f lowerleft = MatrixUtils.toPoint3f(
       MatrixUtils.getGeomPointInWorldCoordinates(
@@ -451,12 +453,13 @@ public class GeomText extends GeomRect
     boolean debug = false;
     if (debug)
     {
+      GL2 gl = getGL();
       System.out.println("pxW/pxH = " + pxWidth + "/" + pxHeight);
       gl.glPushMatrix();
       temp_mv = MatrixUtils.translate(temp_mv, -w / 2f, -h / 2f, 0f);
       gl.glLoadMatrixd(temp_mv, 0);
       gl.glColor4f(0f, 0f, 1f, 1f);
-      drawRect(gl, 0f);
+      drawRect(0f);
       gl.glPopMatrix();
     }
   }
@@ -464,8 +467,9 @@ public class GeomText extends GeomRect
 
   //DebugTimer timer = new DebugTimer();
   @Override
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = getGL();
     if (isRecalculated)
     {
       recalculate();
@@ -474,7 +478,7 @@ public class GeomText extends GeomRect
     if (this.backgroundColor != null)
     {
       gl.glColor4fv(backgroundColor.array(), 0);
-      drawRect(gl, offset);
+      drawRect(offset);
     }
 
     if (useNonDynamicTextRenderer == true)
@@ -484,7 +488,7 @@ public class GeomText extends GeomRect
     else
     {
       //timer.resetTime();
-      calculateUnrotatedPixelWidthAndHeight(gl);
+      calculateUnrotatedPixelWidthAndHeight();
       //System.out.println("time to calc = " + timer.resetTime());
       {
         if (isRecalculated || this.pxWidth != this.prevPxWidth || this.pxHeight != this.prevPxHeight || this.textRenderer == null)
@@ -523,8 +527,9 @@ public class GeomText extends GeomRect
   //textRenderer.flush();
   }
 
-  private void drawRect(GL gl, float offset)
+  private void drawRect(float offset)
   {
+    GL2 gl = getGL();
     float x = -transX;
     float y = transY;
     gl.glBegin(gl.GL_QUADS);
@@ -537,7 +542,7 @@ public class GeomText extends GeomRect
 
   //have to think about this...
   @Override
-  public void drawPickingBackground(GL gl)
+  public void drawPickingBackground()
   {
 //    gl.glColor4f(0f, 0f, 0f, 0f);
 //    drawRect(gl, 0f);

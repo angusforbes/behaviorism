@@ -1,6 +1,9 @@
-package behaviorism. shaders;
+package behaviorism.shaders;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import behaviorism.utils.RenderUtils;
+import static behaviorism.utils.RenderUtils.*;
 
 /**
  *
@@ -8,10 +11,10 @@ import javax.media.opengl.GL;
  */
 public enum ShaderEnum
 {
-  VERTEX(GL.GL_VERTEX_SHADER),
-  FRAGMENT(GL.GL_FRAGMENT_SHADER),
-  GEOMETRY(GL.GL_GEOMETRY_SHADER_EXT);
 
+  VERTEX(GL_VERTEX_SHADER),
+  FRAGMENT(GL_FRAGMENT_SHADER),
+  GEOMETRY(GL_GEOMETRY_SHADER);
   private int type = -1;
 
   ShaderEnum(int type)

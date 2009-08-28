@@ -4,8 +4,12 @@ package behaviorism. geometry;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.media.opengl.GL;
+import behaviorism.utils.RenderUtils;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
 import javax.media.opengl.glu.GLU;
+import static behaviorism.utils.RenderUtils.*;
+
 
 public class GeomPath extends Geom
 {
@@ -16,14 +20,15 @@ public class GeomPath extends Geom
     this.vertices = vertices;
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = getGL();
     gl.glColor4fv(color.array(), 0);
 
     //gl.glColor4f(r, g, b, a);
 
     //gl.glLineWidth(1f);
-    gl.glBegin(gl.GL_LINE_STRIP);
+    gl.glBegin(GL_LINE_STRIP);
     
     for (int i = 0; i < vertices.size(); i++)
     {

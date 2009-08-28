@@ -4,9 +4,11 @@
  */
 package behaviorism.renderers.cameras;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import behaviorism.utils.RenderUtils;
+import static behaviorism.utils.RenderUtils.*;
 
 /**
  *
@@ -64,8 +66,9 @@ public class CamOrbit extends Cam
   }
 
   @Override
-  public void setPerspective(GL gl, GLU glu)
+  public void setPerspective()
   {
+    GL2 gl = getGL();
     //gl.glTranslatef(rotateAnchor.translate.x, rotateAnchor.translate.y, rotateAnchor.translate.z);
     gl.glTranslatef(rotateAnchor.x, rotateAnchor.y, rotateAnchor.z);
 

@@ -8,8 +8,10 @@ import behaviorism.geometry.GeomRect;
 import behaviorism.textures.TextureImage;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
-import javax.media.opengl.GL;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.GL2;
 import javax.vecmath.Point3f;
+import static behaviorism.utils.RenderUtils.*;
 
 /**
  * GeomImage applies a single texture to GeomRect. Versions that extend from this
@@ -107,8 +109,9 @@ public class GeomImage extends GeomRect
   }
 
   @Override
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = getGL();
     TextureImage texImage = getTexture();
     if (texImage == null)
     {
@@ -145,13 +148,13 @@ public class GeomImage extends GeomRect
 
 
     tex.bind();
-    gl.glEnable(GL.GL_TEXTURE_2D);
+    gl.glEnable(GL_TEXTURE_2D);
     TextureCoords tc = this.textures.get(0).texture.getImageTexCoords();
 
     drawRect(gl,
       0f, 0f, offset, w, h,
       tc.left(), tc.right(), tc.bottom(), tc.top());
 
-    gl.glDisable(GL.GL_TEXTURE_2D);
+    gl.glDisable(GL_TEXTURE_2D);
   }
 }

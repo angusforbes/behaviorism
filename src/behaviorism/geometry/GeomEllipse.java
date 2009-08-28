@@ -3,8 +3,10 @@ package behaviorism.geometry;
 
 import behaviorism.renderers.Renderer;
 import behaviorism.utils.RenderUtils;
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
 import javax.media.opengl.glu.GLU;
+import static behaviorism.utils.RenderUtils.*;
 import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3f;
 
@@ -181,9 +183,10 @@ public class GeomEllipse extends GeomPoly
     }
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
-    GLU glu = Renderer.getInstance().glu;
+    GL2 gl = getGL();
+    GLU glu = getGLU();
 
     //	gl.glRotatef(30f,0f,0f,1f);
     //get Tesselator object
@@ -196,12 +199,12 @@ public class GeomEllipse extends GeomPoly
     }
 
     //get state variables
-    boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
+    boolean depthTest = RenderUtils.getBoolean(GL_DEPTH_TEST);
 
     if (depthTest == false && isSelectable == true)
     {
       //then we need to render it invisibly with DEPTH_TEST on so that we can pick it
-      gl.glEnable(GL.GL_DEPTH_TEST);
+      gl.glEnable(GL_DEPTH_TEST);
 
       if (startAngle == 0f && endAngle == 360f)
       {
@@ -214,7 +217,7 @@ public class GeomEllipse extends GeomPoly
         drawDiskTesselation(gl, glu, tobj, offset);
       }
 
-      gl.glDisable(GL.GL_DEPTH_TEST);
+      gl.glDisable(GL_DEPTH_TEST);
     }
 
     gl.glColor4fv(color.array(), 0);
@@ -231,7 +234,7 @@ public class GeomEllipse extends GeomPoly
     }
   }
 
-  private void drawDiskTesselation(GL gl, GLU glu, GLUtessellator tobj, float offset)
+  private void drawDiskTesselation(GL2 gl, GLU glu, GLUtessellator tobj, float offset)
   {
     //glu.gluTessProperty(tobj, GLU.GLU_TESS_WINDING_RULE, GLU.GLU_TESS_WINDING_POSITIVE);
 
@@ -259,7 +262,7 @@ public class GeomEllipse extends GeomPoly
 
   }
 
-  private void drawCircleTesselation(GL gl, GLU glu, GLUtessellator tobj, float offset)
+  private void drawCircleTesselation(GL2 gl, GLU glu, GLUtessellator tobj, float offset)
   {
     //glu.gluTessProperty(tobj, GLU.GLU_TESS_WINDING_RULE, GLU.GLU_TESS_WINDING_POSITIVE);
     glu.gluTessProperty(tobj, GLU.GLU_TESS_WINDING_RULE, GLU.GLU_TESS_WINDING_ODD);

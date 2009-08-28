@@ -11,8 +11,6 @@ import behaviorism.textures.TextureImage;
 import behaviorism.utils.MatrixUtils;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import static behaviorism.utils.MatrixUtils.*;
@@ -267,7 +265,7 @@ public abstract class Geom
    * @param offset
    */
   //public abstract void draw(GL gl, GLU glu, float offset);
-  public abstract void draw(GL gl);
+  public abstract void draw();
 
   //have the sceneGraph set the offset manually only if necessary, rather than passing
   //it in with every frame.
@@ -306,6 +304,7 @@ public abstract class Geom
     this.isVisible = !this.isVisible;
   }
 
+  /*
   //Hmm-- is this useful here? It is not being used anywhere...
   @Deprecated
   public void drawDebugGeom(GL gl, GLU glu)
@@ -319,11 +318,11 @@ public abstract class Geom
 
       //gl.glVertex3f(0f, 0f, 0f);
       gl.glVertex3f(rotateAnchor.x, rotateAnchor.y, rotateAnchor.z);
-      /*
-      gl.glVertex3f(translate.x + rotateAnchor.translate.x,
-      translate.y + rotateAnchor.translate.y,
-      translate.z + rotateAnchor.translate.z);
-       */
+      
+//      gl.glVertex3f(translate.x + rotateAnchor.translate.x,
+//      translate.y + rotateAnchor.translate.y,
+//      translate.z + rotateAnchor.translate.z);
+       
       gl.glEnd();
     }
     if (scaleAnchor != null)
@@ -337,6 +336,7 @@ public abstract class Geom
     }
     gl.glEnable(gl.GL_BLEND);
   }
+  */
 
   /**
    * Translates a point in this Geom's coordinates into world coordinates.
@@ -358,7 +358,7 @@ public abstract class Geom
    * Basically you draw an invisible object with the depth test = true.
    * @param gl
    */
-  public void drawPickingBackground(GL gl)
+  public void drawPickingBackground()
   {
   }
 
@@ -496,6 +496,8 @@ public abstract class Geom
    */
 
   //MOVE THESE somewhere!!! only used in a couple of places...
+
+  /*
   public void scale(GL gl)
   {
     //ScaleEnum se = scaleDirection;
@@ -514,13 +516,14 @@ public abstract class Geom
   {
     gl.glTranslatef(tx, ty, tz);
   }
+  */
 
   public Point3f getCenter()
   {
     //default behavior... obviously needs to be overwritten by almost every Geom.
     return new Point3f(w * .5f, h * .5f, d * .5f);
   }
-
+   
   /**
    * This version of addGeom activates the Geom a specified number of milliseconds in the future.
    * It is simply a convience method to avoid having to define a BehaviorActivateGeom behavior since

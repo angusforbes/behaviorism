@@ -1,8 +1,8 @@
 /* GeomGluDisk.java ~ May 25, 2009 */
-package behaviorism. geometry.glu;
-
-import javax.media.opengl.GL;
+package behaviorism.geometry.glu;
+import static behaviorism.utils.RenderUtils.*;
 import javax.vecmath.Point3f;
+
 
 /**
  *
@@ -29,10 +29,10 @@ public class GeomGluSphere extends GeomGluQuadric
     this.stacks = stacks;
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
-    super.draw(gl);
-    gl.glColor4fv(color.array(), 0);
+    super.draw();
+    getGL().glColor4fv(color.array(), 0);
 
     glu.gluSphere(quadric,
       radius, slices, stacks);

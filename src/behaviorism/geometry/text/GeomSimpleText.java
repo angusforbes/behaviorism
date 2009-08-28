@@ -1,7 +1,7 @@
 /* GeomSimpleText.java ~ Feb 10, 2009 */
 package behaviorism. geometry.text;
 
-import com.sun.opengl.util.j2d.TextRenderer;
+import com.sun.opengl.util.awt.TextRenderer;
 import javax.vecmath.Point3f;
 
 /**

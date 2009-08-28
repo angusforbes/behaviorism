@@ -2,7 +2,8 @@
 package behaviorism.renderers;
 
 import behaviorism.utils.RenderUtils;
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
 
 public class State
 {
@@ -23,31 +24,33 @@ public class State
     this.BLEND = parentState.BLEND;
   }
 
-  public void state(GL gl)
+  //applyState?
+  public void state()
   {
+    GL2 gl = RenderUtils.getGL();
     if (DEPTH_TEST)
     {
-      gl.glEnable(GL.GL_DEPTH_TEST);
+      gl.glEnable(GL_DEPTH_TEST);
     }
     else
     {
-      gl.glDisable(GL.GL_DEPTH_TEST);
+      gl.glDisable(GL_DEPTH_TEST);
     }
 
     if (BLEND)
     {
-      gl.glEnable(GL.GL_BLEND);
+      gl.glEnable(GL_BLEND);
     }
     else
     {
-      gl.glDisable(GL.GL_BLEND);
+      gl.glDisable(GL_BLEND);
     }
   }
 
-  public static void printCurrentState(GL gl)
+  public static void printCurrentState()
   {
-    boolean blend = RenderUtils.getBoolean(gl, GL.GL_BLEND);
-    boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
+    boolean blend = RenderUtils.getBoolean(GL_BLEND);
+    boolean depthTest = RenderUtils.getBoolean(GL_DEPTH_TEST);
 
     System.out.println("BLEND : " + blend);
     System.out.println("DEPTH TEST : " + depthTest);

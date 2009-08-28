@@ -1,7 +1,7 @@
 /* FontHandler.java (created on March 7, 2008, 1:46 AM) */
 package behaviorism.handlers;
 
-import com.sun.opengl.util.j2d.TextRenderer;
+import com.sun.opengl.util.awt.TextRenderer;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.File;
@@ -248,7 +248,7 @@ public class FontHandler
     TextRenderer renderer = new TextRenderer(
       font.deriveFont(fontStyle, fontSize),
       useAntialias, USE_FRACTIONAL_METRICS, null, USE_MIPMAPS);
-    renderer.setSmoothing(USE_SMOOTHING);
+    //renderer.setSmoothing(USE_SMOOTHING);
     renderer.setUseVertexArrays(USE_VERTEX_ARRAYS);
 
     return renderer;

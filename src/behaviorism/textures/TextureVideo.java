@@ -12,7 +12,7 @@ import com.sun.media.jmc.event.BufferDownloadListener;
 import com.sun.media.jmc.event.BufferDownloadedProgressChangedEvent;
 import com.sun.media.jmc.event.VideoRendererEvent;
 import com.sun.media.jmc.event.VideoRendererListener;
-import com.sun.opengl.util.texture.TextureIO;
+import com.sun.opengl.util.texture.awt.AWTTextureIO;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -115,7 +115,7 @@ public class TextureVideo extends TextureImage
 //      textureData.flush();
 //    }
 
-    textureData = TextureIO.newTextureData(bufferedImage, false); //mipmapping=false
+    textureData = AWTTextureIO.newTextureData(bufferedImage, false); //mipmapping=false
     isTextureWaiting = true;
 
     //bufferedImage.flush();

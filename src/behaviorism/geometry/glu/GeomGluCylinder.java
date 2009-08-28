@@ -1,8 +1,13 @@
 /* GeomGluDisk.java ~ May 25, 2009 */
 package behaviorism.geometry.glu;
 
-import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
+import behaviorism.utils.RenderUtils;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.glu.GLU;
+import static behaviorism.utils.RenderUtils.*;
+
 
 /**
  *
@@ -33,9 +38,11 @@ public class GeomGluCylinder extends GeomGluQuadric
     this.stacks = stacks;
   }
 
-  public void draw(GL gl)
+  @Override
+  public void draw()
   {
-    super.draw(gl);
+    super.draw();
+    GL2 gl = getGL();
     gl.glColor4fv(color.array(), 0);
 
     glu.gluCylinder(quadric,

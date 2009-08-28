@@ -3,11 +3,14 @@ package behaviorism.geometry.glu;
 
 import behaviorism.geometry.Geom;
 import behaviorism.geometry.GeomPoint;
-import behaviorism.utils.RenderUtils;
 import java.util.List;
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
+import behaviorism.utils.RenderUtils;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLUnurbs;
+import javax.media.opengl.glu.gl2.GLUgl2;
+import static behaviorism.utils.RenderUtils.*;
+
 import javax.vecmath.Point3f;
 
 /**
@@ -92,9 +95,10 @@ public class GeomGluNurbsCurve extends Geom
     }
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
-    GLU glu = RenderUtils.getGLU();
+    GL2 gl = getGL();
+    GLUgl2 glu = getGLU();
 
     if (dynamicControlPoints != null) //and there has been a change
     {
@@ -113,7 +117,7 @@ public class GeomGluNurbsCurve extends Geom
 //    glu.gluNurbsCurve(nurbs,
 //      numKnots, knotArray, stride, controlArray, order, GL.GL_MAP1_NORMAL);
     glu.gluNurbsCurve(nurbs,
-      numKnots, knotArray, stride, controlArray, order, GL.GL_MAP1_VERTEX_3);
+      numKnots, knotArray, stride, controlArray, order, GL_MAP1_VERTEX_3);
     glu.gluEndCurve(nurbs);
 
 
@@ -121,7 +125,7 @@ public class GeomGluNurbsCurve extends Geom
     {
       gl.glLineWidth(1f);
 
-      gl.glBegin(GL.GL_LINE_STRIP);
+      gl.glBegin(GL_LINE_STRIP);
       for (int i = 0; i < dynamicControlPoints.size(); i++)
       {
         gl.glVertex3f(controlArray[i * stride], controlArray[i * stride + 1], controlArray[i * stride + 2]);
@@ -133,7 +137,7 @@ public class GeomGluNurbsCurve extends Geom
     {
       gl.glPointSize(5f);
 
-      gl.glBegin(GL.GL_POINTS);
+      gl.glBegin(GL_POINTS);
       for (int i = 0; i < dynamicControlPoints.size(); i++)
       {
         gl.glVertex3f(controlArray[i * stride], controlArray[i * stride + 1], controlArray[i * stride + 2]);

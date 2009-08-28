@@ -1,5 +1,5 @@
 /* TextureFBO.java ~ Jun 4, 2009 */
-package behaviorism. fbos;
+package behaviorism.fbos;
 
 import behaviorism.Behaviorism;
 import behaviorism.renderers.Renderer;
@@ -9,9 +9,9 @@ import behaviorism.utils.RenderUtils;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
 import java.util.List;
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
-import static javax.media.opengl.GL.*;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import static behaviorism.utils.RenderUtils.*;
 
 /**
  *
@@ -36,7 +36,6 @@ public class FboPingPong
 
   public FboPingPong()
   {
-
   }
 
   public FboPingPong(int fboWidth, int fboHeight)
@@ -65,8 +64,9 @@ public class FboPingPong
     this.programs = programs;
   }
 
-  public boolean bind(GL gl)
+  public boolean bind()
   {
+    GL2 gl = getGL();
     //if first time, generate FBO
     if (fboId < 0)
     {
@@ -78,21 +78,22 @@ public class FboPingPong
       }
     }
 
-    writeAttachment = GL_COLOR_ATTACHMENT0_EXT;
-    readAttachment = GL_COLOR_ATTACHMENT1_EXT;
+    writeAttachment = GL_COLOR_ATTACHMENT0; //_EXT;
+    readAttachment = GL_COLOR_ATTACHMENT1; //_EXT;
 
     readTextureId = texture2.getTextureObject();
     writeTextureId = texture1.getTextureObject();
 
     //bind fbo
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+    //gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, fboId);
     gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     gl.glViewport(0, 0, fboWidth, fboHeight);
 
-   return true;
+    return true;
   }
 
-  public Texture process(GL gl, Texture input)
+  public Texture process(Texture input)
   {
     //use first program to process inputTexture into texture2
     drawTextureToOffScreenTexture(input.getTextureObject(),
@@ -110,9 +111,10 @@ public class FboPingPong
     }
   }
 
-  public void unbind(GL gl)
+  public void unbind()
   {
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    GL2 gl = getGL();
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
     gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
   }
 
@@ -122,8 +124,9 @@ public class FboPingPong
    * @param gl
    * @return A Texture that's been processed by the attached shader Programs
    */
-  public Texture apply(GL gl)
+  public Texture apply()
   {
+    GL2 gl = getGL();
     //sanity check
     if (programs.size() == 0)
     {
@@ -146,12 +149,12 @@ public class FboPingPong
     {
       if (program.programId <= 0)
       {
-        program.install(gl);
+        program.install();
       }
     }
 
-    writeAttachment = GL_COLOR_ATTACHMENT0_EXT;
-    readAttachment = GL_COLOR_ATTACHMENT1_EXT;
+    writeAttachment = GL_COLOR_ATTACHMENT0;
+    readAttachment = GL_COLOR_ATTACHMENT1;
 
     readTextureId = texture2.getTextureObject();
     writeTextureId = texture1.getTextureObject();
@@ -160,7 +163,7 @@ public class FboPingPong
 
 
     //bind fbo
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, fboId);
     gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     gl.glViewport(0, 0, fboWidth, fboHeight);
 
@@ -177,7 +180,7 @@ public class FboPingPong
       swapPingPong();
     }
 
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
     gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
 
     if (readTextureId == texture1.getTextureObject())
@@ -201,17 +204,19 @@ public class FboPingPong
     writeTextureId = tmpTex;
   }
 
-
   public void drawTextureToOffScreenTexture(int texId, int attachment)
   //public void drawTextureToOffScreenTextureUsingShader(Texture tex, int attachment, Program program)
   {
-    GL gl = GLU.getCurrentGL();
+    GL2 gl = getGL();
 
     //program.bind(gl);
 
     gl.glBindTexture(GL_TEXTURE_2D, texId);
     //gl.glBindTexture(GL_TEXTURE_2D, tex.getTextureObject());
-    gl.glDrawBuffer(attachment);
+    //gl.glDrawBuffer(attachment);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, attachment); //think this is the new way...
+
+
     gl.glEnable(GL_TEXTURE_2D);
     //gl.glActiveTexture(GL_TEXTURE0);
     gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -221,7 +226,8 @@ public class FboPingPong
 
     //gl.glUniform1i(program.uniform("theTexture"), 0);
     //set projection to ortho
-    gl.glMatrixMode(gl.GL_PROJECTION);
+    gl.glMatrixMode(GL_PROJECTION);
+    gl.glTranslatef(1f,1f,1f);
 
     gl.glPushMatrix();
     {
@@ -252,9 +258,9 @@ public class FboPingPong
   public void drawTextureToOffScreenTextureUsingShader(int texId, int attachment, Program program)
   //public void drawTextureToOffScreenTextureUsingShader(Texture tex, int attachment, Program program)
   {
-    GL gl = GLU.getCurrentGL();
+    GL2 gl = getGL();
 
-    program.bind(gl);
+    program.bind();
 
     gl.glBindTexture(GL_TEXTURE_2D, texId);
     //gl.glBindTexture(GL_TEXTURE_2D, tex.getTextureObject());
@@ -293,10 +299,10 @@ public class FboPingPong
     gl.glMatrixMode(gl.GL_MODELVIEW);
 
     gl.glDisable(GL_TEXTURE_2D);
-    program.unbind(gl);
+    program.unbind();
   }
 
-  public void drawSquare(GL gl, float x, float y, float w, float h)
+  public void drawSquare(GL2 gl, float x, float y, float w, float h)
   {
     gl.glBegin(GL_QUADS);
     {
@@ -348,12 +354,12 @@ public class FboPingPong
   public void dispose()
   {
     System.err.println("disposing of FBO!!!");
-    GL gl = GLU.getCurrentGL();
+    GL2 gl = getGL();
 
     if (!(this.fboId < 0))
     {
       System.err.println("deleting FBO");
-      gl.glDeleteFramebuffersEXT(1, new int[]
+      gl.glDeleteFramebuffers(1, new int[]
         {
           this.fboId
         }, 0);
@@ -363,7 +369,7 @@ public class FboPingPong
     if (!(this.rboId < 0))
     {
       System.err.println("deleting RBO");
-      gl.glDeleteRenderbuffersEXT(1, new int[]
+      gl.glDeleteRenderbuffers(1, new int[]
         {
           this.rboId
         }, 0);
@@ -373,7 +379,7 @@ public class FboPingPong
     System.err.println("disposed of FBO!!!");
   }
 
-  public boolean generateFBO(GL gl)
+  public boolean generateFBO(GL2 gl)
   {
     if (fboWidth < 0 || fboHeight < 0)
     {
@@ -420,25 +426,25 @@ public class FboPingPong
 
     // create a framebuffer object and attach the color texture and depth renderbuffer
     int[] fboBindId = new int[1];
-    gl.glGenFramebuffersEXT(1, fboBindId, 0);
+    gl.glGenFramebuffers(1, fboBindId, 0);
     this.fboId = fboBindId[0];
 
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, this.fboId);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, this.fboId);
 
     int textureLevel = 0; //not using mipmaps so only first level is available
     // attach the texture to FBO color attachment point
-    gl.glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, this.texture1.getTextureObject(), textureLevel);
+    gl.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this.texture1.getTextureObject(), textureLevel);
     // attach the renderbuffer to depth attachment point
     //gl.glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, this.rboId);
 
     // attach the texture to FBO color attachment point
-    gl.glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D, this.texture2.getTextureObject(), textureLevel);
+    gl.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this.texture2.getTextureObject(), textureLevel);
     // attach the renderbuffer to depth attachment point
     //gl.glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, this.rboId);
 
     // check FBO status
-    int status = gl.glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+    int status = gl.glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
     {
       fboUsed = false;
       System.out.println("GL_FRAMEBUFFER_COMPLETE_EXT failed, CANNOT use FBO\n");
@@ -456,7 +462,7 @@ public class FboPingPong
     }
 
     // switch back to window-system-provided framebuffer
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return fboUsed;
   }

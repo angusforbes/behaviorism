@@ -6,9 +6,14 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-package behaviorism. geometry;
+package behaviorism.geometry;
 
-import javax.media.opengl.GL;
+import behaviorism.utils.RenderUtils;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.glu.GLU;
+import static behaviorism.utils.RenderUtils.*;
+
 import javax.vecmath.Point3f;
 
 /**
@@ -63,12 +68,13 @@ public class GeomSimpleLine extends Geom
   {
     setTranslate(p1);
     //ends[0] = new GeomPoint(p1.x, p1.y, p1.z);
-    ends[0] = new GeomPoint(0f,0f,0f);
+    ends[0] = new GeomPoint(0f, 0f, 0f);
     ends[1] = new GeomPoint(p2.x, p2.y, p2.z);
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = getGL();
     //System.out.println("in simpleline, translate = " + translate);
     //float hx = translate.x;
     //float hy = translate.y;
@@ -76,7 +82,7 @@ public class GeomSimpleLine extends Geom
 
     if (isStippled == true)
     {
-      gl.glEnable(GL.GL_LINE_STIPPLE);
+      gl.glEnable(GL_LINE_STIPPLE);
       gl.glLineStipple(1, stipple);
     }
 
@@ -99,7 +105,7 @@ public class GeomSimpleLine extends Geom
 
     if (isStippled == true)
     {
-      gl.glDisable(GL.GL_LINE_STIPPLE);
+      gl.glDisable(GL_LINE_STIPPLE);
     }
   }
   /*

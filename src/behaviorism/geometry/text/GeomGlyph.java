@@ -3,8 +3,9 @@
 package behaviorism. geometry.text;
 
 import behaviorism.geometry.Geom;
-import com.sun.opengl.util.j2d.TextRenderer;
-import javax.media.opengl.GL;
+import behaviorism.utils.RenderUtils;
+import com.sun.opengl.util.awt.TextRenderer;
+import javax.media.opengl.GL2;
 import javax.vecmath.Point3f;
 
 /**
@@ -37,8 +38,9 @@ public class GeomGlyph extends Geom
     this.scaleVal = scaleVal;
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = RenderUtils.getGL();
     /*
     if (textRenderer == null) return;
     

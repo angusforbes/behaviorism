@@ -30,6 +30,7 @@ import java.net.URLClassLoader;
 import javax.swing.*;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.media.opengl.awt.GLCanvas;
 import org.grlea.log.SimpleLogger;
 
 /**
@@ -248,12 +249,16 @@ public class Behaviorism
 
   private GLCanvas makeCanvas()
   {
-    //set up openGL canvas
-    GLCapabilities caps = new GLCapabilities();
-    GLCapabilitiesChooser chooser = new DefaultGLCapabilitiesChooser();
-    caps.setSampleBuffers(true);
+    //GLCapabilities caps = new GLCapabilities();
+//    GLCapabilitiesChooser chooser = new DefaultGLCapabilitiesChooser();
+//    caps.setSampleBuffers(true);
     //caps.setNumSamples(4); //16
-    return new GLCanvas(caps, chooser, null, null);
+   // return new GLCanvas(caps, chooser, null, null);
+
+    //set up openGL canvas
+    GLCapabilities capabilities = new GLCapabilities(GLProfile.get(GLProfile.GL2));
+    return new GLCanvas(capabilities);
+
   }
 
   private void addListeners(GLCanvas can)

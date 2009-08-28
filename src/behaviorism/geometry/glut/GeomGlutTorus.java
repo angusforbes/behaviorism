@@ -3,8 +3,7 @@
 package behaviorism. geometry.glut;
 
 import behaviorism.geometry.Geom;
-import behaviorism.utils.RenderUtils;
-import javax.media.opengl.GL;
+import static behaviorism.utils.RenderUtils.*;
 import javax.vecmath.Point3f;
 
 /**
@@ -40,20 +39,20 @@ public class GeomGlutTorus extends Geom
  
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
 
-    gl.glColor4fv(color.array(), 0);
+    getGL().glColor4fv(color.array(), 0);
 
     //gl.glColor4f(r, g, b, a);
     if (isSolid == true)
     {
-      RenderUtils.getRenderer().glut.glutSolidTorus(innerRadius, outerRadius, slices, stacks);
+      getGLUT().glutSolidTorus(innerRadius, outerRadius, slices, stacks);
     }
     else
     {
       //gl.glLineWidth(lineWidth);
-      RenderUtils.getRenderer().glut.glutWireTorus(innerRadius, outerRadius, slices, stacks);
+      getGLUT().glutWireTorus(innerRadius, outerRadius, slices, stacks);
     }
   }
 

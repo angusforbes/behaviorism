@@ -2,7 +2,12 @@
 
 package behaviorism. geometry.glu;
 
-import javax.media.opengl.GL;
+import behaviorism.utils.RenderUtils;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.glu.GLU;
+import static behaviorism.utils.RenderUtils.*;
+
 import javax.vecmath.Point3f;
 
 /**
@@ -33,11 +38,11 @@ public class GeomGluDisk extends GeomGluQuadric
  
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
-    super.draw(gl);
+    super.draw();
 
-    gl.glColor4fv(color.array(), 0);
+    getGL().glColor4fv(color.array(), 0);
 
     glu.gluDisk(quadric,
       this.innerRadius, this.outerRadius,

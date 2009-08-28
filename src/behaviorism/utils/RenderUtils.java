@@ -12,7 +12,7 @@ import behaviorism.renderers.TessellationCallback;
 import behaviorism.renderers.cameras.Cam;
 import behaviorism.renderers.layers.RendererLayer;
 import behaviorism.worlds.World;
-import com.sun.opengl.util.GLUT;
+import com.sun.opengl.util.gl2.GLUT;
 import java.awt.Point;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
@@ -20,11 +20,12 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLUnurbs;
 import javax.media.opengl.glu.GLUquadric;
 import javax.media.opengl.glu.GLUtessellator;
+import javax.media.opengl.glu.gl2.GLUgl2;
+import static javax.media.opengl.glu.gl2.GLUgl2.*;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 
@@ -211,12 +212,12 @@ public class RenderUtils
     return getRenderer().glut;
   }
 
-  public static GLU getGLU()
+  public static GLUgl2 getGLU()
   {
     return getRenderer().glu;
   }
 
-  public static GL getGL()
+  public static GL2 getGL()
   {
     return getRenderer().gl;
   }
@@ -226,14 +227,14 @@ public class RenderUtils
 
     if (getRenderer().tessellationObject == null)
     {
-      GLU glu = getGLU();
-      TessellationCallback tessellationCallback = new TessellationCallback(getGL(), glu);
+      GLUgl2 glu = getGLU();
+      TessellationCallback tessellationCallback = new TessellationCallback();
       getRenderer().tessellationObject = glu.gluNewTess();
-      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_VERTEX, tessellationCallback);// vertexCallback);
-      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_BEGIN, tessellationCallback);// beginCallback);
-      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_END, tessellationCallback);// endCallback);
-      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_ERROR, tessellationCallback);// errorCallback);
-      glu.gluTessCallback(getRenderer().tessellationObject, GLU.GLU_TESS_COMBINE, tessellationCallback);// combineCallback);
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU_TESS_VERTEX, tessellationCallback);// vertexCallback);
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU_TESS_BEGIN, tessellationCallback);// beginCallback);
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU_TESS_END, tessellationCallback);// endCallback);
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU_TESS_ERROR, tessellationCallback);// errorCallback);
+      glu.gluTessCallback(getRenderer().tessellationObject, GLU_TESS_COMBINE, tessellationCallback);// combineCallback);
     }
 
     return getRenderer().tessellationObject;
@@ -752,10 +753,10 @@ public class RenderUtils
     return p2f;
   }
 
-  public static boolean getBoolean(GL gl, int param)
+  public static boolean getBoolean(int param)
   {
     ByteBuffer bb = ByteBuffer.allocate(1);
-    gl.glGetBooleanv(param, bb);
+    getGL().glGetBooleanv(param, bb);
 
     if (bb.get(0) == 0)
     {

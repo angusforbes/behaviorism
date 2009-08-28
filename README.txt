@@ -1,0 +1,1 @@
+This is a beta version of behaviorism that uses the GL2 profile from JOGL2. A few basic things are not working, such as fullscreen toggle and background texture loading. I am continuing development on behaviorism R1.5 for the time being. R1.5 should be considered the most up-to-date branch.

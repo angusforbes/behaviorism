@@ -2,8 +2,8 @@
 package behaviorism.geometry.glut;
 
 import behaviorism.geometry.Geom;
+import static behaviorism.utils.RenderUtils.*;
 import behaviorism.utils.RenderUtils;
-import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
 
 /**
@@ -23,9 +23,9 @@ public class GeomGlutCube extends Geom
     this.isSolid = isSolid;
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
-    gl.glColor4fv(color.array(), 0);
+    getGL().glColor4fv(color.array(), 0);
 
     //gl.glColor4f(r, g, b, a);
     if (isSolid == true)

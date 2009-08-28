@@ -3,10 +3,10 @@ package behaviorism.textures;
 
 import behaviorism.Behaviorism;
 import com.sun.opengl.util.texture.TextureIO;
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import org.grlea.log.SimpleLogger;
-import static javax.media.opengl.GL.*;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import static behaviorism.utils.RenderUtils.*;
 
 /**
  *
@@ -53,18 +53,20 @@ public class TextureFBO extends Texture
     return true;
   }
 
-  public void bindFBO(GL gl)
+  public void bindFBO()
   {
+    GL2 gl = getGL();
     //0. bind our FBO and start drawing on it
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, fboId);
     gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     gl.glViewport(0, 0, offScreenWidth, offScreenHeight);
   }
 
-  public void unbindFBO(GL gl)
+  public void unbindFBO()
   {
+    GL2 gl = getGL();
     // we are finished drawing to our FBO, so unbind it and return to our original viewport, etc
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
     gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
   }
 
@@ -75,9 +77,9 @@ public class TextureFBO extends Texture
   public void applyFBO()
   {
     log.warn("in applyFBO() : uh-oh... this method should be overridden!");
-    GL gl = GLU.getCurrentGL();
+    GL2 gl = getGL();
 
-    bindFBO(gl);
+    bindFBO();
 
     gl.glPushMatrix();
     {
@@ -85,15 +87,15 @@ public class TextureFBO extends Texture
     }
     gl.glPopMatrix();
 
-    unbindFBO(gl);
+    unbindFBO();
   }
 
   protected void initializeTexture()
   {
     log.entry("in initializeTexture()");
-    GL gl = GLU.getCurrentGL();
+    GL2 gl = getGL();
 
-    if (!generateFBO(gl))
+    if (!generateFBO())
     {
       log.error("in TextureFBO : couldn't create FBO");
       //System.exit(0);
@@ -108,12 +110,13 @@ public class TextureFBO extends Texture
   protected void disposeTexture()
   {
     log.entry("in disposeTexture()");
-    GL gl = GLU.getCurrentGL();
+
+    GL2 gl = getGL();
 
     if (this.fboId >= 0)
     {
       log.info("deleting FBO");
-      gl.glDeleteFramebuffersEXT(1, new int[]
+      gl.glDeleteFramebuffers(1, new int[]
         {
           this.fboId
         }, 0);
@@ -124,7 +127,7 @@ public class TextureFBO extends Texture
     if (this.rboId >= 0)
     {
       log.info("deleting RBO");
-      gl.glDeleteRenderbuffersEXT(1, new int[]
+      gl.glDeleteRenderbuffers(1, new int[]
         {
           this.rboId
         }, 0);
@@ -135,15 +138,16 @@ public class TextureFBO extends Texture
     if (texture != null)
     {
       log.info("disposing of GL texture...");
-      texture.dispose();
+      texture.destroy(gl);
       texture = null;
     }
 
     log.exit("out disposeTexture()");
   }
 
-  public boolean generateFBO(GL gl)
+  public boolean generateFBO()
   {
+    GL2 gl = getGL();
     log.entry("in generateFBO()");
     boolean fboUsed;
 
@@ -162,27 +166,27 @@ public class TextureFBO extends Texture
 
     // create a renderbuffer object to store depth info
     int[] rboBindId = new int[1];
-    gl.glGenRenderbuffersEXT(1, rboBindId, 0);
+    gl.glGenRenderbuffers(1, rboBindId, 0);
     this.rboId = rboBindId[0];
-    gl.glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, this.rboId);
-    gl.glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, offScreenWidth, offScreenHeight);
-    gl.glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+    gl.glBindRenderbuffer(GL_RENDERBUFFER, this.rboId);
+    gl.glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, offScreenWidth, offScreenHeight);
+    gl.glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // create a framebuffer object and attach the color texture and depth renderbuffer
     int[] fboBindId = new int[1];
-    gl.glGenFramebuffersEXT(1, fboBindId, 0);
+    gl.glGenFramebuffers(1, fboBindId, 0);
     this.fboId = fboBindId[0];
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, this.fboId);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, this.fboId);
 
     int textureLevel = 0; //not using mipmaps so only first level is available
     // attach the texture to FBO color attachment point
-    gl.glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, this.texture.getTextureObject(), textureLevel);
+    gl.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this.texture.getTextureObject(), textureLevel);
     // attach the renderbuffer to depth attachment point
-    gl.glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, this.rboId);
+    gl.glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this.rboId);
 
     // check FBO status
-    int status = gl.glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+    int status = gl.glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
     {
       fboUsed = false;
       log.warn("GL_FRAMEBUFFER_COMPLETE_EXT failed, CANNOT use FBO\n");
@@ -198,7 +202,7 @@ public class TextureFBO extends Texture
     }
 
     // switch back to window-system-provided framebuffer
-    gl.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
     log.exit("out generateFBO()");
 
     return fboUsed;

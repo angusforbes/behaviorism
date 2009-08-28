@@ -5,10 +5,11 @@
 package behaviorism.renderers.cameras;
 
 import behaviorism.utils.MatrixUtils;
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point3f;
-
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import behaviorism.utils.RenderUtils;
+import static behaviorism.utils.RenderUtils.*;
 /**
  *
  * @author angus
@@ -54,10 +55,10 @@ public class CamBasic extends Cam
    * a good looking text size.
    */
   @Override
-  public void resetPerspective(GL gl, GLU glu)
+  public void resetPerspective()
   {
     //set original location 
-    gl.glTranslatef(resetAnchor.x, resetAnchor.y, resetAnchor.z);
+    getGL().glTranslatef(resetAnchor.x, resetAnchor.y, resetAnchor.z);
   }
 
   @Override
@@ -74,8 +75,9 @@ public class CamBasic extends Cam
   }
 
   @Override
-  public void setPerspective(GL gl, GLU glu)
+  public void setPerspective()
   {
+    GL2 gl = getGL();
     gl.glRotatef((float) rotate.x, 1.0f, 0.0f, 0.0f);
     gl.glRotatef((float) rotate.y, 0.0f, 1.0f, 0.0f);
     gl.glRotatef((float) rotate.z, 0.0f, 0.0f, 1.0f);

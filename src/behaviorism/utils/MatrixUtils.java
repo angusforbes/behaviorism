@@ -7,7 +7,7 @@ import javax.vecmath.Point3f;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import javax.media.opengl.GL;
+import static javax.media.opengl.GL2.*;
 import javax.vecmath.Point3d;
 import javax.vecmath.SingularMatrixException;
 
@@ -504,7 +504,7 @@ public class MatrixUtils
 
     FloatBuffer zBuf = FloatBuffer.allocate(1);
     RenderUtils.getRenderer().gl.glReadPixels(
-      (int) pixelPt[0], (int) y, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, zBuf);
+      (int) pixelPt[0], (int) y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, zBuf);
     float z = zBuf.get();
     double in[] = new double[]
     {
@@ -718,7 +718,7 @@ public class MatrixUtils
 
       FloatBuffer zBuf = FloatBuffer.allocate(1);
       RenderUtils.getRenderer().gl.glReadPixels(
-        (int) pixels[0], (int) y, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, zBuf);
+        (int) pixels[0], (int) y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, zBuf);
       z = zBuf.get();
     }
     else //we assume you know what you are doing

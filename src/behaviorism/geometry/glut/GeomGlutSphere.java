@@ -2,8 +2,7 @@
 package behaviorism.geometry.glut;
 
 import behaviorism.geometry.Geom;
-import behaviorism.utils.RenderUtils;
-import javax.media.opengl.GL;
+import static behaviorism.utils.RenderUtils.*;
 import javax.vecmath.Point3f;
 
 /**
@@ -27,19 +26,19 @@ public class GeomGlutSphere extends Geom
     this.isSolid = isSolid;
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
-    gl.glLineWidth(1f);
-    gl.glColor4fv(color.array(), 0);
+    getGL().glLineWidth(1f);
+    getGL().glColor4fv(color.array(), 0);
 
     //gl.glColor4f(r, g, b, a);
     if (isSolid == true)
     {
-      RenderUtils.getRenderer().glut.glutSolidSphere(radius, slices, stacks);
+      getGLUT().glutSolidSphere(radius, slices, stacks);
     }
     else
     {
-      RenderUtils.getRenderer().glut.glutWireSphere(radius, slices, stacks);
+      getGLUT().glutWireSphere(radius, slices, stacks);
     }
   }
 }

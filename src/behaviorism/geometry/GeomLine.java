@@ -2,9 +2,12 @@
 package behaviorism. geometry;
 
 import behaviorism.utils.MatrixUtils;
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
+import static javax.media.opengl.GL2.*;
+import static behaviorism.utils.RenderUtils.*;
+
 
 /**  
 GeomLine *requires* that the endpoints of the line are part of the scene graph hierarchy in some way,
@@ -90,8 +93,10 @@ public class GeomLine extends Geom
   }
   
   @Override
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = getGL();
+
     Point3d h1 = MatrixUtils.getGeomPointInGeomCoordinates(
       new Point3d(), firstOffsetPt.modelview, this.modelview);
     Point3d h2 = MatrixUtils.getGeomPointInGeomCoordinates(
@@ -102,7 +107,7 @@ public class GeomLine extends Geom
     gl.glColor4fv(color.array(), 0);
 
     
-    gl.glBegin(gl.GL_LINES);
+    gl.glBegin(GL_LINES);
     {
       gl.glVertex3d(h1.x, h1.y, h1.z);
       gl.glVertex3d(h2.x, h2.y, h2.z);

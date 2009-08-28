@@ -243,10 +243,12 @@ public class TextureImage extends Texture
 
   }
 
+  /*
   public void generateTextureData(BufferedImage bi, boolean useMipMaps)
   {
     this.textureData = TextureIO.newTextureData(bi, useMipMaps);
   }
+  */
 
   @Override
   public String toString()

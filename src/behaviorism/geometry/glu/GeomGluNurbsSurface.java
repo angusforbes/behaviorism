@@ -3,12 +3,15 @@ package behaviorism.geometry.glu;
 
 import behaviorism.geometry.Geom;
 import behaviorism.geometry.GeomPoint;
-import behaviorism.utils.RenderUtils;
 import java.util.List;
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
+import behaviorism.utils.RenderUtils;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLUnurbs;
+import javax.media.opengl.glu.gl2.GLUgl2;
 import javax.vecmath.Point3f;
+import static behaviorism.utils.RenderUtils.*;
+
 
 /**
  *
@@ -149,9 +152,10 @@ public class GeomGluNurbsSurface extends Geom
     //System.out.println("controlArray = " + Arrays.toString(controlArray));
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
-    GLU glu = RenderUtils.getGLU();
+    GL2 gl = getGL();
+    GLUgl2 glu = getGLU();
 
     if (dynamicControlPoints != null) //and there has been a change
     {
@@ -186,7 +190,7 @@ public class GeomGluNurbsSurface extends Geom
       strideU, strideV,
       controlArray,
       orderU, orderV,
-      GL.GL_MAP2_VERTEX_3);
+      GL_MAP2_VERTEX_3);
 
     glu.gluEndSurface(nurbs);
 
@@ -197,7 +201,7 @@ public class GeomGluNurbsSurface extends Geom
       gl.glColor4f(0f, 1f, 0f, 1f);
       for (int i = 0; i < numPointsU; i++)
       {
-        gl.glBegin(GL.GL_LINE_STRIP);
+        gl.glBegin(GL_LINE_STRIP);
 
         for (int j = 0; j < numPointsV; j++)
         {
@@ -214,7 +218,7 @@ public class GeomGluNurbsSurface extends Geom
       gl.glColor4f(0f, 0f, 1f, 1f);
       for (int i = 0; i < numPointsV; i++)
       {
-        gl.glBegin(GL.GL_LINE_STRIP);
+        gl.glBegin(GL_LINE_STRIP);
         for (int j = 0; j < numPointsU; j++)
         {
           int idx = (i * 3) + (j * numPointsU * 3);
@@ -233,7 +237,7 @@ public class GeomGluNurbsSurface extends Geom
       gl.glPointSize(15f);
       gl.glColor4f(1f, 1f, 1f, 1f);
 
-      gl.glBegin(GL.GL_POINTS);
+      gl.glBegin(GL_POINTS);
       for (int i = 0; i < controlArray.length; i += 3)
       {
         gl.glVertex3f(controlArray[i + 0], controlArray[i + 1], controlArray[i + 2]);

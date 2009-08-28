@@ -3,7 +3,12 @@ package behaviorism. geometry;
 
 import java.util.LinkedList;
 import java.util.List;
-import javax.media.opengl.GL;
+import behaviorism.utils.RenderUtils;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.glu.GLU;
+import static behaviorism.utils.RenderUtils.*;
+
 import javax.vecmath.Point3f;
 
 /*
@@ -76,8 +81,9 @@ public class GeomTrace extends GeomPoint
   }
 
   @Override
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = getGL();
     //System.out.println("in GeomTrace() : trace size = " + trace.size());
     gl.glColor4fv(color.array(), 0);
     //gl.glColor4f(1f, 1f, 1f, 1f);

@@ -4,10 +4,16 @@ package behaviorism. geometry.text;
 
 import behaviorism.geometry.Colorf;
 import behaviorism.handlers.FontHandler;
-import com.sun.opengl.util.j2d.TextRenderer;
+import com.sun.opengl.util.awt.TextRenderer;
 import java.awt.Font;
 import java.util.List;
 import javax.vecmath.Point3f;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import behaviorism.utils.RenderUtils;
+import static behaviorism.utils.RenderUtils.*;
+
+
 
 /**
  *

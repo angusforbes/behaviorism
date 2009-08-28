@@ -1,30 +1,25 @@
 /* TesselationCallback.java (created on August 23, 2007, 8:15 PM) */
-package behaviorism. renderers;
+package behaviorism.renderers;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import static behaviorism.utils.RenderUtils.*;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUtessellatorCallback;
 
 public class TessellationCallback implements GLUtessellatorCallback
 {
-
-  private GL gl;
-  private GLU glu;
-
-  public TessellationCallback(GL gl, GLU glu)
+  public TessellationCallback()
   {
-    this.gl = gl;
-    this.glu = glu;
   }
 
   public void begin(int type)
   {
-    gl.glBegin(type);
+    getGL().glBegin(type);
   }
 
   public void end()
   {
-    gl.glEnd();
+    getGL().glEnd();
   }
 
   public void vertex(Object vertexData)
@@ -35,13 +30,13 @@ public class TessellationCallback implements GLUtessellatorCallback
       pointer = (double[]) vertexData;
       if (pointer.length == 6)
       {
-        gl.glColor3dv(pointer, 3);
+        getGL().glColor3dv(pointer, 3);
       }
       if (pointer.length == 5)
       {
-        gl.glTexCoord2dv(pointer, 3);
+        getGL().glTexCoord2dv(pointer, 3);
       }
-      gl.glVertex3dv(pointer, 0);
+      getGL().glVertex3dv(pointer, 0);
     }
   }
 
@@ -68,11 +63,7 @@ public class TessellationCallback implements GLUtessellatorCallback
     //colors
     for (i = 3; i < 6; i++)
     {
-      vertex[i] = weight[0] 
-        * ((double[]) data[0])[i] + weight[1]
-        * ((double[]) data[1])[i] + weight[2]
-        * ((double[]) data[2])[i] + weight[3]
-        * ((double[]) data[3])[i];
+      vertex[i] = weight[0] * ((double[]) data[0])[i] + weight[1] * ((double[]) data[1])[i] + weight[2] * ((double[]) data[2])[i] + weight[3] * ((double[]) data[3])[i];
     }
     outData[0] = vertex;
   }
@@ -87,7 +78,7 @@ public class TessellationCallback implements GLUtessellatorCallback
   {
     String estring;
 
-    estring = glu.gluErrorString(errnum);
+    estring = getGLU().gluErrorString(errnum);
     System.err.println("Tessellation Error: " + estring);
     System.exit(0);
   }

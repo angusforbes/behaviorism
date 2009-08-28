@@ -1,12 +1,14 @@
 package behaviorism. geometry;
 
 import behaviorism.utils.GeomUtils;
-import behaviorism.utils.RenderUtils;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
-import javax.media.opengl.GL;
+import static behaviorism.utils.RenderUtils.*;
+import behaviorism.utils.RenderUtils;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
+
 import javax.media.opengl.glu.GLUtessellator;
 import javax.vecmath.Point3f;
 
@@ -261,7 +263,7 @@ public class GeomPoly extends Geom
   }
     */
 
-	protected void drawConvex(GL gl, GLU glu, float offset)
+	protected void drawConvex(GL2 gl, float offset)
 	{
 		gl.glBegin(gl.GL_POLYGON);
       for(int i = 0; i < vertices.size(); i++)
@@ -273,7 +275,7 @@ public class GeomPoly extends Geom
       
       gl.glEnd();
 	}
-	protected void drawTesselated(GL gl, GLU glu, float offset)
+	protected void drawTesselated(GL2 gl, GLU glu, float offset)
 	{
 
       GLUtessellator tobj = RenderUtils.getRenderer().tessellationObject;
@@ -360,15 +362,16 @@ public class GeomPoly extends Geom
       //glu.gluDeleteTess(tobj); //what does this do?
 	}
 	
-  public void draw(GL gl)
+  public void draw()
   {
+    GL2 gl = getGL();
     GLU glu = RenderUtils.getGLU();
 
 		gl.glColor4fv(color.array(), 0);
 
     if (isConvex == true)
     {
-			drawConvex(gl, glu, offset);
+			drawConvex(gl, offset);
     }
     else //is not a convex polygon, if we aren't sure-- just assume that it is not...
     {

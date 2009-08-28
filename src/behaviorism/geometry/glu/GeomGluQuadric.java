@@ -71,7 +71,7 @@ abstract public class GeomGluQuadric extends Geom
     }
   }
 
-  public void draw(GL gl)
+  public void draw()
   {
     glu.gluQuadricOrientation(quadric, orientation);
     glu.gluQuadricDrawStyle(quadric, drawStyle);

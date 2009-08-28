@@ -9,12 +9,13 @@ import behaviorism.handlers.MouseHandler;
 import behaviorism.renderers.layers.RendererLayer;
 import behaviorism.utils.RenderUtils;
 import behaviorism.utils.Utils;
-import com.sun.opengl.util.j2d.TextRenderer;
+import com.sun.opengl.util.awt.TextRenderer;
 import java.util.ArrayList;
 import java.util.List;
-import javax.media.opengl.*;
-import javax.media.opengl.glu.GLU;
 import java.util.Map;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.GL2;
+import javax.media.opengl.glu.GLU;
 import static behaviorism.utils.RenderUtils.*;
 
 public class SceneGraph
@@ -186,7 +187,7 @@ public class SceneGraph
    * @param gl
    * @param glu
    */
-  public void draw(GL gl)
+  public void draw()
   {
     this.currentNano = System.nanoTime();
     this.offset = 0f; //reset offset
@@ -213,14 +214,14 @@ public class SceneGraph
 //      offset);
     List<Geom> worldGeom = new ArrayList<Geom>();
     worldGeom.add(getWorld());
-    traverseGeoms(gl, worldGeom,
+    traverseGeoms(worldGeom,
       getWorld().isTransformed || getCamera().isTransformed,
       offset);
     getWorld().isTransformed = false;
     getCamera().isTransformed = false;
 
     //iterate through layers and render each element to screen.
-    drawGeoms(gl);
+    drawGeoms();
   }
 
   private void updateCameraBehavior()
@@ -260,7 +261,7 @@ public class SceneGraph
     getRenderer().setPerspective3D();
   }
 
-  private void traverseGeoms(GL gl, List<Geom> geoms, boolean parentTransformed, float prevOffset) //, long currentNano, int level, float prevOffset)
+  private void traverseGeoms(List<Geom> geoms, boolean parentTransformed, float prevOffset) //, long currentNano, int level, float prevOffset)
   {
     List<Geom> scheduledForRemovalGeoms = new ArrayList<Geom>();
 
@@ -277,7 +278,7 @@ public class SceneGraph
 
       g.transform();
       getLayer(g.layerNum).attachedGeoms.add(g);
-      traverseGeoms(gl, g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
+      traverseGeoms(g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
 
       g.isTransformed = false;
 
@@ -296,11 +297,12 @@ public class SceneGraph
   }
 
   //need to clean this up a bit...
-  public void drawGeoms(GL gl)
+  public void drawGeoms()
   {
-    gl.glMatrixMode(gl.GL_PROJECTION);
+    GL2 gl = getGL();
+    gl.glMatrixMode(GL_PROJECTION);
     gl.glLoadMatrixd(getCamera().projection, 0);
-    gl.glMatrixMode(gl.GL_MODELVIEW);
+    gl.glMatrixMode(GL_MODELVIEW);
 
     invisiblePickingGeoms.clear();
 
@@ -316,7 +318,7 @@ public class SceneGraph
           layer.sortGeomsInLayer();
         }
 
-        layer.state.state(gl);
+        layer.state.state();
 
         for (Geom g : layer.attachedGeoms)
         {
@@ -327,8 +329,8 @@ public class SceneGraph
 
           if (g.hasState == true) //then override the layer's State
           {
-            gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
-            g.getState().state(gl);
+            gl.glPushAttrib(GL_ALL_ATTRIB_BITS);
+            g.getState().state();
           }
 
           gl.glLoadMatrixd(g.modelview, 0);
@@ -338,7 +340,7 @@ public class SceneGraph
             invisiblePickingGeoms.add(g);
           }
 
-          g.draw(gl);
+          g.draw();
 
           if (g.hasState == true) //reset to Layer's State if we just overrode it...
           {
@@ -353,12 +355,12 @@ public class SceneGraph
     //hmm is it slower to reload a matrix or to change the depth testing?
     if (invisiblePickingGeoms.size() > 0)
     {
-      gl.glEnable(GL.GL_DEPTH_TEST);
+      gl.glEnable(GL_DEPTH_TEST);
 
       for (Geom g : invisiblePickingGeoms)
       {
         gl.glLoadMatrixd(g.modelview, 0);
-        g.drawPickingBackground(gl); //TO DO handle picking backgorunds!
+        g.drawPickingBackground(); //TO DO handle picking backgorunds!
       }
     }
 
@@ -367,6 +369,7 @@ public class SceneGraph
 
   }
 
+  /*
   public void drawGeom(GL gl, GLU glu, Geom g, float offset)
   {
     //g.transform(gl, glu);
@@ -383,13 +386,13 @@ public class SceneGraph
       //	return;
     }
 
-    /*
-    if (MouseHandler.getInstance().selectedGeom == g)
-    {
-    System.out.println("you selcted g " + g);
-    State.printCurrentState(gl);
-    }
-     */
+    
+//    if (MouseHandler.getInstance().selectedGeom == g)
+//    {
+//    System.out.println("you selcted g " + g);
+//    State.printCurrentState(gl);
+//    }
+     
 
     //g.draw(gl, glu, offset);
     g.setOffset(offset); //that is, only if specified-- TO DO
@@ -401,6 +404,7 @@ public class SceneGraph
     }
 
   }
+  */
 
   /*
   //arbitrary axis!
@@ -431,8 +435,9 @@ public class SceneGraph
   gl.glTranslatef(-x1, -y1, -z1);
   }
    */
-  public void drawGrid(GL gl)
+  public void drawGrid()
   {
+    GL2 gl = getGL();
     gl.glPushMatrix();
     {
       gl.glLoadMatrixd(getCamera().modelview, 0);
@@ -447,7 +452,7 @@ public class SceneGraph
 
       //draw grid lines
       gl.glLineWidth(.5f);
-      gl.glBegin(gl.GL_LINES);
+      gl.glBegin(GL_LINES);
       for (float x = minx; x <= maxx; x += inc)
       {
         gl.glVertex2f(x, miny);
@@ -462,7 +467,7 @@ public class SceneGraph
 
       //draw grid points
       gl.glPointSize(4f);
-      gl.glBegin(gl.GL_POINTS);
+      gl.glBegin(GL_POINTS);
       for (float x = minx; x <= maxx; x += inc)
       {
         for (float y = miny; y <= maxy; y += inc)
@@ -474,7 +479,7 @@ public class SceneGraph
 
       //draw origin
       gl.glPointSize(8f);
-      gl.glBegin(gl.GL_POINTS);
+      gl.glBegin(GL_POINTS);
       gl.glVertex3f(0f, 0f, 0f);
       gl.glEnd();
     }
@@ -482,11 +487,13 @@ public class SceneGraph
 
   }
 
-  public void drawDebuggingInfo(GL gl)
+  public void drawDebuggingInfo()
   {
+    GL2 gl = getGL();
+
     if (drawDebugGrid == true)
     {
-      drawGrid(gl);
+      drawGrid();
     }
 
     //Set to orthographic projectionMatrix
@@ -500,12 +507,12 @@ public class SceneGraph
 
     if (drawDebugMouseDraggedPoint == true)
     {
-      drawDebugSelectPoint(gl);
+      drawDebugSelectPoint();
     }
 
     if (SceneGraph.drawDebugMouseMovedPoint == true)
     {
-      drawDebugMousePoint(gl);
+      drawDebugMousePoint();
     }
   }
 
@@ -515,14 +522,16 @@ public class SceneGraph
    * 
    * @param gl
    */
-  private void drawDebugMousePoint(GL gl)
+  private void drawDebugMousePoint()
   {
+    GL2 gl = getGL();
+
     if (MouseHandler.getInstance().debugMouseMovePoint != null)
     {
       gl.glColor4f(0f, 1f, 0f, 1f);
       gl.glPointSize(10f);
 
-      gl.glBegin(gl.GL_POINTS);
+      gl.glBegin(GL_POINTS);
       gl.glVertex2f(MouseHandler.getInstance().debugMouseMovePoint.x, MouseHandler.getInstance().debugMouseMovePoint.y);
       gl.glEnd();
     }
@@ -535,14 +544,16 @@ public class SceneGraph
    *
    * @param gl
    */
-  private void drawDebugSelectPoint(GL gl)
+  private void drawDebugSelectPoint()
   {
+    GL2 gl = getGL();
+
     if (MouseHandler.getInstance().debugMouseClickPoint != null)
     {
       gl.glColor4f(1f, 0f, 0f, 1f);
       gl.glPointSize(10f);
 
-      gl.glBegin(gl.GL_POINTS);
+      gl.glBegin(GL_POINTS);
       gl.glVertex2f(MouseHandler.getInstance().debugMouseClickPoint.x, MouseHandler.getInstance().debugMouseClickPoint.y);
       gl.glEnd();
     }
@@ -570,9 +581,10 @@ public class SceneGraph
     debugTextRenderer.endRendering();
   }
 
-  public void drawJava2DCoord(GL gl /*, CoordJava2D c*/)
+  /*
+  public void drawJava2DCoord(GL gl , CoordJava2D c)
   {
-    /*
+    
     if (c.img != null)
     {
     int inset = 2;
@@ -603,6 +615,7 @@ public class SceneGraph
     debugTextRenderer.draw3DRect(c.x, c.y, c.z, 0, 0, w, h, .05f);
     debugTextRenderer.end3DRendering();
     }
-     */
+     
   }
+   */
 }

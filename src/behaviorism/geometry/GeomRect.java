@@ -13,12 +13,17 @@ import behaviorism.algorithms.Corner;
 import behaviorism.renderers.Renderer;
 import behaviorism.utils.GeomUtils;
 import behaviorism.utils.MatrixUtils;
-import behaviorism.utils.RenderUtils;
 import java.awt.geom.Rectangle2D;
-import javax.media.opengl.GL;
 import javax.vecmath.Point3f;
 import java.util.Vector;
 import javax.vecmath.Point3d;
+
+import behaviorism.utils.RenderUtils;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import javax.media.opengl.glu.GLU;
+import static behaviorism.utils.RenderUtils.*;
+
 
 public class GeomRect extends Geom
 {
@@ -119,15 +124,15 @@ public class GeomRect extends Geom
     this.h = h;
   }
 
-  public void debugPackingAlgorithm(GL gl)
+  public void debugPackingAlgorithm(GL2 gl)
   {
-    gl.glEnable(GL.GL_BLEND);
+    gl.glEnable(GL_BLEND);
 
     synchronized (corners)
     {
       for (Corner c : corners)
       {
-        gl.glBegin(GL.GL_POINTS);
+        gl.glBegin(GL_POINTS);
         {
           //Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.z);
           Point3d test = new Point3d(c.mark.getX(), c.mark.getY(), this.translate.z);
@@ -142,7 +147,7 @@ public class GeomRect extends Geom
         {
           gl.glColor4f(0f, 0f, 1f, .1f);
 
-          gl.glBegin(GL.GL_POLYGON);
+          gl.glBegin(GL_POLYGON);
           {
 //          gl.glVertex3f(r2f.x, r2f.y, this.z);
 //          gl.glVertex3f(r2f.x + r2f.width, r2f.y, this.z);
@@ -168,13 +173,13 @@ public class GeomRect extends Geom
         }
       }
     }
-    gl.glDisable(GL.GL_BLEND);
+    gl.glDisable(GL_BLEND);
   }
 
   @Override
-  public void draw(GL gl)
+  public void draw()
   {
-
+    GL2 gl = getGL();
     //this should go into the inivs. picking method
     /*
     boolean depthTest = RenderUtils.getBoolean(gl, GL.GL_DEPTH_TEST);
@@ -196,7 +201,7 @@ public class GeomRect extends Geom
     drawRect(gl, 0f, 0f, offset, w, h);
   }
 
-  public void drawRect(GL gl, float x, float y, float z, float w, float h)
+  public void drawRect(GL2 gl, float x, float y, float z, float w, float h)
   {
     gl.glBegin(gl.GL_QUADS);
 
@@ -208,7 +213,7 @@ public class GeomRect extends Geom
     gl.glEnd();
   }
 
-  public void drawRect(GL gl, float x, float y, float z, float w, float h,
+  public void drawRect(GL2 gl, float x, float y, float z, float w, float h,
     float left, float right, float bottom, float top)
   {
     gl.glBegin(gl.GL_QUADS);
@@ -988,9 +993,9 @@ public class GeomRect extends Geom
    */
   }
 
-  public void drawSquare(GL gl, float x, float y, float w, float h)
+  public void drawSquare(GL2 gl, float x, float y, float w, float h)
   {
-    gl.glBegin(GL.GL_QUADS);
+    gl.glBegin(GL_QUADS);
 
     gl.glTexCoord2f(0, 0);
     gl.glVertex2f(x, y);

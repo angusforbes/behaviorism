@@ -1,5 +1,5 @@
 /* Shader.java ~ Mar 15, 2009 */
-package behaviorism. shaders;
+package behaviorism.shaders;
 
 import com.sun.opengl.util.BufferUtil;
 import java.io.BufferedReader;
@@ -13,7 +13,10 @@ import java.nio.IntBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.jar.JarFile;
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import static javax.media.opengl.GL2.*;
+import static behaviorism.utils.RenderUtils.*;
+
 
 /**
  *
@@ -37,25 +40,25 @@ public class Shader
    * @param gl
    * @param programId
    */
-  public void define(GL gl, int programId)
+  public void define(int programId)
   {
     //currently only needs to be overwritten by the GeometryShader
   }
 
-  public int install(GL gl)
+  public int install()
   {
     System.out.println("FILENAME = " + filename);
-    return install(gl, shaderType, filename);
+    return install(shaderType, filename);
   }
 
-  private int install(GL gl, ShaderEnum shaderType, String filename)
+  private int install(ShaderEnum shaderType, String filename)
   {
     boolean success = false;
 
     System.out.println("trying to read shader form JAR...");
     try
     {
-      success = loadAndCompileShaderFromResourceJar(gl, shaderType.type(), filename);
+      success = loadAndCompileShaderFromResourceJar(shaderType.type(), filename);
     }
     catch (Exception e)
     {
@@ -67,7 +70,7 @@ public class Shader
       System.out.println("trying to read shader form File...");
       try
       {
-        success = loadAndCompileShaderFromFile(gl, shaderType.type(), new File(filename));
+        success = loadAndCompileShaderFromFile(shaderType.type(), new File(filename));
       }
       catch (Exception e)
       {
@@ -78,8 +81,9 @@ public class Shader
     return shaderId;
   }
 
-  public boolean loadAndCompileShaderFromResourceJar(GL gl, int type, String filename) throws IOException
+  public boolean loadAndCompileShaderFromResourceJar(int type, String filename) throws IOException
   {
+    GL2 gl = getGL();
     System.err.println("IN loadAndCompileShader...");
     BufferedReader reader = null;
     JarFile jar = new JarFile("dist/lib/behaviorism.jar");
@@ -112,7 +116,7 @@ public class Shader
       gl.glCompileShader(shaderId);
 
       // Check for compile errors
-      checkCompileError(gl);
+      checkCompileError();
     }
     finally
     {
@@ -132,7 +136,6 @@ public class Shader
     return true;
   }
 
-
   //adapted wholesale from cylab on jogl forums
   /**
    * Loads and compiles this Shader. If successful, this Shader's shaderId will be set to
@@ -142,7 +145,7 @@ public class Shader
    * @param file The file containing this Shader's code.
    * @throws java.io.IOException
    */
-  public boolean loadAndCompileShaderFromFile(GL gl, int type, File file) throws IOException
+  public boolean loadAndCompileShaderFromFile(int type, File file) throws IOException
   {
     BufferedReader reader = null;
 
@@ -164,41 +167,43 @@ public class Shader
         lengths[i] = lines[i].length();
       }
 
+      GL2 gl = getGL();
+
       shaderId = gl.glCreateShader(type);
       gl.glShaderSource(shaderId, lines.length, lines, lengths, 0);
       gl.glCompileShader(shaderId);
 
       // Check for compile errors
-      checkCompileError(gl);
+      checkCompileError();
 
-    /*
+      /*
 
-    String errors = null;
-    if ((errors = getGLErrorLog(gl, shaderId)) != null)
-    {
-    shaderId = -1;
-    throw new RuntimeException("Compile error\n" + errors);
-    }
+      String errors = null;
+      if ((errors = getGLErrorLog(gl, shaderId)) != null)
+      {
+      shaderId = -1;
+      throw new RuntimeException("Compile error\n" + errors);
+      }
 
-    //String error = getGLErrorLog(gl, shader);
-    String error = "some error...";
+      //String error = getGLErrorLog(gl, shader);
+      String error = "some error...";
 
-    int[] compileStatus =
-    {
-    0
-    };
+      int[] compileStatus =
+      {
+      0
+      };
 
-    //gl.glGetObjectParameterivARB(shader, GL.GL_OBJECT_COMPILE_STATUS_ARB, compileStatus, 0);
-    gl.glGetShaderiv(shaderId, GL.GL_COMPILE_STATUS, compileStatus, 0);
+      //gl.glGetObjectParameterivARB(shader, GL.GL_OBJECT_COMPILE_STATUS_ARB, compileStatus, 0);
+      gl.glGetShaderiv(shaderId, GL.GL_COMPILE_STATUS, compileStatus, 0);
 
-    if (compileStatus[0] == 0)
-    {
-    shaderId = -1;
-    throw new IllegalArgumentException("Shader could not be compiled! " + (error == null ? "" : error));
-    }
+      if (compileStatus[0] == 0)
+      {
+      shaderId = -1;
+      throw new IllegalArgumentException("Shader could not be compiled! " + (error == null ? "" : error));
+      }
 
-    //return shaderId;
-     */
+      //return shaderId;
+       */
     }
     finally
     {
@@ -218,14 +223,14 @@ public class Shader
     return true;
   }
 
-  private void checkCompileError(GL gl)
+  private void checkCompileError()
   {
     IntBuffer status = BufferUtil.newIntBuffer(1);
-    gl.glGetShaderiv(shaderId, GL.GL_COMPILE_STATUS, status);
+    getGL().glGetShaderiv(shaderId, GL_COMPILE_STATUS, status);
 
-    if (status.get() == GL.GL_FALSE)
+    if (status.get() == GL_FALSE)
     {
-      getInfoLog(gl);
+      getInfoLog();
     }
     else
     {
@@ -233,13 +238,13 @@ public class Shader
     }
   }
 
-  private void getInfoLog(GL gl)
+  private void getInfoLog()
   {
     IntBuffer infoLogLength = BufferUtil.newIntBuffer(1);
-    gl.glGetShaderiv(shaderId, GL.GL_INFO_LOG_LENGTH, infoLogLength);
+    getGL().glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, infoLogLength);
 
     ByteBuffer infoLog = BufferUtil.newByteBuffer(infoLogLength.get(0));
-    gl.glGetShaderInfoLog(shaderId, infoLogLength.get(0), null, infoLog);
+    getGL().glGetShaderInfoLog(shaderId, infoLogLength.get(0), null, infoLog);
 
     String infoLogString =
       Charset.forName("US-ASCII").decode(infoLog).toString();
