@@ -12,6 +12,7 @@ import com.sun.media.jmc.event.BufferDownloadListener;
 import com.sun.media.jmc.event.BufferDownloadedProgressChangedEvent;
 import com.sun.media.jmc.event.VideoRendererEvent;
 import com.sun.media.jmc.event.VideoRendererListener;
+import com.sun.opengl.util.texture.TextureIO;
 import com.sun.opengl.util.texture.awt.AWTTextureIO;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -115,9 +116,17 @@ public class TextureVideo extends TextureImage
 //      textureData.flush();
 //    }
 
-    textureData = AWTTextureIO.newTextureData(bufferedImage, false); //mipmapping=false
-    isTextureWaiting = true;
-
+    try
+    {
+      //these 2 lines are commented out because of an error in GL2 TextureData, see 
+      //updateTexture for the hack to workaround this..
+      //textureData = AWTTextureIO.newTextureData(bufferedImage, false); //mipmapping=false
+      //isTextureWaiting = true;
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
     //bufferedImage.flush();
   }
 
@@ -628,11 +637,22 @@ public class TextureVideo extends TextureImage
       return false;
     }
 
+    //hack for GL2 TextureData bug...)
+    //this is slower than before, since the textureData
+    //is being recreated every GL frame, rather than just when
+    //a new video frame appears...
+    if (bufferedImage != null)
+    {
+      textureData = AWTTextureIO.newTextureData(bufferedImage, false); //mipmapping=false
+      isTextureWaiting = true;
+    }
+
     if (textureData == null) //no data loaded
     {
       log.exit("in updateTexture() : GL textureData has not been loaded yet!");
       return false;
     }
+    //end hack
 
     if (texture == null) //texture needs to be intialized
     {
@@ -650,6 +670,16 @@ public class TextureVideo extends TextureImage
     return true;
   }
 
+  @Override
+  protected void initializeTexture()
+  {
+    log.entry("in initializeTexture()");
+    this.texture = TextureIO.newTexture(textureData);
+    //this.isTextureWaiting = false;
+    log.exit("out initializeTexture()");
+  }
+
+  @Override
   protected void copyDataToTexture()
   {
     texture.updateImage(textureData);

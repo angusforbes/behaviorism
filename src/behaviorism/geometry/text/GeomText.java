@@ -67,7 +67,7 @@ public class GeomText extends GeomRect
   protected float transX = 0f;
   protected float transY = 0f;
   protected LineMetrics metrics;
-  public boolean isRecalculated = false;
+  public boolean isRecalculated = true; //false;
 
   public GeomText()
   {
@@ -77,14 +77,14 @@ public class GeomText extends GeomRect
   {
     super(anchorPt, 0, 0); //we calculate the width/height ourselves
     initialize(builder);
-    calculateWorld();
+   // calculateWorld();
   }
 
   public GeomText(int pxX, int pxY, boolean pixelAnchorUpperLeft, TextBuilder builder)
   {
     super(pixelAnchorUpperLeft, pxX, pxY, 0, 0);  //we calculate the width/height ourselves
     initialize(builder);
-    calculatePixel();
+   // calculatePixel();
   }
 
   public void recalculate()

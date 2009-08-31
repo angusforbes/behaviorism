@@ -259,6 +259,8 @@ public class Behaviorism
 
     //set up openGL canvas
     GLCapabilities capabilities = new GLCapabilities(GLProfile.get(GLProfile.GL2));
+    capabilities.setSampleBuffers(true);
+    capabilities.setNumSamples(4);
     return new GLCanvas(capabilities);
 
   }

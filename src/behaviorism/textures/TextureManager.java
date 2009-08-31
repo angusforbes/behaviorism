@@ -2,8 +2,9 @@
 package behaviorism.textures;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.grlea.log.SimpleLogger;
 
 /**
@@ -13,8 +14,9 @@ import org.grlea.log.SimpleLogger;
 public class TextureManager
 {
 
-  private List<Texture> textures;
-  private static TextureManager instance = null;
+  private final List<Texture> textures = Collections.synchronizedList(new ArrayList<Texture>());
+  //private List<Texture> textures;
+  private static TextureManager instance = new TextureManager(); //null;
   public static final SimpleLogger log = new SimpleLogger(TextureManager.class);
 
   /**
@@ -23,6 +25,8 @@ public class TextureManager
    */
   public static TextureManager getInstance()
   {
+    return instance;
+    /*
     if (instance != null)
     {
       return instance;
@@ -31,11 +35,14 @@ public class TextureManager
     instance = new TextureManager();
 
     return instance;
+    */
   }
 
   private TextureManager()
   {
-    textures = new CopyOnWriteArrayList<Texture>();
+    //this seems to be causing problems! no good way to remove elements. using synchronized list instead!
+    //textures = new CopyOnWriteArrayList<Texture>();
+
   }
 
   /**
@@ -44,20 +51,47 @@ public class TextureManager
   public void updateTextures()
   {
     log.entry("in updateTextures() : textures.size = " + textures.size());
+    synchronized(textures)
+    {
+    System.err.println("in TextureManager : updateTextures(), size = " + textures.size());
     List<Texture> keeps = new ArrayList<Texture>();
 
-    for (Texture t : textures)
+    Iterator<Texture> i = textures.iterator();
+
+    while(i.hasNext())
     {
+      Texture t = i.next();
+
       t.updateTexture();
-      if (t.isDone() == false)
+
+      if (t.isDone() == true)
       {
-        keeps.add(t);
+        i.remove();
       }
     }
 
-    textures.clear();
-    textures.addAll(keeps);
-
+//    for (Texture t : textures)
+//    {
+//      if (!(t instanceof TextureImage))
+//      {
+//        System.err.println("texture is a " + t.getClass());
+//      }
+//      t.updateTexture();
+//      if (t.isDone() == false)
+//      {
+//        keeps.add(t);
+//      }
+//      else
+//      {
+//        System.err.println("" + t.getClass() + " is DONE");
+//      }
+//    }
+//
+//    log.debug("keeps size = " + keeps.size());
+//
+//    textures.clear();
+//    textures.addAll(keeps);
+    }
     log.exit("out updateTextures() : textures.size = " + textures.size());
   }
 
@@ -78,13 +112,13 @@ public class TextureManager
   public void addTexture(Texture ti)
   {
     log.debug("in addTexture() : adding texture of type " + ti.getClass());
+    System.err.println("in addTexture() : adding texture of type " + ti.getClass());
     this.textures.add(ti);
-
-
   }
 
   public void removeTexture(Texture ti)
   {
+    System.err.println("in removeTexture() : removing texture of type " + ti.getClass());
     log.debug("in removeTexture() : removing texture of type " + ti.getClass());
     if (ti != null)
     {

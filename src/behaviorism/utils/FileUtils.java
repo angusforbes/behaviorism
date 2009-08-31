@@ -231,7 +231,7 @@ public class FileUtils
 
     List<File> files = FileUtils.getFilesFromDirectory(directory, "jpg");
 
-    Collections.shuffle(files);
+   // Collections.shuffle(files);
 
     int idx = 0;
     for (File f : files)

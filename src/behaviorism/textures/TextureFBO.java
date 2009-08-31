@@ -32,6 +32,7 @@ public class TextureFBO extends Texture
 
   public boolean updateTexture()
   {
+    System.err.println("in TextureFBO updateTexture!");
     log.entry("TextureFBO : in updateTexture()");
 
     if (isDone() == true)
@@ -55,19 +56,23 @@ public class TextureFBO extends Texture
 
   public void bindFBO()
   {
+    log.entry("in bindFBO()");
     GL2 gl = getGL();
     //0. bind our FBO and start drawing on it
     gl.glBindFramebuffer(GL_FRAMEBUFFER, fboId);
     gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     gl.glViewport(0, 0, offScreenWidth, offScreenHeight);
+    log.exit("out bindFBO()");
   }
 
   public void unbindFBO()
   {
+    log.entry("in unbindFBO()");
     GL2 gl = getGL();
     // we are finished drawing to our FBO, so unbind it and return to our original viewport, etc
     gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
     gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
+    log.exit("out unbindFBO()");
   }
 
   /**
