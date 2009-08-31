@@ -20,6 +20,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.Window;
 import javax.media.opengl.*;
 import java.awt.event.*;
 import java.awt.image.MemoryImageSource;
@@ -192,14 +193,14 @@ public class Behaviorism
     canvas.setSize(300, 300);
 
     //   makeAppletScreen(applet);
-//    if (fullScreen)
-//    {
-//      makeFullScreen(frame);
-//    }
-//    else
-//    {
-//      makeNormalScreen(frame, canvas);
-//    }
+    if (fullScreen)
+    {
+      makeFullScreen(frame);
+    }
+    else
+    {
+      makeNormalScreen(frame, canvas);
+    }
 
     //add listeners
     addListeners(canvas);
@@ -233,6 +234,7 @@ public class Behaviorism
     }
     else
     {
+      //makeFullScreen(frame);
       makeNormalScreen(frame, canvas);
     }
 
@@ -282,6 +284,7 @@ public class Behaviorism
   private void makeFullScreen(JFrame f)
   {
     f.setUndecorated(true);
+    //f.setUndecorated(false);
     device.setFullScreenWindow(f);
   }
 
@@ -306,28 +309,74 @@ public class Behaviorism
     }
     else
     {
-      xLocation = prevLocX;
-      yLocation = prevLocY;
+      xLocation = Utils.randomInt(10, 400); //prevLocX;
+      yLocation = Utils.randomInt(10, 400); //prevLocY;
     }
 
     f.setLocation(xLocation, yLocation);
 
     f.pack();
     f.setVisible(true);
-    f.addWindowListener(new WindowAdapter()
-    {
-
-      @Override
-      public void windowClosing(WindowEvent e)
-      {
-        shutDown();
-      }
-    });
+//    f.addWindowListener(new WindowAdapter()
+//    {
+//
+//      @Override
+//      public void windowClosing(WindowEvent e)
+//      {
+//        log.info("windowClosing event received.");
+//        shutDown();
+//      }
+//    });
   }
 
+ 
   public void toggleFullScreen()
   {
     this.fullScreen = !this.fullScreen;
+
+    removeListeners(canvas);
+    JFrame tmpFrame = new JFrame(this.applicationName);
+
+      GLCanvas tmpCanvas = new GLCanvas(
+        canvas.getChosenGLCapabilities(),
+        new DefaultGLCapabilitiesChooser(),
+        canvas.getContext(),
+        null);
+      tmpFrame.add(tmpCanvas);
+
+      addListeners(tmpCanvas);
+
+      if (fullScreen == true)
+      {
+        prevCanvasWidth = canvas.getWidth();
+        prevCanvasHeight = canvas.getHeight();
+        prevLocX = (int) frame.getLocation().getX();
+        prevLocY = (int) frame.getLocation().getY();
+        makeFullScreen(tmpFrame);
+      }
+      else
+      {
+        makeNormalScreen(tmpFrame, tmpCanvas);
+      }
+
+      tmpCanvas.display();
+      tmpFrame.requestFocus();
+      tmpCanvas.requestFocus();
+
+      frame.dispose();
+      frame = tmpFrame;
+      canvas = tmpCanvas;
+
+    
+  }
+
+  public void toggleFullScreenReal()
+  {
+    this.fullScreen = !this.fullScreen;
+
+
+    //setFullscreen(true);
+
 
     try
     {
@@ -337,6 +386,9 @@ public class Behaviorism
       removeListeners(canvas);
 
       JFrame tmpFrame = new JFrame(this.applicationName);
+
+//      GLCapabilities capabilities = new GLCapabilities(GLProfile.get(GLProfile.GL2));
+//      GLCanvas tmpCanvas = new GLCanvas(capabilities);
 
       GLCanvas tmpCanvas = new GLCanvas(
         canvas.getChosenGLCapabilities(),
@@ -372,6 +424,7 @@ public class Behaviorism
 
       Renderer.getInstance().animator = new Animator(canvas);
       Renderer.getInstance().animator.start();
+
     }
     catch (Exception e)
     {
@@ -533,6 +586,9 @@ public class Behaviorism
   public void shutDown()
   {
     log.entry("in shutDown()");
+
+    frame.getToolkit().getSystemEventQueue().postEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+ /*
     new Thread(new Runnable()
     {
 
@@ -540,20 +596,26 @@ public class Behaviorism
       {
         log.info("disposing of resources...");
         isShutdown.set(true);
+        Utils.sleep(500);
+        
+        //Renderer.getInstance().animator.stop();
+        //System.err.println("animator stopped?");
 
+        Utils.sleep(3000);
         while (doneShutdown.get() == false)
         {
-          Utils.sleep(10);
+          log.info("waiting for display loop to handle disposing resources...");
+          Utils.sleep(1000); //10L
         }
 
         log.info("stopping GL thread...");
 
-        Renderer.getInstance().animator.stop();
-
+        //RenderUtils.getRenderer().dispose(canvas);
         log.info("goodbye!");
 
         System.exit(0);
       }
     }).start();
+  */
   }
 }

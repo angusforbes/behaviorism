@@ -1,8 +1,8 @@
 /* TextureImage.java ~ May 19, 2009 */
 package behaviorism.textures;
 
+import behaviorism.utils.RenderUtils;
 import com.sun.opengl.util.texture.TextureIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -18,18 +18,22 @@ public class TextureImage extends Texture
   public com.sun.opengl.util.texture.TextureData textureData = null;
   public static final SimpleLogger log = new SimpleLogger(TextureImage.class);
 
+  public Object tempTextureDataHackObject = null;
+
   public TextureImage()
   {
   }
 
   public TextureImage(URL url)
   {
-    generateTextureData(url, false);
+    //generateTextureData(url, false);
+    tempTextureDataHackObject = url;
   }
 
   public TextureImage(File file)
   {
-    generateTextureData(file, false);
+    //generateTextureData(file, false);
+    tempTextureDataHackObject = file;
   }
 
   /**
@@ -38,8 +42,19 @@ public class TextureImage extends Texture
   protected void initializeTexture()
   {
     log.entry("in initializeTexture()");
+
+    if (tempTextureDataHackObject instanceof File)
+    {
+      System.err.println("tying to load file " + ((File) tempTextureDataHackObject));
+      generateTextureData((File)tempTextureDataHackObject, false);
+    }
+    
+    else if (tempTextureDataHackObject instanceof URL)
+    {
+      generateTextureData((URL)tempTextureDataHackObject, false);
+    }
+
     this.texture = TextureIO.newTexture(textureData);
-    //this.isTextureWaiting = false;
     log.exit("out initializeTexture()");
   }
 
@@ -60,7 +75,8 @@ public class TextureImage extends Texture
 //      return false;
 //    }
 
-    if (texture == null && textureData != null) //texture needs to be intialized
+    //if (texture == null && textureData != null) //texture needs to be intialized
+    if (texture == null)// && textureData != null) //texture needs to be intialized
     {
       log.debug("GL texture = null, needs to be initialized");
       initializeTexture();

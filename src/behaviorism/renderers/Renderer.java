@@ -232,6 +232,7 @@ public class Renderer implements GLEventListener
   @Override
   public void display(GLAutoDrawable drawable)
   {
+   // log.entry("in display()...");
 //    if (texturesToDispose.size() > 0)
 //    {
 //      isDisposing.set(true);
@@ -410,6 +411,14 @@ public class Renderer implements GLEventListener
   @Override
   public void dispose(GLAutoDrawable arg0)
   {
+    log.entry("in dispose()");
+    log.info("should stuff be disposed of here?");
+    shutdown();
+    log.info("goodbye!!!");
+    log.exit("out dispose()");
+    System.err.println("done disposing...");
+
+    System.exit(0);
   }
 }
 
