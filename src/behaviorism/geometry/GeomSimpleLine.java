@@ -8,10 +8,9 @@
  */
 package behaviorism.geometry;
 
-import behaviorism.utils.RenderUtils;
+import behaviorism.geometry.primitives.Segment;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2.*;
-import javax.media.opengl.glu.GLU;
 import static behaviorism.utils.RenderUtils.*;
 
 import javax.vecmath.Point3f;
@@ -70,6 +69,14 @@ public class GeomSimpleLine extends Geom
     //ends[0] = new GeomPoint(p1.x, p1.y, p1.z);
     ends[0] = new GeomPoint(0f, 0f, 0f);
     ends[1] = new GeomPoint(p2.x, p2.y, p2.z);
+  }
+
+  public GeomSimpleLine(Segment s)
+  {
+    //setTranslate(s.p1);
+    ends[0] = new GeomPoint(s.p1.x, s.p1.y, s.p1.z);
+    //ends[0] = new GeomPoint(0f, 0f, 0f);
+    ends[1] = new GeomPoint(s.p2.x, s.p2.y, s.p2.z);
   }
 
   public void draw()

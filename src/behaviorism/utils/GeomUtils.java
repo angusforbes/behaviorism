@@ -5,10 +5,11 @@ import behaviorism.geometry.Geom;
 import behaviorism.geometry.GeomPoint;
 import behaviorism.geometry.GeomPoly;
 import behaviorism.geometry.GeomRect;
+import behaviorism.geometry.primitives.Segment;
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
@@ -24,14 +25,14 @@ import javax.vecmath.Vector3f;
 /**
  * This class contains static utility methods having to do with shapes and geometry.
  * In particular, in contains both specific methods to facilitate working with the
- * java2D.Shape interface (especially Path2D), as well as more general methods to find
+ * java2D.Shape interface (especially GeneralPath), as well as more general methods to find
  * the area and center of mass of a shape, or distances between points, etc.
  */
 public class GeomUtils
 {
 
   /*
-  public static List<Line2D> getLinesFromPath2D(Path2D path)
+  public static List<Line2D> getLinesFromGeneralPath(GeneralPath path)
   {
   PathIterator pi = path.getPathIterator(null);
   
@@ -83,7 +84,7 @@ public class GeomUtils
   return lines;
   }
    */
-  public static List<Line2D> getLinesFromPath2D(Path2D path)
+  public static List<Line2D> getLinesFromPath(GeneralPath path)
   {
     List<Line2D> lines = new ArrayList<Line2D>();
 
@@ -131,7 +132,7 @@ public class GeomUtils
     return lines;
   }
 
-  public static List<Point2D> getPointsFromPath2D(Path2D path)
+  public static List<Point2D> getPointsFromGeneralPath(GeneralPath path)
   {
     PathIterator pi = path.getPathIterator(null, .001);
 
@@ -183,21 +184,21 @@ public class GeomUtils
   }
 
   //Pick's algo...
-  //public static float area(Path2D.Float p2d)
+  //public static float area(GeneralPath p2d)
   public static float area(Shape shape)
   {
-    Path2D.Float p2d;
+    GeneralPath p2d;
 
-    if (shape instanceof Path2D.Float)
+    if (shape instanceof GeneralPath)
     {
-      p2d = (Path2D.Float) shape;
+      p2d = (GeneralPath) shape;
     }
     else
     {
-      p2d = new Path2D.Float(shape);
+      p2d = new GeneralPath(shape);
     }
 
-    List<Point2D> points = getPointsFromPath2D(p2d);
+    List<Point2D> points = getPointsFromGeneralPath(p2d);
 
     int i, j, n = points.size();
     float area = 0f;
@@ -454,6 +455,130 @@ public class GeomUtils
     return false;
   }
 
+  //  Determines the intersection point of the line defined by points A and B with the
+//  line defined by points C and D.
+//
+//  Returns YES if the intersection point was found, and stores that point in X,Y.
+//  Returns NO if there is no determinable intersection point, in which case X,Y will
+//  be unmodified.
+
+ public static Point3f getIntersectionBetweenLineSegments2(final Segment s1, final Segment s2)
+ {
+  float m1 = getSlope(s1.p1, s1.p2);
+  float b1 = getYIntercept(m1, s1.p1);
+
+  float m2 = getSlope(s2.p1, s2.p2);
+  float b2 = getYIntercept(m2, s2.p1);
+
+
+  float xi = (b2 - b1) / (m1 - m2);
+  float yi = (m1 * xi) + b1;
+
+  if (
+    ( (Math.min(s1.p1.x, s1.p2.x) <= xi) && (xi <= Math.max(s1.p1.x, s1.p2.x)) )
+    &&
+    ( (Math.min(s1.p1.y, s1.p2.y) <= yi) && (yi <= Math.max(s1.p1.y, s1.p2.y)) )
+    &&
+    ( (Math.min(s2.p1.x, s2.p2.x) <= xi) && (xi <= Math.max(s2.p1.x, s2.p2.x)) )
+    &&
+    ( (Math.min(s2.p1.y, s2.p2.y) <= yi) && (yi <= Math.max(s2.p1.y, s2.p2.y)) )
+    )
+  {
+    return new Point3f(xi,yi,0f);
+  }
+
+  return null;
+
+
+ }
+
+ public static Point3f getIntersectionBetweenLineSegments(final Segment s1, final Segment s2)
+ {
+   double Ax = s1.p1.x;
+   double Ay = s1.p1.y;
+   double Bx = s1.p2.x;
+   double By = s1.p2.y;
+   double Cx = s2.p1.x;
+   double Cy = s2.p1.y;
+   double Dx = s2.p2.x;
+   double Dy = s2.p2.y;
+   double X;
+   double Y;
+
+   double  distAB, theCos, theSin, newX, ABpos ;
+
+  //  Fail if either line is undefined.
+  if (Ax==Bx && Ay==By || Cx==Dx && Cy==Dy) return null;
+
+  //  (1) Translate the system so that point A is on the origin.
+  Bx-=Ax; By-=Ay;
+  Cx-=Ax; Cy-=Ay;
+  Dx-=Ax; Dy-=Ay;
+
+  //  Discover the length of segment A-B.
+  distAB=Math.sqrt(Bx*Bx+By*By);
+
+  //  (2) Rotate the system so that point B is on the positive X axis.
+  theCos=Bx/distAB;
+  theSin=By/distAB;
+  newX=Cx*theCos+Cy*theSin;
+  Cy  =Cy*theCos-Cx*theSin; Cx=newX;
+  newX=Dx*theCos+Dy*theSin;
+  Dy  =Dy*theCos-Dx*theSin; Dx=newX;
+
+  //  Fail if the lines are parallel.
+  if (Cy==Dy) return null;
+
+  //  (3) Discover the position of the intersection point along line A-B.
+  ABpos=Dx+(Cx-Dx)*Dy/(Dy-Cy);
+
+  //  (4) Apply the discovered position to line A-B in the original coordinate system.
+  X=Ax+ABpos*theCos;
+  Y=Ay+ABpos*theSin;
+
+  //  Success.
+  return new Point3f((float)X, (float)Y, 0f);
+ }
+  /* NOT WORKING!
+  //assuming 2D
+  public static Point3f getIntersectionBetweenLineSegments(Segment s1, Segment s2)
+  {
+    Vector3f u = new Vector3f(s1.p2.x - s1.p1.x, s1.p2.y - s1.p1.y, 0f);
+    Vector3f v = new Vector3f(s2.p2.x - s2.p1.x, s2.p2.y - s2.p1.y, 0f);
+
+    System.err.println("vector u = " + u);
+    System.err.println("vector v = " + v);
+    float D = u.x * v.y - u.y * v.x;
+
+    if (Math.abs(D) < .0001) {
+      System.err.println("D is less than epsilon...");
+      return null; //parallel test
+    }
+
+    System.err.println("D = " + D);
+    Vector3f w = new Vector3f(s1.p1.x - s2.p1.x, s1.p1.y - s2.p1.y, 0f);
+    System.err.println("vector w = " + w);
+
+    float s = v.x * w.y - v.y * w.x;
+      System.err.println("s = " + s);
+    if (s < 0 || s > D)
+    {
+      System.err.println("s fails...");
+      return null;
+    }
+    float t = u.x * w.y - u.y * w.x;
+    if (t < 0 || t > D)
+    {
+      System.err.println("t fails...");
+      return null;
+    }
+    return new Point3f(s1.p1.x + u.x * (s/D), s1.p1.y + u.y * (s/D), 0f);
+
+	//cVector2 intersectPt = a + u * (s/d); //or b + v * (t/d);
+	//return true;
+}
+   **/
+
   public static boolean getIntersectionBetweenLines(Point3f line1_p1, Point3f line1_p2,
     Point3f line2_p1, Point3f line2_p2,
     Point3f intersectionPt)
@@ -469,15 +594,15 @@ public class GeomUtils
     {
       intersectionPt.x = (float) testP2D.getX();
       intersectionPt.y = (float) testP2D.getY();
-      intersectionPt.z = (float) 0f;
+      intersectionPt.z = 0f;
       return true;
     }
   }
 
   public static Point2D getIntersectionBetweenLineAndPolygon(
-    Line2D line, Path2D poly)
+    Line2D line, GeneralPath poly)
   {
-    List<Line2D> lines = getLinesFromPath2D(poly);
+    List<Line2D> lines = getLinesFromPath(poly);
 
     for (Line2D polyline : lines)
     {
@@ -549,6 +674,15 @@ public class GeomUtils
     //error!!!
     System.out.println("ERROR : GeomUtils.getIntersectionBetweenLineAndRectangle() : how is this null?");
     return null;
+  }
+
+  public static boolean leftOf(final Segment s, final Point3f p)
+  {
+    if ( ((s.p1.y - s.p2.y) * (p.x - s.p2.x)) - ((p.y - s.p2.y) * (s.p1.x - s.p2.x)) > 0)
+    {
+      return true;
+    }
+    return false;
   }
 
   public static Point2D getIntersectionBetweenLines(Line2D line1, Line2D line2) //throws MultipleIntersectionException
@@ -1183,7 +1317,6 @@ public class GeomUtils
     Collections.sort(points, new Comparator<Geom>()
     {
 
-      @Override
       public int compare(Geom a, Geom b)
       {
         float dA = linePointDist(lineA, lineB, a.translate);
@@ -1207,7 +1340,6 @@ public class GeomUtils
     Collections.sort(points, new Comparator<Point3f>()
     {
 
-      @Override
       public int compare(Point3f a, Point3f b)
       {
         float dA = linePointDist(lineA, lineB, a);
@@ -1247,7 +1379,7 @@ public class GeomUtils
     Collections.sort(list, new Comparator()
     {
 
-      @Override
+      //@Override
       public int compare(Object a, Object b)
       {
         Point3f g1 = (Point3f) a;
@@ -1344,6 +1476,21 @@ public class GeomUtils
     return new Point2D.Double(x, y);
   }
 
+    /**
+   * Compute the midpoint between two points.
+   * @param p1 A point.
+   * @param p2 Another point.
+   * @return The midpoint of p1 and p2.
+   */
+  public static Point3f getPercPointOfTwoPoints(Point3f p1, Point3f p2, float perc)
+  {
+    float nx = (p1.x + ((p2.x - p1.x) * perc));
+    float ny = (p1.y + ((p2.y - p1.y) * perc));
+    float nz = (p1.x + ((p2.z - p1.z) * perc));
+
+    return new Point3f(nx, ny, nz);
+  }
+
   /**
    * Compute the midpoint between two points.
    * @param p1 A point.
@@ -1356,6 +1503,65 @@ public class GeomUtils
     float ny = (p1.y + p2.y) / 2f;
     float nz = (p1.z + p2.z) / 2f;
     return new Point3f(nx, ny, nz);
+  }
+
+  /**
+   * Creates a Segement that is perpindicular to the specified segment. This created segment will 
+   * be start and end a specified distance from the first point of the specified segment. If the 
+   * direction is +1, then the new segment will be clockwise to the start point, if -1, then counterclockwise. 
+   * @param p1
+   * @param p2
+   * @param start
+   * @param end
+   * @param direction either +1 for clockwise or -1 for counterclockwise
+   * @return The new segment
+   */
+  public static Segment getPerpindicularSegment(final Segment s, final float start, final float end, final int direction)
+  {
+    float dx = s.p2.x - s.p1.x;
+    float dy = s.p2.y - s.p1.y;
+    double theta = Math.atan2(dy, dx);
+
+    Point3f s1 = new Point3f();
+    Point3f s2 = new Point3f();
+
+    //System.err.println("THETA = " + theta);
+
+
+    s1.x = s.p1.x + ((float) Math.cos(theta - (Math.toRadians(90.0 * direction))) * start);
+    s1.y = s.p1.y + ((float) Math.sin(theta - (Math.toRadians(90.0 * direction))) * start);
+
+    s2.x = s.p1.x + ((float) Math.cos(theta - (Math.toRadians(90.0 * direction))) * end);
+    s2.y = s.p1.y + ((float) Math.sin(theta - (Math.toRadians(90.0 * direction))) * end);
+//    s2.x = s.p1.x + ((float) Math.cos(theta - Math.PI/2) * end);
+//    s2.y = s.p1.y + ((float) Math.sin(theta - Math.PI/2) * end);
+
+    return new Segment(s1, s2);
+  }
+
+  /**
+   * Creates a Segment perpindicular to the specifed segment, centered on the first point of the specified
+   * Segment. The new segment will be length (dist * 2).
+   * @param s
+   * @param dist
+   * @return The new Segment.
+   */
+  public static Segment getPerpindicularSegment(Segment s, float dist)
+  {
+    float dx = s.p2.x - s.p1.x;
+    float dy = s.p2.y - s.p1.y;
+    double theta = Math.atan2(dy, dx);
+
+    Point3f s1 = new Point3f();
+    Point3f s2 = new Point3f();
+
+    s1.x = s.p1.x + ((float) Math.cos(theta - (Math.toRadians(90))) * -dist);
+    s1.y = s.p1.y + ((float) Math.sin(theta - (Math.toRadians(90))) * -dist);
+
+    s2.x = s.p1.x + ((float) Math.cos(theta - (Math.toRadians(90))) * dist);
+    s2.y = s.p1.y + ((float) Math.sin(theta - (Math.toRadians(90))) * dist);
+
+    return new Segment(s1, s2);
   }
 
   /** pass in a line segment, return a second line segment of length 1000f, which is perpendicular to the first
@@ -1617,9 +1823,9 @@ public class GeomUtils
     QuadCurve2D q2d = new QuadCurve2D.Float(x1, y1, ctrx, ctrly, x2, y2);
     System.out.printf("Quad: %f %f, %f %f, %f %f\n", x1, y1, ctrx, ctrly, x2, y2);
 
-    Path2D.Float p2d = new Path2D.Float(q2d);
+    GeneralPath p2d = new GeneralPath(q2d);
 
-    List<Point2D> pts = getPointsFromPath2D(p2d);
+    List<Point2D> pts = getPointsFromGeneralPath(p2d);
 
     return point2DListToPoint3fList(pts);
   }
@@ -1974,12 +2180,12 @@ public class GeomUtils
   }
 
   /**
-   * Get a Rectangle2D.Float view of a four sided Path2D.Float. This is *not* the same as
+   * Get a Rectangle2D.Float view of a four sided GeneralPath. This is *not* the same as
    * a call to getBounds! 
    * @param path
    * @return a rectangle2D.Float representation of the path.
    */
-  public static Rectangle2D.Float pathToRect(Path2D.Float path)
+  public static Rectangle2D.Float pathToRect(GeneralPath path)
   {
     //hmm isn't there some way of checking how many points the path has??
     // float x, y, w, h;
@@ -2034,7 +2240,7 @@ public class GeomUtils
   }
 
   public static String printPath(
-    Path2D.Float path)
+    GeneralPath path)
   {
     String str = "";
     PathIterator pi = path.getPathIterator(null);
@@ -2188,7 +2394,7 @@ public class GeomUtils
 
     //4. construct 2D projected shape from projected points
     //and make sure that it doesn't intersect with the screen shape
-    Path2D.Float p2f = new Path2D.Float();
+    GeneralPath p2f = new GeneralPath();
     p2f.moveTo(pts[0].x, pts[0].y);
 
     for (int i = 1; i <

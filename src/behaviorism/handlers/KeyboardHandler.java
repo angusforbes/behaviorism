@@ -6,7 +6,6 @@ package behaviorism.handlers;
 
 import behaviorism.Behaviorism;
 import behaviorism.geometry.Geom;
-import behaviorism.renderers.Renderer;
 import behaviorism.renderers.SceneGraph;
 import behaviorism.renderers.cameras.Cam;
 import behaviorism.utils.RenderUtils;
@@ -43,7 +42,7 @@ public class KeyboardHandler implements KeyListener
   }
 
   private ModeEnum mode = ModeEnum.MODE_TRANSLATE;
-  private static KeyboardHandler instance = null;
+  private static final KeyboardHandler instance = new KeyboardHandler();
 
   public static final SimpleLogger log = new SimpleLogger(KeyboardHandler.class);
 
@@ -53,11 +52,6 @@ public class KeyboardHandler implements KeyListener
    */
   public static KeyboardHandler getInstance()
   {
-    if (instance == null)
-    {
-      instance = new KeyboardHandler();
-    }
-
     return instance;
   }
 
@@ -90,11 +84,9 @@ public class KeyboardHandler implements KeyListener
     checkModeKeys(); //keys specfic to a particular mode
   }
 
-  @Override
   public void keyPressed(KeyEvent evt)
   {
 
-    System.err.println("in keyPressed() : code=" + evt.getKeyCode() + ", text=" + getKeyText(evt.getKeyCode()));
     log.entry("in keyPressed() : code=" + evt.getKeyCode() + ", text=" + getKeyText(evt.getKeyCode()));
 
     if (evt.getKeyCode() > keys.length)
@@ -109,12 +101,10 @@ public class KeyboardHandler implements KeyListener
 
   }
 
-  @Override
   public void keyTyped(KeyEvent evt)
   {
   }
 
-  @Override
   public void keyReleased(KeyEvent evt)
   {
     log.entry("in keyReleased() : releasing " + evt.getKeyCode() + ", contorlPressing = " + controlPressing );
@@ -240,7 +230,6 @@ public class KeyboardHandler implements KeyListener
   {
     if (keys[KeyEvent.VK_ESCAPE])
     {
-      System.err.println("pressed ESC");
       Behaviorism.getInstance().shutDown();
 
       return true;
@@ -253,14 +242,6 @@ public class KeyboardHandler implements KeyListener
 
     if (controlPressing == true)
     {
-
-//      if (keys[VK_Q])
-//      {
-//        System.err.println("VK_Q");
-//        Behaviorism.getInstance().shutDown();
-//        return true;
-//      }
-
       if (keys[VK_C])
       {
         if (keysPressing[VK_C] == false)
@@ -278,7 +259,6 @@ public class KeyboardHandler implements KeyListener
           keysPressing[VK_F] = true;
 
           Behaviorism.getInstance().toggleFullScreen();
-          //Renderer.getInstance().togglingFullScreen.set(true);
         }
         return true;
       }

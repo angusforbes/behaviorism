@@ -115,7 +115,10 @@ public class FboPingPong
   {
     GL2 gl = getGL();
     gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
+     int www =  RenderUtils.getViewport()[2];
+    int hhh =  RenderUtils.getViewport()[3];
+
+    gl.glViewport(0, 0, www, hhh);
   }
 
   /**
@@ -181,7 +184,10 @@ public class FboPingPong
     }
 
     gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
+     int www =  RenderUtils.getViewport()[2];
+    int hhh =  RenderUtils.getViewport()[3];
+
+    gl.glViewport(0, 0, www, hhh);
 
     if (readTextureId == texture1.getTextureObject())
     {

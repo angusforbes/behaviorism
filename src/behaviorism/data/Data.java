@@ -31,7 +31,7 @@ public class Data
 
   public DataEnum dataType = null;
   public float weight = 1.0f;
-  //should this map actually map a key to a SET (instead of a list)???
+  //should this map actually map a key to a (sorted?) SET (instead of a list)???
   Map<DataEnum, List<Data>> dataMap = new HashMap<DataEnum, List<Data>>();
 
   public List<Data> getRelated(Data d)
@@ -149,9 +149,10 @@ public class Data
   /** Get a random element from ANY list in the dataMap */
   public Data getRandomElement()
   {
-    List listOfKeys = new ArrayList(dataMap.keySet());
+    //List listOfKeys = new ArrayList(dataMap.keySet());
+    List<DataEnum> listOfKeys = new ArrayList<DataEnum>(dataMap.keySet());
 
-    DataEnum key = (DataEnum) listOfKeys.get(Utils.randomInt(0, listOfKeys.size()));
+    DataEnum key = listOfKeys.get(Utils.randomInt(0, listOfKeys.size()));
 
     return getRandomElement(key);
   }

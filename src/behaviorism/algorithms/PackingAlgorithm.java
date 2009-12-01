@@ -51,7 +51,7 @@ public class PackingAlgorithm
   
   //used internally
   private Rectangle2D boundingBox = null;
-  private Path2D.Float boundingPath = null;
+  private GeneralPath boundingPath = null;
   //private List<Line2D> boundingLines = null;
   private List<Line2D> boundingLines = null;
   
@@ -60,12 +60,12 @@ public class PackingAlgorithm
   {
   }
 
-  public PackingAlgorithm(Path2D.Float boundingPath)
+  public PackingAlgorithm(GeneralPath boundingPath)
   {
     initialize(boundingPath);
   }
 
-  public PackingAlgorithm(List<GeomText> geomTexts, Path2D.Float boundingPath) //make a poly later...
+  public PackingAlgorithm(List<GeomText> geomTexts, GeneralPath boundingPath) //make a poly later...
   {
     initialize(geomTexts, boundingPath);
   }
@@ -75,34 +75,34 @@ public class PackingAlgorithm
   {
     placedGeomTexts = new ArrayList<GeomRect>();
     
-    this.boundingPath = new Path2D.Float(boundingRect);
+    this.boundingPath = new GeneralPath(boundingRect);
     Rectangle2D bounds = this.boundingPath.getBounds2D();
     this.boundingBox = new Rectangle2D.Double((float)bounds.getX(), (float)bounds.getY(), (float)bounds.getWidth(), (float)bounds.getHeight());
-    this.boundingLines = GeomUtils.getLinesFromPath2D(boundingPath);
+    this.boundingLines = GeomUtils.getLinesFromPath(boundingPath);
   }
   
-  public void initialize(Path2D.Float boundingPath)
+  public void initialize(GeneralPath boundingPath)
   {
     placedGeomTexts = new ArrayList<GeomRect>();
     
     this.boundingPath = boundingPath;
     Rectangle2D bounds = this.boundingPath.getBounds2D();
     this.boundingBox = new Rectangle2D.Double((float)bounds.getX(), (float)bounds.getY(), (float)bounds.getWidth(), (float)bounds.getHeight());
-    this.boundingLines = GeomUtils.getLinesFromPath2D(boundingPath);
+    this.boundingLines = GeomUtils.getLinesFromPath(boundingPath);
   }
   
   public void initialize(List<GeomText> geomTexts, Rectangle2D boundingRect)
   {
-    initialize(geomTexts, new Path2D.Float(boundingRect));
+    initialize(geomTexts, new GeneralPath(boundingRect));
   }
-  public void initialize(List<GeomText> geomTexts, Path2D.Float boundingPath)
+  public void initialize(List<GeomText> geomTexts, GeneralPath boundingPath)
   {
     placedGeomTexts = new ArrayList<GeomRect>();
     
     this.boundingPath = boundingPath;
     Rectangle2D bounds = this.boundingPath.getBounds2D();
     this.boundingBox = new Rectangle2D.Double((float)bounds.getX(), (float)bounds.getY(), (float)bounds.getWidth(), (float)bounds.getHeight());
-    this.boundingLines = GeomUtils.getLinesFromPath2D(boundingPath);
+    this.boundingLines = GeomUtils.getLinesFromPath(boundingPath);
     
       boolean firstTime = true;
     for(GeomText gt : geomTexts)
@@ -268,7 +268,7 @@ public class PackingAlgorithm
         //within the box
         //So we remove it.
         
-        /**** ANGUS ADD this back in-- make it works with Path2D.Float!!!!
+        /**** ANGUS ADD this back in-- make it works with GeneralPath!!!!
          * /*
          * if (c.mark.y > boundingBox.getY() + boundingBox.getHeight() - flub || c.mark.y < boundingBox.getY() + flub)
          * {

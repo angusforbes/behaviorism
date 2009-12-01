@@ -1,4 +1,4 @@
-package behaviorism. utils;
+package behaviorism.utils;
 /*
  * Utils.java
  * Created on April 23, 2007, 7:37 PM
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.ImageIcon;
+import javax.vecmath.Vector3f;
 
 /** 
  * This class contains static utility methods for a number of common but miscellaneous "chores",
@@ -307,6 +308,41 @@ public class Utils
     return new Point3f(randomFloat(p1.x, p2.x), randomFloat(p1.y, p2.y), randomFloat(p1.z, p2.z));
   }
 
+  public static float randomAngle()
+  {
+    return (float)Utils.random(-Math.PI, Math.PI);
+  }
+
+  /**
+   * Creates a random 2D normalized vector (the z value is always set to 0f)
+   * @return the random normalized vector.
+   */
+  public static Vector3f randomVector2D()
+  {
+    float radian = randomAngle();
+
+    //System.err.println("in randomVector2D() : angle (in degrees) = " + Math.toDegrees(radian));
+    float x = (float) Math.cos(radian);
+    float y = (float) Math.sin(radian);
+
+    //System.err.println("x/y = " + x + "/" +y);
+
+    Vector3f vec = new Vector3f(x, y, 0f);
+    //vec.normalize();  //already normalized
+    return vec;
+  }
+
+  /**
+   * Creates a random 3D normalized vector.
+   *
+   * @return The random normalized vector.
+   */
+  public static Vector3f randomVector3D()
+  {
+    Vector3f vec = new Vector3f(Utils.randomFloat(-1f, 1f), Utils.randomFloat(-1f, 1f), Utils.randomFloat(-1f, 1f));
+    vec.normalize();
+    return vec;
+  }
   /**
    * creates a float between or equal to the specified values.
    * @param min
@@ -654,7 +690,7 @@ public class Utils
    * @param set2
    * @return
    */
-  public static <T> Set xorSets(Set<T> set1, Set<T> set2)
+  public static <T> Set<T> xorSets(Set<T> set1, Set<T> set2)
   {
     Set<T> xorSet = new HashSet<T>(set1);
     xorSet.addAll(set2);
@@ -671,7 +707,7 @@ public class Utils
    * @param set2
    * @return
    */
-  public static <T> Set intersectSets(Set<T> set1, Set<T> set2)
+  public static <T> Set<T> intersectSets(Set<T> set1, Set<T> set2)
   {
     Set<T> intersectionSet = new HashSet<T>(set1);
     intersectionSet.retainAll(set2);
@@ -685,7 +721,8 @@ public class Utils
    * @param set2
    * @return
    */
-  public static <T> Set complementSets(Set<T> set1, Set<T> set2)
+  //public static <T> Set complementSets(Set<T> set1, Set<T> set2)
+  public static <T> Set<T> complementSets(Set<T> set1, Set<T> set2)
   {
     Set<T> complementSet = new HashSet<T>(set1);
     complementSet.removeAll(set2);

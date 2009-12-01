@@ -1,7 +1,6 @@
 /* GeomText.java ~ Oct 6, 2008 */
-package behaviorism. geometry.text;
+package behaviorism.geometry.text;
 
-import behaviorism.Behaviorism;
 import behaviorism.geometry.Colorf;
 import behaviorism.geometry.Geom;
 import behaviorism.geometry.GeomRect;
@@ -17,8 +16,8 @@ import javax.vecmath.Point3f;
 import java.awt.font.LineMetrics;
 import java.util.List;
 import javax.media.opengl.GL2;
-import static javax.media.opengl.GL2.*;
 import behaviorism.utils.RenderUtils;
+import javax.media.opengl.GL;
 import static behaviorism.utils.RenderUtils.*;
 
 public class GeomText extends GeomRect
@@ -77,19 +76,19 @@ public class GeomText extends GeomRect
   {
     super(anchorPt, 0, 0); //we calculate the width/height ourselves
     initialize(builder);
-   // calculateWorld();
+    // calculateWorld();
   }
 
   public GeomText(int pxX, int pxY, boolean pixelAnchorUpperLeft, TextBuilder builder)
   {
     super(pixelAnchorUpperLeft, pxX, pxY, 0, 0);  //we calculate the width/height ourselves
     initialize(builder);
-   // calculatePixel();
+    // calculatePixel();
   }
 
   public void recalculate()
   {
-    System.out.println("in recalculate()");
+    //System.out.println("in recalculate()");
     this.w = 0;
     this.h = 0;
     useX = 0;
@@ -150,13 +149,16 @@ public class GeomText extends GeomRect
 
     if (exactPadding == true && pixelPadding == true)
     {
+      int www = RenderUtils.getViewport()[2];
+      int hhh = RenderUtils.getViewport()[3];
+
       //since padding is in pixels, we need to make it in world
       Point3f worldPaddingLL = MatrixUtils.pixelToWorld(
-        Behaviorism.getInstance().canvasWidth / 2 + marginLeft,
-        Behaviorism.getInstance().canvasHeight / 2 - marginBottom);
+        www / 2 + marginLeft,
+        hhh / 2 - marginBottom);
       Point3f worldPaddingUR = MatrixUtils.pixelToWorld(
-        Behaviorism.getInstance().canvasWidth / 2 + marginRight,
-        Behaviorism.getInstance().canvasHeight / 2 - marginTop);
+        www / 2 + marginRight,
+        hhh / 2 - marginTop);
 
       initializePadding(worldPaddingLL.x, worldPaddingLL.y, worldPaddingUR.x, worldPaddingUR.y);
     }
@@ -193,36 +195,39 @@ public class GeomText extends GeomRect
     //determine padding
     initializePadding(marginLeft, marginRight, marginBottom, marginTop);
 
+    int www = RenderUtils.getViewport()[2];
+    int hhh = RenderUtils.getViewport()[3];
+
     //transform pixels to world coordinates & update translate point
     Point3f upperright = MatrixUtils.pixelToWorld(
-      Behaviorism.getInstance().canvasWidth / 2 + this.w,
-      Behaviorism.getInstance().canvasHeight / 2 + this.h);
+      www / 2 + this.w,
+      hhh / 2 + this.h);
 
     this.w = upperright.x;
     this.h = -upperright.y;
 
     if (usePadding == true)
     {
+
       //this works if the GeomText is directly attached to world...
       //Test when attached to other things, especially when parents are scaled/rotated, etc.
       Point3f worldPaddingLL = MatrixUtils.pixelToWorld(
-        Behaviorism.getInstance().canvasWidth / 2 +
+        www / 2 +
         this.paddingLeft,
-        Behaviorism.getInstance().canvasHeight / 2 -
+        hhh / 2 -
         this.paddingBottom);
       this.paddingLeft = worldPaddingLL.x;
       this.paddingBottom = worldPaddingLL.y;
 
       Point3f worldPaddingUR = MatrixUtils.pixelToWorld(
-        Behaviorism.getInstance().canvasWidth / 2 +
+        www / 2 +
         this.paddingRight,
-        Behaviorism.getInstance().canvasHeight / 2 -
+        hhh / 2 -
         this.paddingTop);
       this.paddingRight = worldPaddingUR.x;
       this.paddingTop = worldPaddingUR.y;
     }
   }
-
 
   private void calculateBoundsIgnoringLOD()
   {
@@ -243,8 +248,11 @@ public class GeomText extends GeomRect
 
     bounds = this.stringBounds;
 
+    int www = RenderUtils.getViewport()[2];
+    int hhh = RenderUtils.getViewport()[3];
+
     float worldHeight = Renderer.screenBoundsInWorldCoords.height; //Behaviorism.world.getWorldRect().h;
-    this.scaleVal = ((worldHeight / (float) Behaviorism.getInstance().canvasHeight));
+    this.scaleVal = ((worldHeight / (float) hhh));
 
     this.metrics = font.getLineMetrics(text, frc);
 
@@ -321,10 +329,13 @@ public class GeomText extends GeomRect
   {
     if (fitInBox == true)
     {
+      int www = RenderUtils.getViewport()[2];
+      int hhh = RenderUtils.getViewport()[3];
+
       Point3f worldBox = MatrixUtils.pixelToWorld(
-        Behaviorism.getInstance().canvasWidth / 2 +
+        www / 2 +
         boxWidth,
-        Behaviorism.getInstance().canvasHeight / 2 -
+        hhh / 2 -
         boxHeight);
 
       transX += calculateWorldJustificationBoxX(worldBox.x);
@@ -440,14 +451,14 @@ public class GeomText extends GeomRect
       upp = upp.parent;
     }
 
-    temp_mv = MatrixUtils.translate(temp_mv, 0f, 0f, (float) avgdist);
+    temp_mv = MatrixUtils.translate(temp_mv, 0f, 0f, avgdist);
 
     double[] temp_pj = RenderUtils.getCamera().projection;
     int[] temp_vp = RenderUtils.getCamera().viewport;
 
-    this.pxWidth = (int) (RenderUtils.getWidthOfObjectInPixels(
+    this.pxWidth = (RenderUtils.getWidthOfObjectInPixels(
       this, this.paddingLeft + this.paddingRight, temp_mv, temp_pj, temp_vp));
-    this.pxHeight = (int) (RenderUtils.getHeightOfObjectInPixels(
+    this.pxHeight = (RenderUtils.getHeightOfObjectInPixels(
       this, this.paddingBottom + this.paddingTop, temp_mv, temp_pj, temp_vp));
 
     boolean debug = false;
@@ -463,7 +474,6 @@ public class GeomText extends GeomRect
       gl.glPopMatrix();
     }
   }
-
 
   //DebugTimer timer = new DebugTimer();
   @Override
@@ -524,7 +534,7 @@ public class GeomText extends GeomRect
       scaleVal);
     textRenderer.end3DRendering();
 
-  //textRenderer.flush();
+    //textRenderer.flush();
   }
 
   private void drawRect(float offset)
@@ -544,8 +554,36 @@ public class GeomText extends GeomRect
   @Override
   public void drawPickingBackground()
   {
-//    gl.glColor4f(0f, 0f, 0f, 0f);
-//    drawRect(gl, 0f);
+    GL2 gl = getGL();
+    gl.glColor4f(1f, 0f, 0f, .2f);
+    offset = 0f;
+
+    translateAnchor.x = -transX;
+    translateAnchor.y = transY;
+    float x = -transX;
+    float y = transY;
+    gl.glBegin(gl.GL_QUADS);
+    gl.glVertex3f(x, y, offset);
+    gl.glVertex3f(x + w, y, offset);
+    gl.glVertex3f(x + w, y + h, offset);
+    gl.glVertex3f(x, y + h, offset);
+    gl.glEnd();
+    //drawRect(0f);
+
+//    boolean depthTest = RenderUtils.getBoolean(GL.GL_DEPTH_TEST);
+//
+//    if (depthTest == false && isSelectable == true)
+//    {
+//    gl.glEnable(GL.GL_DEPTH_TEST);
+//
+//    gl.glColor4f(1f, 0f, 0f, 1f);
+//
+//    drawRect(1f);
+//
+//    gl.glDisable(GL.GL_DEPTH_TEST);
+//    }
+    //gl.glColor4f(0f, 0f, 0f, 0f);
+    //drawRect(0f);
   }
 
   /*
@@ -745,7 +783,7 @@ public class GeomText extends GeomRect
 //    }
   }
 
-    public void setMargins(float left, float right, float bottom, float top)
+  public void setMargins(float left, float right, float bottom, float top)
   {
     this.marginLeft = left;
     this.marginRight = right;
@@ -753,6 +791,7 @@ public class GeomText extends GeomRect
     this.marginTop = top;
     isRecalculated = true;
   }
+
   public void setJustify(float x, float y)
   {
     this.justifyX = x;
@@ -786,5 +825,4 @@ public class GeomText extends GeomRect
     this.text = text;
     isRecalculated = true;
   }
-
 }

@@ -89,7 +89,6 @@ abstract public class RendererLayer
     Collections.sort(geomList, new Comparator<Geom>()
     {
 
-      @Override
       public int compare(Geom a, Geom b)
       {
         Point3d p3d_a = MatrixUtils.getGeomPointInAbsoluteCoordinates(

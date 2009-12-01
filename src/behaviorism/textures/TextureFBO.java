@@ -2,6 +2,7 @@
 package behaviorism.textures;
 
 import behaviorism.Behaviorism;
+import behaviorism.utils.RenderUtils;
 import com.sun.opengl.util.texture.TextureIO;
 import org.grlea.log.SimpleLogger;
 import javax.media.opengl.GL2;
@@ -32,7 +33,6 @@ public class TextureFBO extends Texture
 
   public boolean updateTexture()
   {
-    System.err.println("in TextureFBO updateTexture!");
     log.entry("TextureFBO : in updateTexture()");
 
     if (isDone() == true)
@@ -61,6 +61,10 @@ public class TextureFBO extends Texture
     //0. bind our FBO and start drawing on it
     gl.glBindFramebuffer(GL_FRAMEBUFFER, fboId);
     gl.glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+//    int www =  RenderUtils.getViewport()[2];
+//    int hhh =  RenderUtils.getViewport()[3];
+
+    //gl.glViewport(0, 0, www, hhh);
     gl.glViewport(0, 0, offScreenWidth, offScreenHeight);
     log.exit("out bindFBO()");
   }
@@ -71,7 +75,11 @@ public class TextureFBO extends Texture
     GL2 gl = getGL();
     // we are finished drawing to our FBO, so unbind it and return to our original viewport, etc
     gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    gl.glViewport(0, 0, Behaviorism.getInstance().canvasWidth, Behaviorism.getInstance().canvasHeight);
+    
+    int www =  RenderUtils.getViewport()[2];
+    int hhh =  RenderUtils.getViewport()[3];
+    
+    gl.glViewport(0, 0, www, hhh);
     log.exit("out unbindFBO()");
   }
 

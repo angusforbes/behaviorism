@@ -6,9 +6,8 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-package behaviorism. geometry;
+package behaviorism.geometry;
 
-import behaviorism.Behaviorism;
 import behaviorism.algorithms.Corner;
 import behaviorism.renderers.Renderer;
 import behaviorism.utils.GeomUtils;
@@ -21,7 +20,6 @@ import javax.vecmath.Point3d;
 import behaviorism.utils.RenderUtils;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2.*;
-import javax.media.opengl.glu.GLU;
 import static behaviorism.utils.RenderUtils.*;
 
 
@@ -75,9 +73,12 @@ public class GeomRect extends Geom
     }
     else
     {
+       int www =  RenderUtils.getViewport()[2];
+    int hhh =  RenderUtils.getViewport()[3];
+
       upperright = MatrixUtils.pixelToWorld(
-        x + Behaviorism.getInstance().canvasWidth / 2 + w,
-        y + Behaviorism.getInstance().canvasHeight / 2 + h);
+        x + www / 2 + w,
+        y + hhh / 2 + h);
     }
     this.w = upperright.x - translate.x;
     this.h = upperright.y - translate.y;

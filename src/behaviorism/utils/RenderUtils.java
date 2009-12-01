@@ -14,7 +14,7 @@ import behaviorism.renderers.layers.RendererLayer;
 import behaviorism.worlds.World;
 import com.sun.opengl.util.gl2.GLUT;
 import java.awt.Point;
-import java.awt.geom.Path2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -132,17 +132,17 @@ public class RenderUtils
    */
   public static Rectangle2D.Float getScreenRectangleForWorldCoords(GeomRect gr)
   {
-    Path2D.Float p2d = getScreenShapeForWorldCoords(gr);
+    GeneralPath p2d = getScreenShapeForWorldCoords(gr);
     return GeomUtils.pathToRect(p2d);
   }
 
   //gluProject maps object coords to screen coords
   //public Shape getScreenShapeForWorldCoords(GL gl, GLU glu, Geom g)
-  public static Path2D.Float getScreenShapeForWorldCoords(Geom g)
+  public static GeneralPath getScreenShapeForWorldCoords(Geom g)
   {
     //Renderer rj = getRenderer();
 
-    Path2D.Float p2f = null;
+    GeneralPath p2f = null;
     double projection[] = new double[16];
     int viewport[] = new int[4];
 
@@ -165,6 +165,12 @@ public class RenderUtils
   public static long getTick()
   {
     return SceneGraph.getInstance().currentNano;
+  }
+
+
+  public static SceneGraph getSceneGraph()
+  {
+    return SceneGraph.getInstance();
   }
 
   public static Renderer getRenderer()
@@ -653,68 +659,84 @@ public class RenderUtils
     return dist - insetdist;
   }
 
-  public static Path2D.Float projectGeomRect(GeomRect g,
+  public static GeneralPath projectGeomRect(GeomRect g,
     double[] modelview, double[] projection, int[] viewport)
   {
+    if (getCamera() != null)
+    {
+      int pw = getViewport()[2];
+      int ph = getViewport()[3];
 
-    Renderer rj = getRenderer();
+      Renderer rj = getRenderer();
 
-    Path2D.Float p2f = new Path2D.Float();
+      //Path2D.Float p2f = new Path2D.Float();
+      GeneralPath p2f = new GeneralPath();
 
-    double hx = 0.0;
-    double hy = 0.0;
-    double hz = 0.0;
-    //double hx = (double)g.translate.x;
-    //double hy = (double)g.translate.y;
-    //double hz = (double)g.translate.z;
-    double screenCoords[] = new double[3];
+//      double hx = 0.0;
+//      double hy = 0.0;
+//      double hz = 0.0;
+      double hx = (double)g.translateAnchor.x;
+      double hy = (double)g.translateAnchor.y;
+      double hz = (double)g.translateAnchor.z;
+      double screenCoords[] = new double[3];
 
-    //System.out.print("screenCoords[2] : ");
+      //System.out.print("screenCoords[2] : ");
 
-    rj.glu.gluProject(hx, hy, hz,
-      modelview, 0,
-      projection, 0,
-      viewport, 0,
-      screenCoords, 0);
-    p2f.moveTo((float) screenCoords[0], (float) (Behaviorism.getInstance().canvasHeight - screenCoords[1]));
-    //System.out.print(" " + screenCoords[2]);
+      rj.glu.gluProject(hx, hy, hz,
+        modelview, 0,
+        projection, 0,
+        viewport, 0,
+        screenCoords, 0);
+      p2f.moveTo((float) screenCoords[0], (float) (ph - screenCoords[1]));
+      //System.out.print(" " + screenCoords[2]);
 
-    rj.glu.gluProject(hx + g.w, hy, hz,
-      modelview, 0,
-      projection, 0,
-      viewport, 0,
-      screenCoords, 0);
-    p2f.lineTo((float) screenCoords[0], (float) (Behaviorism.getInstance().canvasHeight - screenCoords[1]));
-    //System.out.print(" " + screenCoords[2]);
+      rj.glu.gluProject(hx + g.w, hy, hz,
+        modelview, 0,
+        projection, 0,
+        viewport, 0,
+        screenCoords, 0);
+      p2f.lineTo((float) screenCoords[0], (float) (ph - screenCoords[1]));
+      //System.out.print(" " + screenCoords[2]);
 
-    rj.glu.gluProject(hx + g.w, hy + g.h, hz,
-      modelview, 0,
-      projection, 0,
-      viewport, 0,
-      screenCoords, 0);
-    p2f.lineTo((float) screenCoords[0], (float) (Behaviorism.getInstance().canvasHeight - screenCoords[1]));
-    //System.out.print(" " + screenCoords[2]);
+      rj.glu.gluProject(hx + g.w, hy + g.h, hz,
+        modelview, 0,
+        projection, 0,
+        viewport, 0,
+        screenCoords, 0);
+      p2f.lineTo((float) screenCoords[0], (float) (ph - screenCoords[1]));
+      //System.out.print(" " + screenCoords[2]);
 
-    rj.glu.gluProject(hx, hy + g.h, hz,
-      modelview, 0,
-      projection, 0,
-      viewport, 0,
-      screenCoords, 0);
-    p2f.lineTo((float) screenCoords[0], (float) (Behaviorism.getInstance().canvasHeight - screenCoords[1]));
-    //System.out.print(" " + screenCoords[2]);
+      rj.glu.gluProject(hx, hy + g.h, hz,
+        modelview, 0,
+        projection, 0,
+        viewport, 0,
+        screenCoords, 0);
+      p2f.lineTo((float) screenCoords[0], (float) (ph - screenCoords[1]));
+      //System.out.print(" " + screenCoords[2]);
 
-    p2f.closePath();
+      p2f.closePath();
 
-    //System.out.println("");
-    return p2f;
+      //System.out.println("");
+      return p2f;
+    }
+
+    System.err.println("in projectGeomRect : camera not ready...");
+    return null;
   }
 
-  public static Path2D.Float projectGeomPoly(GeomPoly g,
+  public static GeneralPath projectGeomPoly(GeomPoly g,
     double[] modelview, double[] projection, int[] viewport)
   {
+    if (getCamera() != null)
+    {
+      int pw = getViewport()[2];
+      int ph = getViewport()[3];
+
+
     Renderer rj = getRenderer();
 
-    Path2D.Float p2f = new Path2D.Float();
+    //Path2D.Float p2f = new Path2D.Float();
+    GeneralPath p2f = new GeneralPath();
 
     double hx = 0.0; //(double)g.translate.x;
     double hy = 0.0; //(double)g.translate.y;
@@ -730,7 +752,7 @@ public class RenderUtils
       projection, 0,
       viewport, 0,
       windowCoords, 0);
-    p2f.moveTo((float) windowCoords[0], (float) (Behaviorism.getInstance().canvasHeight - windowCoords[1]));
+    p2f.moveTo((float) windowCoords[0], (float) (ph - windowCoords[1]));
 
     //System.out.println("g.verts.size = " + g.selectableBoundary.size());
     for (int i = 1; i < g.vertices.size(); i++) //for (int i = 1; i < g.selectableBoundary.size(); i++)
@@ -743,7 +765,7 @@ public class RenderUtils
         projection, 0,
         viewport, 0,
         windowCoords, 0);
-      p2f.lineTo((float) windowCoords[0], (float) (Behaviorism.getInstance().canvasHeight - windowCoords[1]));
+      p2f.lineTo((float) windowCoords[0], (float) (ph - windowCoords[1]));
     }
 
     p2f.closePath();
@@ -751,6 +773,10 @@ public class RenderUtils
     //GeomUtils.printPath(p2f);
 
     return p2f;
+    }
+   System.err.println("in projectGeomPoly : camera not ready...");
+    return null;
+
   }
 
   public static boolean getBoolean(int param)

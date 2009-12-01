@@ -4,9 +4,13 @@ package behaviorism.utils;
 import behaviorism.textures.TextureImage;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import javax.imageio.ImageIO;
 
 /**
@@ -54,6 +61,80 @@ public class FileUtils
     return Collections.emptyList();
   }
 
+  public static List<String> getFilenamesFromJar(String jarname)
+  {
+    List<String> filenames = new ArrayList<String>();
+    JarFile jarFile;
+
+    try
+    {
+      jarFile = new JarFile(jarname);
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+      return filenames; //on error return empty list
+    }
+
+    Enumeration<JarEntry> entries = jarFile.entries();
+
+    while (entries.hasMoreElements())
+    {
+      JarEntry entry = entries.nextElement();
+      filenames.add(entry.getName());
+    }
+
+    return filenames;
+  }
+
+
+  public static List<String> listFilesFromDirectoryInJar(String dirname)
+  {
+    List<String> filenames = new ArrayList<String>();
+    try
+    {
+      System.err.println("trying to read in " + dirname);
+      InputStream is = FileUtils.class.getResourceAsStream(dirname);
+      InputStreamReader isr = new InputStreamReader(is);
+      BufferedReader br = new BufferedReader(isr);
+      String line;
+      System.err.println("did we find anything?");
+      while ((line = br.readLine()) != null)
+      {
+        System.err.println("line = " + line);
+        filenames.add(dirname + line);
+      }
+      br.close();
+      isr.close();
+      is.close();
+      return filenames;
+    }
+    catch (IOException ioe)
+    {
+      ioe.printStackTrace();
+    }
+
+    return null;
+  }
+
+
+/*
+  public static List<String> getFilenamesFromJarMatching(String match)
+  {
+
+    List<String> filenames = getFilenamesFromJar(jarname);
+    List<String> matches = new ArrayList<String>();
+
+    for (String name : filenames)
+    {
+      if (name.matches(match) && !name.startsWith("."))
+      {
+        matches.add(name);
+      }
+    }
+    return matches;
+  }
+*/
   public static List<String> getFilenamesFromDirectoryMatching(String dirName, final String match)
   {
     File dir = new File(dirName); //e.g., "/data/images/celltango" 
@@ -67,6 +148,7 @@ public class FileUtils
         {
           return false;
         }
+
         return true;
       }
     };
@@ -94,6 +176,7 @@ public class FileUtils
         {
           return false;
         }
+
         return true;
       }
     };
@@ -113,8 +196,8 @@ public class FileUtils
       file.delete();
     }
 
-    //and then delete it...
-    //System.out.println("we are now going to delete " + folder);
+//and then delete it...
+//System.out.println("we are now going to delete " + folder);
     folder.delete();
   }
 
@@ -133,6 +216,7 @@ public class FileUtils
     {
       return Arrays.asList(files);
     }
+
     return Collections.emptyList();
   }
 
@@ -149,6 +233,7 @@ public class FileUtils
         {
           return false;
         }
+
         return true;
       }
     };
@@ -159,6 +244,7 @@ public class FileUtils
     {
       return Arrays.asList(files);
     }
+
     return Collections.emptyList();
   }
 
@@ -183,7 +269,7 @@ public class FileUtils
           return false;
         }
 
-        //System.out.println("... yes matches...");
+//System.out.println("... yes matches...");
         return true;
       }
     };
@@ -194,6 +280,7 @@ public class FileUtils
     {
       return Arrays.asList(files);
     }
+
     return Collections.emptyList();
   }
 
@@ -231,7 +318,7 @@ public class FileUtils
 
     List<File> files = FileUtils.getFilesFromDirectory(directory, "jpg");
 
-   // Collections.shuffle(files);
+    // Collections.shuffle(files);
 
     int idx = 0;
     for (File f : files)
@@ -242,6 +329,7 @@ public class FileUtils
       {
         photos.add(new TextureImage(f));
         idx++;
+
       }
       catch (IllegalArgumentException iae)
       {
@@ -252,12 +340,14 @@ public class FileUtils
       {
         break;
       }
+
     }
 
     return photos;
   }
 
-  public static BufferedImage loadBufferedImageFromFile(String filename)
+  public static BufferedImage loadBufferedImageFromFile(
+    String filename)
   {
     try
     {
@@ -268,12 +358,14 @@ public class FileUtils
     {
       e.printStackTrace();
     }
+
     return null;
     //return Utils.toBufferedImage(loadImageFromFile(toCrossPlatformFilename(filename)));
   }
 
   @Deprecated
-  public static Image loadImageFromFile(String filename)
+  public static Image loadImageFromFile(
+    String filename)
   {
     /*
     //System.out.println("in loadImageFromFile... trying to load " + filename + "...");
@@ -284,7 +376,8 @@ public class FileUtils
     return null;
   }
 
-  public static BufferedImage loadBufferedImageFromFile(File file)
+  public static BufferedImage loadBufferedImageFromFile(
+    File file)
   {
     try
     {
@@ -301,7 +394,8 @@ public class FileUtils
   }
 
   @Deprecated
-  public static Image loadImageFromFile(File file)
+  public static Image loadImageFromFile(
+    File file)
   {
     /*
     System.out.println("in loadImageFromFile : " + file);
@@ -321,7 +415,8 @@ public class FileUtils
   }
 
   @Deprecated
-  public static Image loadImageFromURL(String urlstr)
+  public static Image loadImageFromURL(
+    String urlstr)
   {
     /*
     URL url = null;
@@ -347,7 +442,8 @@ public class FileUtils
     return null;
   }
 
-  public static BufferedImage loadBufferedImageFromURL(String urlstr)
+  public static BufferedImage loadBufferedImageFromURL(
+    String urlstr)
   {
     try
     {
@@ -357,11 +453,13 @@ public class FileUtils
     {
       mue.printStackTrace();
     }
+
     return null;
     //return Utils.toBufferedImage(loadImageFromURL(urlstr));
   }
 
-  public static BufferedImage loadBufferedImageFromURL(URL url)
+  public static BufferedImage loadBufferedImageFromURL(
+    URL url)
   {
     try
     {
@@ -384,7 +482,8 @@ public class FileUtils
   }
 
   @Deprecated
-  public static Image loadImageFromURL(URL url)
+  public static Image loadImageFromURL(
+    URL url)
   {
     /*
     //System.out.println("loading image " + url);
@@ -398,7 +497,8 @@ public class FileUtils
     return null;
   }
 
-  public static URL loadURL(String urlStr)
+  public static URL loadURL(
+    String urlStr)
   {
     URL url = null;
     try
@@ -413,7 +513,8 @@ public class FileUtils
     return url;
   }
 
-  public static URI toURI(URL url)
+  public static URI toURI(
+    URL url)
   {
     try
     {
@@ -427,17 +528,20 @@ public class FileUtils
     return null;
   }
 
-  public static URI toURI(String filename)
+  public static URI toURI(
+    String filename)
   {
     return (new File(filename)).toURI();
   }
 
-  public static URI toURI(File file)
+  public static URI toURI(
+    File file)
   {
     return file.toURI();
   }
 
-  public static URL toURL(URI uri)
+  public static URL toURL(
+    URI uri)
   {
     try
     {
@@ -452,12 +556,14 @@ public class FileUtils
 
   }
 
-  public static URL toURL(String filename)
+  public static URL toURL(
+    String filename)
   {
     return toURL(new File(filename));
   }
 
-  public static URL toURL(File file)
+  public static URL toURL(
+    File file)
   {
     try
     {
@@ -467,6 +573,7 @@ public class FileUtils
     {
       mue.printStackTrace();
     }
+
     return null;
   }
 
@@ -486,6 +593,7 @@ public class FileUtils
     {
       e.printStackTrace();
     }
+
   }
 
   public static void saveImageToFile(BufferedImage bi, String filename, String format)
@@ -505,6 +613,33 @@ public class FileUtils
     {
       e.printStackTrace();
     }
+
+  }
+
+  public static List<String> loadTextFromFile(String filename)
+  {
+    return loadTextFromFile(new File(filename));
+  }
+
+  public static List<String> loadTextFromFile(File file)
+  {
+    List<String> lines = new ArrayList<String>();
+
+    try {
+        BufferedReader in = new BufferedReader(new FileReader(file));
+        String str;
+        while ((str = in.readLine()) != null) {
+            lines.add(str);
+        }
+        in.close();
+    }
+    catch (IOException e)
+    {
+      System.err.println("error in loadTextFromFile!");
+      e.printStackTrace();
+    }
+
+    return lines;
   }
 }
 /*

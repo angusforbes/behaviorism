@@ -173,7 +173,7 @@ public class BehaviorInterpolated extends Behavior
 
   public float getRawPercentage(long currentNano, long loopNano)
   {
-    return (float) ((float) currentNano / (float) loopNano); //% of raw time elapsed
+    return ((float) currentNano / (float) loopNano); //% of raw time elapsed
   }
 
   @Override

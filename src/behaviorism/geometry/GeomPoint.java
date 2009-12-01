@@ -28,6 +28,7 @@ public class GeomPoint extends Geom
 {
   public Point2D.Float texCoord = new Point2D.Float();
   public float pointSize = 8f;
+//  public boolean square = false;
 
 
   public GeomPoint(){}
@@ -67,11 +68,24 @@ public class GeomPoint extends Geom
     gl.glColor4fv(color.array(), 0);
 
     gl.glPointSize(this.pointSize);
-    
+//
+//    if (square == true)
+//    {
+//      gl.glDisable(GL_POINT_SMOOTH);
+//      gl.glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);	// Make round points, not square points
+//    }
+
     gl.glBegin(GL_POINTS);
     //gl.glVertex3f(translate.x, translate.y , translate.z);  //draws the point, it should be the point plus translate
     gl.glVertex3f(0f, 0f, 0f);  //draws the point, it should be the point plus translate
     gl.glEnd();
+//
+//    if (square == true)
+//    {
+//      //set back to circle...
+//      gl.glEnable(GL_POINT_SMOOTH);
+//      gl.glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+//    }
   }
   
   

@@ -16,7 +16,9 @@ import behaviorism.renderers.cameras.CamBasic;
 import behaviorism.renderers.layers.BackToFrontLayer;
 import behaviorism.renderers.layers.RendererLayer;
 import behaviorism.sequences.Sequence;
+import behaviorism.utils.FileUtils;
 import behaviorism.utils.RenderUtils;
+import behaviorism.utils.Utils;
 import java.util.List;
 import java.awt.geom.Rectangle2D;
 import java.io.FileInputStream;
@@ -26,6 +28,8 @@ import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.JApplet;
+import org.grlea.log.SimpleLogger;
 
 public abstract class World extends GeomPoint
 {
@@ -35,6 +39,7 @@ public abstract class World extends GeomPoint
   public Cam cam = new CamBasic(); //this cam should be the same as the cam in RendererJogl, or should point to it.
   //TESTING
   public List<Behavior> behaviors2 = new CopyOnWriteArrayList<Behavior>();
+  public static final SimpleLogger log = new SimpleLogger(World.class);
 
   public void scheduleBehavior(Behavior b)
   {
@@ -43,6 +48,36 @@ public abstract class World extends GeomPoint
   //DONE WITH TEST CODE
 
   public abstract void setUpWorld();
+
+  /**
+   * This method needs to be called from the start() method of the JApplet
+   * in order to insure that the JOGL Renderer & Canvas are set up properly *before* calling
+   * the customized setUpWorld() for the project, as it may rely on
+   * information about the screen bounds, etc., which are only available after
+   * the JOGL canvas is ready.
+   * @param applet
+   */
+  public void setUpWorld(JApplet applet)
+  {
+    Thread t = new Thread()
+    {
+
+      public void run()
+      {
+
+        while (RenderUtils.getRenderer().isInstalled == false)
+        {
+          System.err.println("in setUpWorld(JApplet)... waiting for JOGL Renderer to be installed...");
+          Utils.sleep(1000);
+        }
+
+        System.err.println("in setUpWorld(JApplet)... JOGL Renderer is now available.");
+        setUpWorld();
+      }
+    };
+
+    t.start();
+  }
 
   public void reset()
   {
@@ -123,6 +158,28 @@ public abstract class World extends GeomPoint
     return properties;
   }
 
+  public static Properties loadPropertiesFileFromJarFile(String fileName)
+  {
+    log.entry("in loadPropertiesFileFromJarFile(" + fileName + ")");
+    Properties properties = new Properties();
+
+    try
+    {
+      InputStream is = FileUtils.class.getResourceAsStream(fileName);
+      properties.load(is);
+      is.close();
+      log.info("successfully loaded properties file " + fileName + ".");
+    }
+    catch (Exception e)
+    {
+      log.info("couldn't find properties file " + fileName + "!");
+      properties = null;
+    }
+
+    log.exit("out loadPropertiesFileFromJarFile()");
+    return properties;
+  }
+
   public void setWorldParams(Properties properties)
   {
   }
@@ -172,6 +229,13 @@ public abstract class World extends GeomPoint
   {
     return false;
   }
+
+  //this can be used by a Geom to notify the world that a click was registered, in case a click
+  //affects a more global property
+//  public void doubleClickAction(Geom g)
+//  { }
+//  public void clickAction(Geom g)
+//  { }
   /*
   protected Connector setDatabase()
   {
@@ -351,7 +415,7 @@ public abstract class World extends GeomPoint
    * Can be overidden as necessary.
    */
   @Override
-  public void dragAction()
+  public void dragAction(Geom originatingGeom)
   {
     MouseHandler.getInstance().dragCamera();
   }

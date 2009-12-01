@@ -11,11 +11,11 @@ import behaviorism.behaviors.easing.Easing;
 public class ContinuousBehaviorBuilder extends BehaviorBuilder
 {
 
-  protected boolean isLooping = false;
-  protected boolean isReversing = false;
+  public boolean isLooping = false;
+  public boolean isReversing = false;
   public float ranges[] = null; //protected?
-  protected Easing easing = null;
-  protected int repeats = 1;
+  public Easing easing = null;
+  public int repeats = 1;
 
   public ContinuousBehaviorBuilder(long lengthMS)
   {

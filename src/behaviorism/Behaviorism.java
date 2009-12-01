@@ -14,13 +14,13 @@ import behaviorism.worlds.World;
 import com.sun.opengl.util.Animator;
 import com.sun.opengl.util.texture.TextureIO;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.Window;
 import javax.media.opengl.*;
 import java.awt.event.*;
 import java.awt.image.MemoryImageSource;
@@ -54,12 +54,13 @@ import org.grlea.log.SimpleLogger;
 public class Behaviorism
 {
 
-  public int prevCanvasWidth = 600;
-  public int prevCanvasHeight = 400;
+  public boolean useMouse = true;
+  private int prevCanvasWidth = 600;
+  private int prevCanvasHeight = 400;
   public int prevLocX = -1;
   public int prevLocY = -1;
-  public int canvasWidth = 600;
-  public int canvasHeight = 400;
+  private int canvasWidth = 600;
+  private int canvasHeight = 400;
   public boolean fullScreen = false;
   public boolean frameUndecorated = false;
   public boolean useCursor = true;
@@ -67,18 +68,16 @@ public class Behaviorism
   public AtomicBoolean isShutdown = new AtomicBoolean(false);
   public AtomicBoolean doneShutdown = new AtomicBoolean(false);
   private JFrame frame;
-  private GLCanvas canvas;
+  private static GLCanvas canvas;
   private Cursor cursor;
   private GraphicsDevice device = null;
   public boolean centerFrame = true;
-  public boolean isApplet = false;
-
+  public static boolean isApplet = false;
   public static final SimpleLogger log = new SimpleLogger(Behaviorism.class);
-
   /**
    * Singleton instance of Behaviorism. The only way to use this class is via the static getInstance() method.
    */
-  private static Behaviorism instance = null;
+  private static final Behaviorism instance = new Behaviorism();
 
   /**
    * Gets the singleton Behaviorism driver.
@@ -86,11 +85,6 @@ public class Behaviorism
    */
   public static Behaviorism getInstance()
   {
-    if (instance == null)
-    {
-      instance = new Behaviorism();
-    }
-
     return instance;
   }
 
@@ -133,23 +127,51 @@ public class Behaviorism
     Renderer.getInstance().installWorld(world);
 
     world.setUpWorld();
+
+    //Renderer.getInstance().animator = new Animator(canvas);
+    //animator.setRunAsFastAsPossible(true);
+    //Renderer.getInstance().animator.setRunAsFastAsPossible(false);
+    //Renderer.getInstance().animator.start();
+
     log.exit("out installWorld()");
   }
 
   public static void installWorld(World world, Properties properties, JApplet applet)
   {
+
+    isApplet = true;
+
+    System.err.println("in applet installWorld()...");
     Behaviorism.getInstance().installProperties(properties);
+    System.err.println("properties installed...");
+
+    System.err.println("install world...");
+    Renderer.getInstance().installWorld(world, applet);
 
     Behaviorism.getInstance().initialize(applet);
+    System.err.println("applet initialize...");
 
     if (properties != null)
     {
+      System.err.println("set world params...");
       world.setWorldParams(properties);
     }
 
-    Renderer.getInstance().installWorld(world);
-
+    /*
+    System.err.println("install world...");
+    Renderer.getInstance().installWorld(world, applet);
+    
+    System.err.println("set up world...");
     world.setUpWorld();
+     */
+    //animator = new FPSAnimator(glDrawable, 60, false);
+    //animator = new FPSAnimator(glDrawable, 5, true);
+    //animator = new Animator(glDrawable);
+    //Renderer.getInstance().animator = new Animator(canvas);
+    //animator.setRunAsFastAsPossible(true);
+    //Renderer.getInstance().animator.setRunAsFastAsPossible(false);
+
+
   }
 
   public void printSystemInfo()
@@ -193,20 +215,21 @@ public class Behaviorism
     canvas.setSize(300, 300);
 
     //   makeAppletScreen(applet);
-    if (fullScreen)
-    {
-      makeFullScreen(frame);
-    }
-    else
-    {
-      makeNormalScreen(frame, canvas);
-    }
+//    if (fullScreen)
+//    {
+//      makeFullScreen(frame);
+//    }
+//    else
+//    {
+//      makeNormalScreen(frame, canvas);
+//    }
 
     //add listeners
     addListeners(canvas);
 
     canvas.requestFocus();
 
+    applet.setVisible(true);
     //frame.setVisible(true);
 
     centerFrame = false;
@@ -255,30 +278,38 @@ public class Behaviorism
 //    GLCapabilitiesChooser chooser = new DefaultGLCapabilitiesChooser();
 //    caps.setSampleBuffers(true);
     //caps.setNumSamples(4); //16
-   // return new GLCanvas(caps, chooser, null, null);
+    // return new GLCanvas(caps, chooser, null, null);
 
     //set up openGL canvas
     GLCapabilities capabilities = new GLCapabilities(GLProfile.get(GLProfile.GL2));
     capabilities.setSampleBuffers(true);
+    //capabilities.setSampleBuffers(false);
     capabilities.setNumSamples(4);
+    //capabilities.setNumSamples(1);
     return new GLCanvas(capabilities);
-
   }
 
   private void addListeners(GLCanvas can)
   {
     can.addGLEventListener(Renderer.getInstance());
     can.addKeyListener(KeyboardHandler.getInstance());
-    can.addMouseListener(MouseHandler.getInstance());
-    can.addMouseMotionListener(MouseHandler.getInstance());
-    can.addMouseWheelListener(MouseHandler.getInstance());
+
+    if (useMouse == true)
+    {
+      can.addMouseListener(MouseHandler.getInstance());
+      can.addMouseMotionListener(MouseHandler.getInstance());
+      can.addMouseWheelListener(MouseHandler.getInstance());
+    }
   }
 
   private void removeListeners(GLCanvas can)
   {
-    can.removeMouseListener(MouseHandler.getInstance());
-    can.removeMouseMotionListener(MouseHandler.getInstance());
-    can.removeMouseWheelListener(MouseHandler.getInstance());
+    if (useMouse == true)
+    {
+      can.removeMouseListener(MouseHandler.getInstance());
+      can.removeMouseMotionListener(MouseHandler.getInstance());
+      can.removeMouseWheelListener(MouseHandler.getInstance());
+    }
     can.removeKeyListener(KeyboardHandler.getInstance());
     can.removeGLEventListener(Renderer.getInstance());
   }
@@ -311,8 +342,8 @@ public class Behaviorism
     }
     else
     {
-      xLocation = Utils.randomInt(10, 400); //prevLocX;
-      yLocation = Utils.randomInt(10, 400); //prevLocY;
+      xLocation = prevLocX;
+      yLocation = prevLocY;
     }
 
     f.setLocation(xLocation, yLocation);
@@ -331,7 +362,6 @@ public class Behaviorism
 //    });
   }
 
- 
   public void toggleFullScreen()
   {
     this.fullScreen = !this.fullScreen;
@@ -339,37 +369,38 @@ public class Behaviorism
     removeListeners(canvas);
     JFrame tmpFrame = new JFrame(this.applicationName);
 
-      GLCanvas tmpCanvas = new GLCanvas(
-        canvas.getChosenGLCapabilities(),
-        new DefaultGLCapabilitiesChooser(),
-        canvas.getContext(),
-        null);
-      tmpFrame.add(tmpCanvas);
+    GLCanvas tmpCanvas = new GLCanvas(
+      canvas.getChosenGLCapabilities(),
+      new DefaultGLCapabilitiesChooser(),
+      canvas.getContext(),
+      null);
 
-      addListeners(tmpCanvas);
+    tmpFrame.add(tmpCanvas);
 
-      if (fullScreen == true)
-      {
-        prevCanvasWidth = canvas.getWidth();
-        prevCanvasHeight = canvas.getHeight();
-        prevLocX = (int) frame.getLocation().getX();
-        prevLocY = (int) frame.getLocation().getY();
-        makeFullScreen(tmpFrame);
-      }
-      else
-      {
-        makeNormalScreen(tmpFrame, tmpCanvas);
-      }
+    addListeners(tmpCanvas);
 
-      tmpCanvas.display();
-      tmpFrame.requestFocus();
-      tmpCanvas.requestFocus();
+    if (fullScreen == true)
+    {
+      prevCanvasWidth = canvas.getWidth();
+      prevCanvasHeight = canvas.getHeight();
+      prevLocX = (int) frame.getLocation().getX();
+      prevLocY = (int) frame.getLocation().getY();
+      makeFullScreen(tmpFrame);
+    }
+    else
+    {
+      makeNormalScreen(tmpFrame, tmpCanvas);
+    }
 
-      frame.dispose();
-      frame = tmpFrame;
-      canvas = tmpCanvas;
+    tmpCanvas.display();
+    tmpFrame.requestFocus();
+    tmpCanvas.requestFocus();
 
-    
+    frame.dispose();
+    frame = tmpFrame;
+    canvas = tmpCanvas;
+
+
   }
 
   public void toggleFullScreenReal()
@@ -481,17 +512,24 @@ public class Behaviorism
 
   private void setMainParams(Properties properties)
   {
+    log.entry("in setMainParams()");
     String appName = properties.getProperty("main.applicationName");
     if (appName != null)
     {
       this.applicationName = appName;
     }
 
+    this.useMouse = Boolean.parseBoolean(properties.getProperty("main.useMouse"));
+
+    log.debug("useMouse = " + useMouse);
+
     this.useCursor = Boolean.parseBoolean(properties.getProperty("main.useCursor"));
 
-    System.out.println("this.useCursor = " + useCursor);
+    log.debug("useCursor = " + useCursor);
 
     this.frameUndecorated = Boolean.parseBoolean(properties.getProperty("main.frameUndecorated"));
+
+    log.debug("frameUndecorated = " + frameUndecorated);
 
     this.fullScreen = Boolean.parseBoolean(properties.getProperty("main.fullScreen"));
 
@@ -509,8 +547,15 @@ public class Behaviorism
         System.out.println("error: didn't find canvas.width or canvas.height properties, so using default values");
       }
     }
+
+    log.debug("canvasWidth / canvasHeight = " + canvasWidth + "/" + canvasHeight);
+
     //opengl.isTexRectEnabled : support for non-power-of-two cards
     TextureIO.setTexRectEnabled(Boolean.parseBoolean(properties.getProperty("opengl.isTexRectEnabled")));
+
+    log.debug("TextureIO.texRectEnabled = " + TextureIO.isTexRectEnabled());
+
+    log.exit("out setMainParams()");
   }
 
   private void setBehaviorParams(Properties properties)
@@ -589,35 +634,46 @@ public class Behaviorism
   {
     log.entry("in shutDown()");
 
-    frame.getToolkit().getSystemEventQueue().postEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
- /*
+    if (!isApplet)
+    {
+      log.debug("firing WINDOW_CLOSING event (to trigger Renderer.dispose method).");
+      frame.getToolkit().getSystemEventQueue().postEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+    }
+    else
+    {
+      //hmm I guess we don't shut down the applet except via the browser.
+    }
+
+    log.exit("in shutDown()");
+
+    /*
     new Thread(new Runnable()
     {
 
-      public void run()
-      {
-        log.info("disposing of resources...");
-        isShutdown.set(true);
-        Utils.sleep(500);
-        
-        //Renderer.getInstance().animator.stop();
-        //System.err.println("animator stopped?");
+    public void run()
+    {
+    log.info("disposing of resources...");
+    isShutdown.set(true);
+    Utils.sleep(500);
 
-        Utils.sleep(3000);
-        while (doneShutdown.get() == false)
-        {
-          log.info("waiting for display loop to handle disposing resources...");
-          Utils.sleep(1000); //10L
-        }
+    //Renderer.getInstance().animator.stop();
+    //System.err.println("animator stopped?");
 
-        log.info("stopping GL thread...");
+    Utils.sleep(3000);
+    while (doneShutdown.get() == false)
+    {
+    log.info("waiting for display loop to handle disposing resources...");
+    Utils.sleep(1000); //10L
+    }
 
-        //RenderUtils.getRenderer().dispose(canvas);
-        log.info("goodbye!");
+    log.info("stopping GL thread...");
 
-        System.exit(0);
-      }
+    //RenderUtils.getRenderer().dispose(canvas);
+    log.info("goodbye!");
+
+    System.exit(0);
+    }
     }).start();
-  */
+     */
   }
 }

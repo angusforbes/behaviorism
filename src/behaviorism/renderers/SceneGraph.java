@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import static javax.media.opengl.GL2.*;
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 import static behaviorism.utils.RenderUtils.*;
 
 public class SceneGraph
@@ -40,7 +39,7 @@ public class SceneGraph
   public boolean isStepping = false;
   public static float vizOffset = .00001f;
   private List<Geom> invisiblePickingGeoms = new ArrayList<Geom>(); //thinking...
-  private static SceneGraph instance = null;
+  private static final SceneGraph instance = new SceneGraph();
 
   /**
    * Gets (or creates then gets) the singleton SceneGraph object.
@@ -48,13 +47,6 @@ public class SceneGraph
    */
   public static SceneGraph getInstance()
   {
-    if (instance != null)
-    {
-      return instance;
-    }
-
-    instance = new SceneGraph();
-
     return instance;
   }
 
@@ -209,14 +201,16 @@ public class SceneGraph
     }
 
     //traverse scene graph to determine each element's transformation matrix
-//    traverseGeoms(gl, BehaviorismDriver.renderer.currentWorld.geoms,
-//      BehaviorismDriver.renderer.currentWorld.isTransformed || BehaviorismDriver.renderer.cam.isTransformed,
-//      offset);
     List<Geom> worldGeom = new ArrayList<Geom>();
     worldGeom.add(getWorld());
     traverseGeoms(worldGeom,
       getWorld().isTransformed || getCamera().isTransformed,
       offset);
+
+//    getWorld().isTransformed = true; //
+//    getWorld().transform(); //
+//    traverseGeoms(worldGeom, true, offset); // testing... use version above...
+
     getWorld().isTransformed = false;
     getCamera().isTransformed = false;
 
@@ -278,7 +272,8 @@ public class SceneGraph
 
       g.transform();
       getLayer(g.layerNum).attachedGeoms.add(g);
-      traverseGeoms(g.geoms, g.isTransformed, offset); //, currentNano, level + 1, offset);
+      traverseGeoms(g.geoms, g.isTransformed, offset);
+      //traverseGeoms(g.geoms, true, offset);
 
       g.isTransformed = false;
 
@@ -356,6 +351,7 @@ public class SceneGraph
     if (invisiblePickingGeoms.size() > 0)
     {
       gl.glEnable(GL_DEPTH_TEST);
+      gl.glEnable(GL_BLEND);
 
       for (Geom g : invisiblePickingGeoms)
       {

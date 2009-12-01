@@ -63,6 +63,7 @@ public class GeomTrace extends GeomPoint
    */
   public void addPoint(Point3f p3f)
   {
+    //System.err.println("adding Point : " + p3f);
     if (this.trace.size() > 0)
     {
       if (!(this.trace.getLast().equals(p3f)))
@@ -84,7 +85,7 @@ public class GeomTrace extends GeomPoint
   public void draw()
   {
     GL2 gl = getGL();
-    //System.out.println("in GeomTrace() : trace size = " + trace.size());
+    System.out.println("in GeomTrace() : trace size = " + trace.size());
     gl.glColor4fv(color.array(), 0);
     //gl.glColor4f(1f, 1f, 1f, 1f);
     gl.glLineWidth(this.lineWidth);

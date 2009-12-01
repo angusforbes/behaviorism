@@ -1,11 +1,11 @@
 package behaviorism. geometry;
 
 import behaviorism.utils.GeomUtils;
-import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
 import static behaviorism.utils.RenderUtils.*;
 import behaviorism.utils.RenderUtils;
+import java.awt.geom.GeneralPath;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
@@ -18,7 +18,7 @@ public class GeomPoly extends Geom
   public List<GeomPoint> vertices = new ArrayList<GeomPoint>();
   //public List<GeomPoint> selectableBoundary = new ArrayList<GeomPoint>();
   public boolean isConvex = true;
-  public Path2D.Float path2D = null;
+  public GeneralPath path2D = null;
   
   public static GeomPoly makeGeomPolyWithDynamicPoints(List<GeomPoint> vertices)
   {
@@ -181,9 +181,10 @@ public class GeomPoly extends Geom
   
   
   //also sets it...
-  public Path2D.Float makePath2DFromPoly()
+  public GeneralPath /*Path2D.Float*/ makePath2DFromPoly()
   {
-    Path2D.Float p2d = new Path2D.Float();
+    //Path2D.Float p2d = new Path2D.Float();
+    GeneralPath p2d = new GeneralPath();
     GeomPoint gp = this.vertices.get(0);
     p2d.moveTo(gp.translate.x, gp.translate.y);
     

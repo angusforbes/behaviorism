@@ -11,11 +11,13 @@ import behaviorism.utils.RenderUtils;
 import behaviorism.utils.Utils;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Path2D;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.List;
 import javax.vecmath.Point3f;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseWheelEvent;
+import java.awt.geom.GeneralPath;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.vecmath.Point3d;
 
@@ -46,7 +48,7 @@ import javax.vecmath.Point3d;
  * 
  * @author angus
  */
-public class MouseHandler extends MouseAdapter
+public class MouseHandler implements MouseListener, MouseMotionListener, MouseWheelListener
 {
 
   public Point mousePixel = new Point();
@@ -74,7 +76,7 @@ public class MouseHandler extends MouseAdapter
   public Geom hoverGeom = null;
   public Geom prevMouseOverGeom = null;
   public long lastTimeMoved = 0;
-  private static MouseHandler instance = null;
+  private static final MouseHandler instance = new MouseHandler();
 
   /**
    * Gets (or creates then gets) the singleton MouseHandler object.
@@ -82,13 +84,6 @@ public class MouseHandler extends MouseAdapter
    */
   public static MouseHandler getInstance()
   {
-    if (instance != null)
-    {
-      return instance;
-    }
-
-    instance = new MouseHandler();
-
     return instance;
   }
 
@@ -167,7 +162,7 @@ public class MouseHandler extends MouseAdapter
 
   public void processMouseOver()
   {
-    //System.out.println("in processMouseOver()");
+    //System.err.println("in processMouseOver()");
 
     if (hoverGeom != prevMouseOverGeom)
     {
@@ -192,6 +187,7 @@ public class MouseHandler extends MouseAdapter
 
   private void processMouseMoving()
   {
+    //System.err.println("in processMouseMoving : hoverGeom = " + hoverGeom);
     if (hoverGeom != null)
     {
       hoverGeom.handleMouseMoving();
@@ -200,7 +196,7 @@ public class MouseHandler extends MouseAdapter
 
   private void processMouseStartedMoving()
   {
-    //System.out.println("in processMouseStartedMoving");
+    //System.err.println("in processMouseStartedMoving");
     if (hoverGeom != null)
     {
       //System.out.println("mog = " + mog);
@@ -210,7 +206,7 @@ public class MouseHandler extends MouseAdapter
 
   private void processMouseStoppedMoving()
   {
-    //System.out.println("in processMouseStoppedMoving\n\n");
+    //System.err.println("in processMouseStoppedMoving\n\n");
     if (hoverGeom != null)
     {
       hoverGeom.handleMouseStoppedMoving();
@@ -240,6 +236,10 @@ public class MouseHandler extends MouseAdapter
     else if (selectedGeom != null && clicks != 0)
     {
       selectedGeom.handleClick();
+    }
+    else //see if the World needs a click...
+    {
+      RenderUtils.getWorld().handleClick();
     }
 
     //tripleClick?
@@ -286,6 +286,8 @@ public class MouseHandler extends MouseAdapter
       mouseGeomPoint = worldPtToGeomPt(mouseWorldPoint, mouseOverGeom);
       hoverGeom = mouseOverGeom.hoverableObject;
     }
+
+    //System.err.println("mouseOverGeom = " + mouseOverGeom);
   }
 
   private void getSelectedGeom()
@@ -313,6 +315,8 @@ public class MouseHandler extends MouseAdapter
 
       prevSelectedGeom = selectedGeom;
     }
+
+    //System.err.println("selectedGeom = " + selectedGeom);
   }
 
   /**
@@ -460,9 +464,10 @@ public class MouseHandler extends MouseAdapter
         //then can't be selected-- but still need to check its children...
         {
           //g.setColor(1f, 0f, 0f, 1f);
-          Path2D s = RenderUtils.getScreenShapeForWorldCoords(g);
+          GeneralPath s = RenderUtils.getScreenShapeForWorldCoords(g);
           if (s == null)
           {
+            System.err.println("GeneralPath for " + g + " is NULL!");
             continue;
           }
           if (s.contains(mousePixel))
@@ -491,7 +496,7 @@ public class MouseHandler extends MouseAdapter
   {
   //g.setColor(1f, 0f, 0f, 1f);
 
-  Path2D.Float s = RenderUtils.getScreenShapeForWorldCoords(g);
+  GeneralPath s = RenderUtils.getScreenShapeForWorldCoords(g);
   if (s == null)
   {
   continue;
@@ -516,14 +521,13 @@ public class MouseHandler extends MouseAdapter
   /****
   mouseAdapter methods : executed on Java Thread (not openGL thread) ***
    ****/
-  @Override
   public void mouseClicked(MouseEvent e)
   {
   }
 
-  @Override
   public void mousePressed(MouseEvent e)
   {
+    //System.err.println("in MouseHandler : mousePresssed()");
     debugMouseClickPoint.x = e.getX();
     debugMouseClickPoint.y = e.getY();
 
@@ -542,7 +546,7 @@ public class MouseHandler extends MouseAdapter
     isPressing = true;
   }
 
-  @Override
+  
   public void mouseDragged(MouseEvent e)
   {
     debugMouseClickPoint.x = e.getX();
@@ -558,14 +562,26 @@ public class MouseHandler extends MouseAdapter
 
     isDragging = true;
   }
-
-  @Override
+  
   public void mouseReleased(MouseEvent e)
   {
     isReleasing = true;
   }
 
-  @Override
+
+
+
+
+
+  public void mouseEntered(MouseEvent e)
+  {
+
+  }
+  public void mouseExited(MouseEvent e)
+  {
+
+  }
+
   public void mouseMoved(MouseEvent e)
   {
     debugMouseMovePoint.x = e.getX();
@@ -580,7 +596,6 @@ public class MouseHandler extends MouseAdapter
     isMoving = true;
   }
 
-  @Override
   public void mouseWheelMoved(MouseWheelEvent e)
   {
     //System.out.println("mouseWheelMoved...");
@@ -597,5 +612,6 @@ public class MouseHandler extends MouseAdapter
       RenderUtils.getCamera().translateZ(notches * 0.05f);
     }
   }
+  
 }
 

@@ -1,14 +1,15 @@
 /* Geom.java - Created on July 12, 2007, 7:52 PM */
 package behaviorism. geometry;
 
-import behaviorism.Behaviorism;
 import behaviorism.behaviors.geom.BehaviorActivateGeom;
 import behaviorism.behaviors.geom.BehaviorRemoveGeom;
-import behaviorism.data.Data;
+import behaviorism.data.Node;
 import behaviorism.handlers.MouseHandler;
 import behaviorism.renderers.State;
 import behaviorism.textures.TextureImage;
 import behaviorism.utils.MatrixUtils;
+import behaviorism.utils.RenderUtils;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.vecmath.Point3d;
@@ -40,11 +41,12 @@ public abstract class Geom
    * A root Data node that can hold various types of Data attached to this Geom.
    * This should be NULL by default, only used if needed!!!
    */
-  public Data data = null; //new Data();
-  public Point3f translate = new Point3f(0f, 0f, 0f);
+  public Node data = null; //new Data();
 
-  //don't think it makes sense to have both (think about this...)
-  //public Point3f translateAnchor = new Point3f(0f, 0f, 0f);
+  //used for centering, etc, without changing the modelview
+  public Point3f translateAnchor = new Point3f(0f, 0f, 0f);
+
+  public Point3f translate = new Point3f(0f, 0f, 0f);
   /**
    * The relative point (in parent's coordinates) around which the object is to rotate.
    * By default it is set to be the lower left corner of the object
@@ -174,8 +176,11 @@ public abstract class Geom
     }
     else
     {
-      int pxX = x + Behaviorism.getInstance().canvasWidth / 2;
-      int pxY = y + Behaviorism.getInstance().canvasHeight / 2;
+       int www =  RenderUtils.getViewport()[2];
+    int hhh =  RenderUtils.getViewport()[3];
+
+      int pxX = x + www / 2;
+      int pxY = y + hhh / 2;
 
       setTranslate(
         pixelToWorld(pxX, pxY));
@@ -218,9 +223,12 @@ public abstract class Geom
   {
     System.out.println("PIXEL ");
 
+     int www =  RenderUtils.getViewport()[2];
+    int hhh =  RenderUtils.getViewport()[3];
+
     this.w = pixelToWorld(
-        Behaviorism.getInstance().canvasWidth / 2 + w,
-        Behaviorism.getInstance().canvasHeight / 2 - 0).x;
+        www / 2 + w,
+        hhh / 2 - 0).x;
 
     System.out.println("width 1 = " + this.w);
 
@@ -381,6 +389,7 @@ public abstract class Geom
       System.err.println("is transform() : WHY IS TRANSFORM NULL??????");
       return;
     }
+
     /* System.arrayCopy is slightly faster that Arrays.copyOf, allegedly. */
     System.arraycopy(parent.modelview, 0, modelview, 0, 16);
 
@@ -768,7 +777,7 @@ public abstract class Geom
    // g.isDone = true;
   }
 
-  public void removeGeoms(List<Geom> geoms)
+  public void removeGeoms(Collection<Geom> geoms)
   {
     for (Geom g : geoms)
     {
@@ -1440,32 +1449,32 @@ public abstract class Geom
   }
 
   /** these "action" methods SHOULD be overridden! */
-  public void selectedAction()
+  public void selectedAction(Geom originatingGeom)
   {
   }
 
-  public void unselectedAction()
+  public void unselectedAction(Geom originatingGeom)
   {
   }
   //pressing and holding down
-  public void pressAction()
+  public void pressAction(Geom originatingGeom)
   {
 
   }
 
 
-  public void clickAction()
+  public void clickAction(Geom originatingGeom)
   {
     //System.out.println("Geom superclass clickAction : I shouldn't be here... i should be with my children!");
     //System.out.println("you clicked a " + getClass());
   }
 
-  public void doubleClickAction()
+  public void doubleClickAction(Geom originatingGeom) //can ignore originatingGeom unless needed
   {
     //System.out.println("Geom superclass doubleClickAction : I shouldn't be here... i should be with my children!");
   }
 
-  public void releaseAction()
+  public void releaseAction(Geom originatingGeom)
   {
     //System.out.println("Geom superclass releaseAction : I shouldn't be here... i should be with my children!");
   }
@@ -1473,36 +1482,36 @@ public abstract class Geom
   
 
   // these three are for hovering without moving
-  public void mouseInAction()
+  public void mouseInAction(Geom originatingGeom)
   {
 
   }
 
-  public void mouseOverAction()
+  public void mouseOverAction(Geom originatingGeom)
   {
 
   }
 
-  public void mouseOutAction()
+  public void mouseOutAction(Geom originatingGeom)
   {
 
   }
 
 
   //these three look for mouse movement
-  public void mouseMovingAction()
+  public void mouseMovingAction(Geom originatingGeom)
   {
   //  System.out.println("i am a " + getClass());
    // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
   }
 
-  public void mouseStoppedMovingAction()
+  public void mouseStoppedMovingAction(Geom originatingGeom)
   {
   //  System.out.println("i am a " + getClass());
    // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
   }
 
-  public void mouseStartedMovingAction()
+  public void mouseStartedMovingAction(Geom originatingGeom)
   {
   //  System.out.println("i am a " + getClass());
    // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
@@ -1511,7 +1520,7 @@ public abstract class Geom
   //combo mouse pressed and mouse moved
   //default is to move/scale/rotate the geom (depending on with button combo is being used).
   //this can be overidden if you want different behavior.
-  public void dragAction()
+  public void dragAction(Geom originatingGeom)
   {
     MouseHandler.getInstance().dragGeom();
     //System.out.println("you dragged a " + getClass());
@@ -1522,7 +1531,7 @@ public abstract class Geom
   {
     if (selectableObject != null)
     {
-      selectableObject.selectedAction();
+      selectableObject.selectedAction(this);
     }
   }
 
@@ -1530,7 +1539,7 @@ public abstract class Geom
   {
     if (selectableObject != null)
     {
-      selectableObject.unselectedAction();
+      selectableObject.unselectedAction(this);
     }
   }
 
@@ -1538,7 +1547,7 @@ public abstract class Geom
   {
     if (draggableObject != null)
     {
-      draggableObject.dragAction();
+      draggableObject.dragAction(this);
     }
   }
 
@@ -1546,7 +1555,7 @@ public abstract class Geom
   {
     if (hoverableObject != null)
     {
-      hoverableObject.mouseInAction();
+      hoverableObject.mouseInAction(this);
     }
   }
 
@@ -1555,7 +1564,7 @@ public abstract class Geom
   {
     if (hoverableObject != null)
     {
-      hoverableObject.mouseOverAction();
+      hoverableObject.mouseOverAction(this);
     }
   }
 
@@ -1563,7 +1572,7 @@ public abstract class Geom
   {
     if (hoverableObject != null)
     {
-      hoverableObject.mouseOutAction();
+      hoverableObject.mouseOutAction(this);
     }
   }
 
@@ -1571,7 +1580,7 @@ public abstract class Geom
   {
     if (pressableObject != null)
     {
-      pressableObject.pressAction();
+      pressableObject.pressAction(this);
     }
   }
 
@@ -1579,7 +1588,7 @@ public abstract class Geom
   {
     if (clickableObject != null)
     {
-      clickableObject.clickAction();
+      clickableObject.clickAction(this);
     }
   }
 
@@ -1588,7 +1597,7 @@ public abstract class Geom
     //System.out.println("in Geom:handleDoubleClick()");
     if (clickableObject != null)
     {
-      clickableObject.doubleClickAction();
+      clickableObject.doubleClickAction(this); //we tell the registered object where the click came from...
     }
   }
 
@@ -1596,7 +1605,7 @@ public abstract class Geom
   {
     if (releasableObject != null)
     {
-      releasableObject.releaseAction();
+      releasableObject.releaseAction(this);
     }
   }
 
@@ -1604,7 +1613,7 @@ public abstract class Geom
   {
     if (hoverableObject != null)
     {
-      hoverableObject.mouseStartedMovingAction();
+      hoverableObject.mouseStartedMovingAction(this);
     }
 
   }
@@ -1613,7 +1622,7 @@ public abstract class Geom
   {
     if (hoverableObject != null)
     {
-      hoverableObject.mouseMovingAction();
+      hoverableObject.mouseMovingAction(this);
     }
 
   }
@@ -1622,7 +1631,7 @@ public abstract class Geom
   {
     if (hoverableObject != null)
     {
-      hoverableObject.mouseStoppedMovingAction();
+      hoverableObject.mouseStoppedMovingAction(this);
     }
 
   }

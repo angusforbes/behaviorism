@@ -94,14 +94,16 @@ public class GeomVideo extends GeomRect
     TextureImage texImage = getTexture();
     if (texImage == null)
     {
-      System.err.println("returning because texImage == null");
+      drawRect(gl, 0f, 0f, 0f, w, h);
+      //System.err.println("returning because texImage == null");
       return;
     }
 
     Texture tex = texImage.texture;
     if (tex == null)
     {
-      System.err.println("returning because tex == null");
+      drawRect(gl, 0f, 0f, 0f, w, h);
+     // System.err.println("returning because tex == null");
       return;
     }
 

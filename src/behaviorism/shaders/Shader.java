@@ -86,6 +86,62 @@ public class Shader
     GL2 gl = getGL();
     System.err.println("IN loadAndCompileShader...");
     BufferedReader reader = null;
+ //   JarFile jar = new JarFile("dist/lib/behaviorism.jar");
+
+//    Enumeration entries = jar.entries();
+//    for (Enumeration<JarEntry> e = jar.entries(); e.hasMoreElements();)
+//       System.err.println(e.nextElement());
+
+    InputStream is = getClass().getResourceAsStream("/" + filename);
+    try
+    {
+      reader = new BufferedReader(new InputStreamReader(is));
+      ArrayList<String> lineList = new ArrayList<String>(100);
+
+      for (String line = reader.readLine(); line != null; line = reader.readLine())
+      {
+        lineList.add(line + "\n");
+      }
+
+      String[] lines = lineList.toArray(new String[lineList.size()]);
+
+      int[] lengths = new int[lines.length];
+      for (int i = 0; i < lines.length; i++)
+      {
+        lengths[i] = lines[i].length();
+      }
+
+      shaderId = gl.glCreateShader(type);
+      gl.glShaderSource(shaderId, lines.length, lines, lengths, 0);
+      gl.glCompileShader(shaderId);
+
+      // Check for compile errors
+      checkCompileError();
+    }
+    finally
+    {
+      if (reader != null)
+      {
+        try
+        {
+          reader.close();
+        }
+        catch (Exception ignoreSunsInsanity)
+        {
+          //do nothing
+        }
+      }
+    }
+
+    return true;
+  }
+
+
+  public boolean loadAndCompileShaderFromResourceJar_OLD_REAL(int type, String filename) throws IOException
+  {
+    GL2 gl = getGL();
+    System.err.println("IN loadAndCompileShader...");
+    BufferedReader reader = null;
     JarFile jar = new JarFile("dist/lib/behaviorism.jar");
 
 //    Enumeration entries = jar.entries();

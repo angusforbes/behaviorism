@@ -41,7 +41,6 @@ public class BehaviorRemoveGeom extends BehaviorSimple implements GeomUpdater
     super(startTime);
   }
 
-  @Override
   public void updateGeom(Geom g)
   {
     if (isActive == true)

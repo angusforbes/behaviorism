@@ -1,10 +1,10 @@
 /* TextureManager.java ~ Aug 16, 2009 */
 package behaviorism.textures;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import org.grlea.log.SimpleLogger;
 
 /**
@@ -14,9 +14,11 @@ import org.grlea.log.SimpleLogger;
 public class TextureManager
 {
 
-  private final List<Texture> textures = Collections.synchronizedList(new ArrayList<Texture>());
+  //private final List<Texture> textures = Collections.synchronizedList(new ArrayList<Texture>());
+  private final Set<Texture> textures = Collections.synchronizedSet(new HashSet<Texture>());
+
   //private List<Texture> textures;
-  private static TextureManager instance = new TextureManager(); //null;
+  private static final TextureManager instance = new TextureManager(); //null;
   public static final SimpleLogger log = new SimpleLogger(TextureManager.class);
 
   /**
@@ -29,68 +31,47 @@ public class TextureManager
     /*
     if (instance != null)
     {
-      return instance;
+    return instance;
     }
 
     instance = new TextureManager();
 
     return instance;
-    */
+     */
   }
 
   private TextureManager()
   {
     //this seems to be causing problems! no good way to remove elements. using synchronized list instead!
     //textures = new CopyOnWriteArrayList<Texture>();
-
   }
 
   /**
    * This should only be called from within the Render loop.
+   * Using a synchronizedList instead of a CopyOnWriteArrayList because
+   * the latter does not seem to work with my removal strategy.
+   * May need to rethink if the synchornization causes slowness
+   * (after all this gets called every single frame!). But it may not be an issue at all.
    */
   public void updateTextures()
   {
     log.entry("in updateTextures() : textures.size = " + textures.size());
-    synchronized(textures)
+    synchronized (textures)
     {
-    System.err.println("in TextureManager : updateTextures(), size = " + textures.size());
-    List<Texture> keeps = new ArrayList<Texture>();
+      Iterator<Texture> i = textures.iterator();
 
-    Iterator<Texture> i = textures.iterator();
-
-    while(i.hasNext())
-    {
-      Texture t = i.next();
-
-      t.updateTexture();
-
-      if (t.isDone() == true)
+      while (i.hasNext())
       {
-        i.remove();
-      }
-    }
+        Texture t = i.next();
 
-//    for (Texture t : textures)
-//    {
-//      if (!(t instanceof TextureImage))
-//      {
-//        System.err.println("texture is a " + t.getClass());
-//      }
-//      t.updateTexture();
-//      if (t.isDone() == false)
-//      {
-//        keeps.add(t);
-//      }
-//      else
-//      {
-//        System.err.println("" + t.getClass() + " is DONE");
-//      }
-//    }
-//
-//    log.debug("keeps size = " + keeps.size());
-//
-//    textures.clear();
-//    textures.addAll(keeps);
+        t.updateTexture();
+
+        if (t.isDone() == true)
+        {
+          i.remove();
+        }
+      }
+
     }
     log.exit("out updateTextures() : textures.size = " + textures.size());
   }
@@ -112,13 +93,11 @@ public class TextureManager
   public void addTexture(Texture ti)
   {
     log.debug("in addTexture() : adding texture of type " + ti.getClass());
-    System.err.println("in addTexture() : adding texture of type " + ti.getClass());
     this.textures.add(ti);
   }
 
   public void removeTexture(Texture ti)
   {
-    System.err.println("in removeTexture() : removing texture of type " + ti.getClass());
     log.debug("in removeTexture() : removing texture of type " + ti.getClass());
     if (ti != null)
     {

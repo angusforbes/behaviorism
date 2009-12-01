@@ -74,7 +74,6 @@ public class BehaviorTranslate extends BehaviorRange implements GeomUpdater
     super(startTime, lengthMS, MatrixUtils.toArray(p3f));
   }
   
-  @Override
   public void updateGeom(Geom g)
   {
     if (isActive == true)

@@ -11,6 +11,7 @@ import behaviorism.handlers.KeyboardHandler;
 import behaviorism.handlers.MouseHandler;
 import behaviorism.renderers.cameras.Cam;
 import behaviorism.textures.TextureManager;
+import behaviorism.utils.RenderUtils;
 import behaviorism.worlds.World;
 import com.sun.opengl.util.Animator;
 import com.sun.opengl.util.gl2.GLUT;
@@ -29,11 +30,11 @@ import static javax.media.opengl.GL2.*;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUnurbs;
 import javax.media.opengl.glu.GLUquadric;
 import javax.media.opengl.glu.GLUtessellator;
 import javax.media.opengl.glu.gl2.GLUgl2;
+import javax.swing.JApplet;
 import org.grlea.log.SimpleLogger;
 import static behaviorism.utils.MatrixUtils.*;
 import static behaviorism.utils.RenderUtils.*;
@@ -41,10 +42,9 @@ import static behaviorism.utils.Utils.*;
 
 public class Renderer implements GLEventListener
 {
-
   public Map<World, Boolean> worlds = new ConcurrentHashMap<World, Boolean>();
   public World currentWorld = null;
-  public SceneGraph sceneGraph = null;
+  //public SceneGraph sceneGraph = null;
   public static GLUT glut;
   public static GLUgl2 glu;
   public GL2 gl;
@@ -60,8 +60,8 @@ public class Renderer implements GLEventListener
   public static List<GeomPoint> worldBoundaryPoints = null;
   public static boolean boundsHaveChanged = true;
   public AtomicBoolean togglingFullScreen = new AtomicBoolean(false);
-  private boolean isInstalled = false;
-  private static Renderer instance = null;
+  public  boolean isInstalled = false;
+  private static final Renderer instance = new Renderer();
   //hack for cell tango 2009
   public List<Data> texturesToDispose = new CopyOnWriteArrayList<Data>();
   public AtomicBoolean isDisposing = new AtomicBoolean(false);
@@ -73,22 +73,38 @@ public class Renderer implements GLEventListener
    */
   public static Renderer getInstance()
   {
-    if (instance == null)
-    {
-      instance = new Renderer();
-    }
-
     return instance;
   }
 
   private Renderer()
   {
-    sceneGraph = SceneGraph.getInstance();
   }
 
   public void installWorld(World world)
   {
     installWorld(world, true, true);
+  }
+
+
+  public void installWorld(World world, JApplet applet)
+  {
+    if (!worlds.keySet().contains(world))
+    {
+      worlds.put(world, true);
+    }
+
+    currentWorld = world;
+
+    this.cam = currentWorld.cam;
+
+    boundsHaveChanged = true;
+
+    System.err.println("in installWorld : applet");
+//    while (isInstalled == false) //we need to wait until the reshape method is called via the gl context.
+//    {
+//      System.err.println("in installWorld applet, waiting to be installed...");
+//      sleep(1000);
+//    }
   }
 
   public void installWorld(World world, boolean isActive, boolean isCurrent)
@@ -182,7 +198,8 @@ public class Renderer implements GLEventListener
     //gl = drawable.getGL();
     gl = drawable.getGL().getGL2();
 
-    Behaviorism.getInstance().setCursor(); //make sure we have the proper cursor
+    /*** THIS IS REAL!! TURN BACK ON!! ***/
+    //Behaviorism.getInstance().setCursor(); //make sure we have the proper cursor
 
     return true;
   }
@@ -190,13 +207,17 @@ public class Renderer implements GLEventListener
   //no reason for this to be in scene graph... move it here or to renderutils.
   private void processDebugs()
   {
-    sceneGraph.drawDebuggingInfo();
+    RenderUtils.getSceneGraph().drawDebuggingInfo();
   }
 
   private void processInputs()
   {
     //TO DO: have a list of attached handlers...
-    MouseHandler.getInstance().processMouse();
+    
+    if (Behaviorism.getInstance().useMouse == true)
+    {
+      MouseHandler.getInstance().processMouse();
+    }
     KeyboardHandler.getInstance().processKeyboard();
   }
 
@@ -229,28 +250,10 @@ public class Renderer implements GLEventListener
     log.entry("out shutdown()");
   }
 
-  @Override
   public void display(GLAutoDrawable drawable)
   {
    // log.entry("in display()...");
-//    if (texturesToDispose.size() > 0)
-//    {
-//      isDisposing.set(true);
-//      for (Data d : texturesToDispose)
-//      {
-//        d.dispose();
-//      }
-//      texturesToDispose.clear();
-//      isDisposing.set(false);
-//    }
-
-    if (togglingFullScreen.get() == true)
-    {
-      togglingFullScreen.set(false);
-      Behaviorism.getInstance().toggleFullScreen();
-      return;
-    }
-
+   
     if (!isReady(drawable))
     {
       return;
@@ -260,7 +263,7 @@ public class Renderer implements GLEventListener
 
     TextureManager.getInstance().updateTextures();
 
-    sceneGraph.draw();
+    RenderUtils.getSceneGraph().draw();
 
     processInputs();
 
@@ -276,9 +279,9 @@ public class Renderer implements GLEventListener
     }
   }
 
-  @Override
   public void init(GLAutoDrawable drawable)
   {
+    System.err.println("in Renderer init!");
     drawable.setGL(new DebugGL2(drawable.getGL().getGL2()));
     this.gl = drawable.getGL().getGL2();
 
@@ -349,7 +352,7 @@ public class Renderer implements GLEventListener
     // 0 = do *not* synch with refresh rate (ie fast as possible), 1 = synch with refresh rate (ie always 60fps)
     gl.setSwapInterval(1); //0
 
-
+    
     //animator = new FPSAnimator(glDrawable, 60, false);
     //animator = new FPSAnimator(glDrawable, 5, true);
     //animator = new Animator(glDrawable);
@@ -358,17 +361,17 @@ public class Renderer implements GLEventListener
     animator.setRunAsFastAsPossible(false);
 
     animator.start();
-
-
   }
 
-  @Override
-  public void reshape(GLAutoDrawable drawable, int xstart, int ystart, int width, int height)
+  public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height)
   {
+    System.err.println("in reshape() : RESHAPE IS BEING CALLLED : " + x + "/" +y + "/" +width + "/" +height);
     Renderer.screenBounds = new Rectangle2D.Float(0, 0, width, height);
 
+    System.err.print("in reshape() : CHECKING CAM...");
     if (cam != null)
     {
+      System.err.println(" ... it is available");
       cam.setViewport(0, 0, width, height);
       cam.setAspectRatio(width, height);
       setPerspective3D();
@@ -377,13 +380,19 @@ public class Renderer implements GLEventListener
 
       isInstalled = true;
     }
+    else
+    {
+      System.err.println(" ... it is null!");
+    }
+
   }
 
 //  @Override
 //  public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged)
 //  {
 //  }
-  private void setBoundaries()
+  //We may need to call this manaully in the case of appelts... test this out...
+  public void setBoundaries()
   {
     Point3f lowerleft = toPoint3f(
       rayIntersect(currentWorld, 0, (int) screenBounds.getHeight(), new Point3d()));
@@ -408,17 +417,27 @@ public class Renderer implements GLEventListener
 
   }
 
-  @Override
   public void dispose(GLAutoDrawable arg0)
   {
     log.entry("in dispose()");
+
+    if (Behaviorism.isApplet == true)
+    {
+      //hmm...
+     System.err.println("in dispose() for an applet... what to do?");
+    }
+    else
+    {
     log.info("should stuff be disposed of here?");
     shutdown();
     log.info("goodbye!!!");
     log.exit("out dispose()");
     System.err.println("done disposing...");
 
+    //System.err.println("APPLET TEST... not exiting...");
+
     System.exit(0);
+    }
   }
 }
 

@@ -1,10 +1,10 @@
 /* TextureImage.java ~ May 19, 2009 */
 package behaviorism.textures;
 
-import behaviorism.utils.RenderUtils;
 import com.sun.opengl.util.texture.TextureIO;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import org.grlea.log.SimpleLogger;
 
@@ -36,6 +36,12 @@ public class TextureImage extends Texture
     tempTextureDataHackObject = file;
   }
 
+  public TextureImage(InputStream is)
+  {
+    //generateTextureData(file, false);
+    tempTextureDataHackObject = is;
+  }
+
   /**
    * Creates a new texture from the textureData. Assumes that textureData is indeed available.
    */
@@ -45,15 +51,21 @@ public class TextureImage extends Texture
 
     if (tempTextureDataHackObject instanceof File)
     {
-      System.err.println("tying to load file " + ((File) tempTextureDataHackObject));
+      log.debug("trying to load texture from file " + ((File) tempTextureDataHackObject));
       generateTextureData((File)tempTextureDataHackObject, false);
     }
     
     else if (tempTextureDataHackObject instanceof URL)
     {
+      log.debug("trying to load texture from URL " + ((URL) tempTextureDataHackObject));
       generateTextureData((URL)tempTextureDataHackObject, false);
     }
 
+    else if (tempTextureDataHackObject instanceof InputStream)
+    {
+      log.debug("trying to load texture from InputStream " + ((InputStream) tempTextureDataHackObject));
+      generateTextureData((InputStream)tempTextureDataHackObject, false);
+    }
     this.texture = TextureIO.newTexture(textureData);
     log.exit("out initializeTexture()");
   }
@@ -224,6 +236,32 @@ public class TextureImage extends Texture
     catch (IOException ioe)
     {
       ioe.printStackTrace();
+    }
+
+
+  }
+
+  public void generateTextureData(InputStream is, boolean useMipMaps)
+  {
+    this.name = is.toString();
+    //setColor(1f, 1f, 1f, 1f);
+    //String fileType = TextureIO.JPG;
+
+    try
+    {
+      //this.textureData = TextureIO.newTextureData(url, useMipMaps, imageType);
+      this.textureData = TextureIO.newTextureData(is, useMipMaps, null);
+      this.w = textureData.getWidth();
+      this.h = textureData.getHeight();
+
+      //close this because we have loaded it in completely.
+      is.close();
+
+    }
+    catch (IOException ioe)
+    {
+      ioe.printStackTrace();
+
     }
 
 

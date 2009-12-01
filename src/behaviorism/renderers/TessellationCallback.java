@@ -50,7 +50,6 @@ public class TessellationCallback implements GLUtessellatorCallback
    * used to average color, normal, or texture coordinate data. In this
    * program, color is weighted.
    */
-  @Override
   public void combine(double[] coords, Object[] data, float[] weight, Object[] outData)
   {
     double[] vertex = new double[6];
@@ -68,7 +67,6 @@ public class TessellationCallback implements GLUtessellatorCallback
     outData[0] = vertex;
   }
 
-  @Override
   public void combineData(double[] coords, Object[] data, float[] weight, Object[] outData, Object polygonData)
   {
     System.out.println("in combineData...");

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.grlea.log.SimpleLogger;
 
 /**
  * FontHandler determines the available fonts (stored in data/fonts) and handles
@@ -25,6 +26,7 @@ public class FontHandler
   boolean USE_SMOOTHING = true;
   boolean USE_MIPMAPS = false;
   boolean USE_FRACTIONAL_METRICS = false;
+  float MIN_ALIASED_FONT_SIZE = 10f; //18f;
   public Map<String, List<TextRenderer>> fontFamilyMap = new ConcurrentHashMap<String, List<TextRenderer>>();
   public List<TextRenderer> defaultFontFamily = null;
   //public List<String> fontNames = new ArrayList<String>();
@@ -49,7 +51,10 @@ public class FontHandler
   /**
    * Singleton instance of FontHandler. The only way to use this class is via the static getInstance() method.
    */
-  private static FontHandler instance = null;
+  private static final FontHandler instance = new FontHandler();
+
+
+  public static final SimpleLogger log = new SimpleLogger(FontHandler.class);
 
   /**
    * Gets the singleton FontHandler object.
@@ -57,13 +62,6 @@ public class FontHandler
    */
   public static FontHandler getInstance()
   {
-    if (instance != null)
-    {
-      return instance;
-    }
-
-    instance = new FontHandler();
-
     return instance;
   }
 
@@ -164,7 +162,7 @@ public class FontHandler
       }
     }
 
-    System.out.println("in getFont() : couldn't find size <" + fontSize + ">, creating it...");
+    log.info("in getFont() : couldn't find size <" + fontSize + ">, creating it...");
 
     String familyId = fontName + "," + fontStyle;
     List<TextRenderer> test = fontFamilyMap.get(familyId);
@@ -172,13 +170,13 @@ public class FontHandler
 
     if (test == null)
     {
-      System.out.println("in getFont() : we weren't able to load this font. using default.");
+      log.warn("in getFont() : we weren't able to load this font. using default.");
       renderer = getDefaultFont(fontSize);
     }
     else
     {
       Font derive = new Font(fontName, fontStyle, 800);
-      System.out.println("in getFont() : derive font = " + derive);
+      log.info("in getFont() : derive font = " + derive);
       renderer = createTextRenderer(derive, fontStyle, fontSize);
     }
 
@@ -210,7 +208,7 @@ public class FontHandler
       }
     }
 
-    System.out.println("couldn't find size <" + fontSize + ">, creating it...");
+    log.info("couldn't find size <" + fontSize + ">, creating it...");
     Font derive = new Font(defaultFont, defaultStyle, 800);
 
     TextRenderer renderer = createTextRenderer(derive, defaultStyle, fontSize);
@@ -240,7 +238,7 @@ public class FontHandler
   {
     boolean useAntialias = true;
 
-    if (fontSize < 18f) //then don't anti-alias!
+    if (fontSize < MIN_ALIASED_FONT_SIZE) //then don't anti-alias!
     {
       useAntialias = false;
     }
@@ -279,7 +277,7 @@ public class FontHandler
     }
     else // we haven't seen this family yet...
     {
-      System.out.println("in getFontFamily : we have not yet loaded this font family...");
+      log.debug("in getFontFamily : we have not yet loaded this font family...");
       //try to load in native font from the system...
 
       Font derive = new Font(fontName, fontStyle, 800);
@@ -287,18 +285,18 @@ public class FontHandler
       {
         familyTextRenderers = createTextRenderersForFamily(derive, fontStyle);
         fontFamilyMap.put(familyId, familyTextRenderers);
-        System.out.println("in findFontFamily : we loaded the font family from the system :" + familyId);
+        log.debug("in findFontFamily : we loaded the font family from the system :" + familyId);
         return familyTextRenderers;
       }
       else
       {
-        System.out.println("in findFontFamily : we failed to load the font family from the system :" + familyId);
+        log.info("in findFontFamily : we failed to load the font family from the system :" + familyId);
 
         //try to load from data file...
         if (familyTextRenderers == null) //if unsuccesful...
         {
           String fontPath = "data" + File.separator + "fonts" + File.separator + fontName + ".ttf";
-          System.out.println("trying to load font \"" + fontPath + "\"");
+          log.debug("trying to load font \"" + fontPath + "\"");
 
           try
           {
@@ -306,29 +304,29 @@ public class FontHandler
             derive = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, fontStream);
 
             familyTextRenderers = createTextRenderersForFamily(derive, fontStyle);
-            System.out.println("in findFontFamily : we loaded the font family from a data file :" + familyId);
-            System.out.println("familyTextRenderers size = " + familyTextRenderers.size());
+            log.debug("in findFontFamily : we loaded the font family from a data file :" + familyId);
+            log.debug("familyTextRenderers size = " + familyTextRenderers.size());
             fontFamilyMap.put(familyId, familyTextRenderers);
             return familyTextRenderers;
           }
           catch (IOException e)
           {
-            System.out.println("in findFontFamily : we failed to load the font family from a data file :" + familyId);
+            log.info("in findFontFamily : we failed to load the font family from a data file :" + familyId);
           }
           catch (FontFormatException e)
           {
-            System.out.println("in findFontFamily : we failed to load the font family from a data file :" + familyId);
+            log.info("in findFontFamily : we failed to load the font family from a data file :" + familyId);
           }
         }
 
         if (defaultFontFamily != null)
         {
-          System.out.println("in findFontFamily : We couldn't load your font, so returning default!");
+          log.info("in findFontFamily : We couldn't load your font, so returning default!");
           return defaultFontFamily;
         }
         else
         {
-          System.out.println("in findFontFamily : We couldn't load your font, and your default" +
+          log.warn("in findFontFamily : We couldn't load your font, and your default" +
             "is broken, so creating a backup default and returning that!");
           return loadBackupFontFamily();
         }

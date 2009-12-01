@@ -34,7 +34,10 @@ public class MatrixUtils
 
   private static Point3d getPointInAbsoluteCoordinates(Point3d pt, double[] modelview)
   {
-    double[] temp = Arrays.copyOf(modelview, 16);
+    double temp[] = new double[16];
+    System.arraycopy(modelview, 0, temp, 0, 16);
+
+    //double[] temp = Arrays.copyOf(modelview, 16);
     Matrix4d matrix = new Matrix4d(temp);
     //Matrix4d matrix = new Matrix4d(modelview);
     Point3d absPt = new Point3d(pt);
@@ -46,7 +49,10 @@ public class MatrixUtils
   private static Point3d getPointInAbsoluteCoordinates(Point3d pt, double[] modelview,
     boolean transpose)
   {
-    double[] temp = Arrays.copyOf(modelview, 16);
+    double temp[] = new double[16];
+    System.arraycopy(modelview, 0, temp, 0, 16);
+
+    //double[] temp = Arrays.copyOf(modelview, 16);
     Matrix4d matrix = new Matrix4d(temp);
     //Matrix4d matrix = new Matrix4d(modelview);
     Point3d absPt = new Point3d(pt);
@@ -60,7 +66,10 @@ public class MatrixUtils
 
   private static Point3d getAbsolutePointInCoordinates(Point3d absPt, double[] modelview)
   {
-    double[] temp = Arrays.copyOf(modelview, 16);
+    double temp[] = new double[16];
+    System.arraycopy(modelview, 0, temp, 0, 16);
+
+    //double[] temp = Arrays.copyOf(modelview, 16);
     Matrix4d matrix = new Matrix4d(temp);
 
     //Matrix4d matrix = new Matrix4d(modelview);
@@ -83,7 +92,10 @@ public class MatrixUtils
   private static Point3d getAbsolutePointInCoordinates(Point3d absPt, double[] modelview,
     boolean transpose)
   {
-    double[] temp = Arrays.copyOf(modelview, 16);
+    double temp[] = new double[16];
+    System.arraycopy(modelview, 0, temp, 0, 16);
+    //double[] temp = Arrays.copyOf(modelview, 16);
+
     Matrix4d matrix = new Matrix4d(temp);
 
     //Matrix4d matrix = new Matrix4d(modelview);

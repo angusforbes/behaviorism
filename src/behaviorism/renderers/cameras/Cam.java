@@ -38,18 +38,21 @@ public abstract class Cam extends GeomPoint
   {
     this.fovy = fovy;
     this.projectionHasChanged = true;
+    System.err.println("new fovy is : " + fovy);
   }
 
   public void setAspectRatio(double aspect)
   {
     this.aspect = aspect;
     this.projectionHasChanged = true;
+    System.err.println("new aspect ration is : " + aspect);
   }
 
   public void setAspectRatio(int w, int h)
   {
     this.aspect = (double) w / (double) h;
     this.projectionHasChanged = true;
+    System.err.println("new aspect ration is : " + aspect);
   }
 
   public void setViewport(int x, int y, int w, int h)
@@ -59,6 +62,7 @@ public abstract class Cam extends GeomPoint
         x, y, w, h
       };
 
+    System.err.println("new viewport is : " + x + "/" + y + "/" + w + "/" + h);
     this.projectionHasChanged = true;
   }
 
@@ -95,6 +99,7 @@ public abstract class Cam extends GeomPoint
     if (projection == null || projectionHasChanged == true) //or has changed... TO DO
     {
 
+      System.err.println("in Cam.projection() : UPDATING PROJECTION");
       projection = MatrixUtils.perspective(
         fovy,
         aspect,
