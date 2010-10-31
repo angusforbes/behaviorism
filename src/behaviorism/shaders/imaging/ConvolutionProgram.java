@@ -180,8 +180,8 @@ abstract public class ConvolutionProgram extends Program
     int h = kernelH * 2 + 1;
     this.offsets = new float[w * h * 2];
 
-    float xinc = (float) 1f / (float) (pixelW - 1);
-    float yinc = (float) 1f / (float) (pixelH - 1);
+    float xinc = 1f / (float) (pixelW - 1);
+    float yinc = 1f / (float) (pixelH - 1);
     int xhalf = kernelW;
     int yhalf = kernelH;
     //System.out.println("xinc / yinc = " + xinc + "/" +yinc);

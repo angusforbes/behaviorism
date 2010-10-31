@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package behaviorism. geometry;
+package behaviorism.geometry;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;

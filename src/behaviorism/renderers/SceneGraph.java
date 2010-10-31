@@ -3,10 +3,12 @@ package behaviorism.renderers;
 import behaviorism.behaviors.Behavior;
 import behaviorism.behaviors.behavior.BehaviorUpdater;
 import behaviorism.behaviors.geom.GeomUpdater;
+import behaviorism.data.Node;
 import behaviorism.geometry.Geom;
 import behaviorism.handlers.FontHandler;
 import behaviorism.handlers.MouseHandler;
 import behaviorism.renderers.layers.RendererLayer;
+import behaviorism.utils.MatrixUtils;
 import behaviorism.utils.RenderUtils;
 import behaviorism.utils.Utils;
 import com.sun.opengl.util.awt.TextRenderer;
@@ -119,17 +121,33 @@ public class SceneGraph
   public void processScheduledBehaviors()
   {
     /////testing new scheduler////////////
-    // System.out.println(" global behaviors size : " + RenderUtils.getWorld().behaviors2.size() );
-    for (Behavior b : RenderUtils.getWorld().behaviors2)
+    //System.out.println(" global behaviors size : " + RenderUtils.getSchedule().size() );
+    //for (Behavior b : RenderUtils.getWorld().behaviors2)
+
+    for (Behavior b : RenderUtils.getSchedule())
     {
       b.tick();
 
       b.update(); //generic update
 
-      // System.out.println("attached geoms size : " + b.attachedGeoms);
+      for (Node n : b.attachedNodes) //haven't implemented this yet...
+      {
+        /*
+        if (g.isDone == true)
+        {
+          b.attachedGeoms.remove(g);
+        }
+        else if (b.isActive == true) //g.isActive?
+        {
+          ((GeomUpdater) b).updateGeom(g);
+        }
+        */
+      }
+
+       //System.out.println("attached geoms size : " + b.attachedGeoms);
       for (Geom g : b.attachedGeoms)
       {
-        // System.out.println("updating Geom " + g);
+         //System.out.println("updating Geom " + g);
         // System.out.println("is g done? " + g.isDone);
         if (g.isDone == true)
         {
@@ -161,11 +179,12 @@ public class SceneGraph
 
       if (b.isDone == true)
       {
+        RenderUtils.getScheduler().unschedule(b);
 
         //System.out.println("REMOVING behavior " + b.getClass() + " from scheduler");
-        RenderUtils.getWorld().behaviors2.remove(b);
-        b.isActive = (false);
-        b.dispose();
+        //RenderUtils.getWorld().behaviors2.remove(b);
+        //b.isActive = (false);
+        //b.dispose();
       }
     }
     /////end testing new scheduler////////////
@@ -261,6 +280,17 @@ public class SceneGraph
 
     for (Geom g : geoms)
     {
+
+      if (g.isDone == true)
+      {
+        scheduledForRemovalGeoms.add(g);
+      }
+
+      if (g.isActive == false)
+      {
+        continue;
+      }
+
       //processBehaviors(g);
 
       offset = prevOffset + vizOffset; //.00001f; //ideal, works good on my nvidia card
@@ -277,10 +307,6 @@ public class SceneGraph
 
       g.isTransformed = false;
 
-      if (g.isDone == true)
-      {
-        scheduledForRemovalGeoms.add(g);
-      }
     }
 
     for (Geom g : scheduledForRemovalGeoms)
@@ -298,8 +324,7 @@ public class SceneGraph
     gl.glMatrixMode(GL_PROJECTION);
     gl.glLoadMatrixd(getCamera().projection, 0);
     gl.glMatrixMode(GL_MODELVIEW);
-
-    invisiblePickingGeoms.clear();
+     invisiblePickingGeoms.clear();
 
     for (Map.Entry<Integer, RendererLayer> entry : getWorld().layers.entrySet())
     {
@@ -317,6 +342,13 @@ public class SceneGraph
 
         for (Geom g : layer.attachedGeoms)
         {
+          if (!g.isCalculated)
+          {
+            g.calculate();
+            g.isCalculated = true;
+            continue;
+          }
+
           if (!g.isActive || !g.isVisible || g.isDone) //then ignore
           {
             continue;
@@ -324,7 +356,7 @@ public class SceneGraph
 
           if (g.hasState == true) //then override the layer's State
           {
-            gl.glPushAttrib(GL_ALL_ATTRIB_BITS);
+            //gl.glPushAttrib(GL_ALL_ATTRIB_BITS);
             g.getState().state();
           }
 
@@ -335,12 +367,13 @@ public class SceneGraph
             invisiblePickingGeoms.add(g);
           }
 
+
           g.draw();
 
           if (g.hasState == true) //reset to Layer's State if we just overrode it...
           {
             //layer.state.state(gl);
-            gl.glPopAttrib();
+            //gl.glPopAttrib();
           }
         }
       }

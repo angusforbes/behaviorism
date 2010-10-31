@@ -14,8 +14,10 @@ import behaviorism.textures.TextureManager;
 import behaviorism.utils.RenderUtils;
 import behaviorism.worlds.World;
 import com.sun.opengl.util.Animator;
+import com.sun.opengl.util.awt.Screenshot;
 import com.sun.opengl.util.gl2.GLUT;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 import java.util.ArrayList;
@@ -158,7 +160,7 @@ public class Renderer implements GLEventListener
   public void setPerspective3D()
   {
     cam.projection();
-    cam.perspective();
+    cam.view();
 
     //extractFrustum();
     //System.out.println("leaving setPerspective3D()...");
@@ -265,6 +267,16 @@ public class Renderer implements GLEventListener
 
     RenderUtils.getSceneGraph().draw();
 
+//    try
+//    {
+//    Screenshot.writeToFile(new File("savedImages/blah_" + System.currentTimeMillis() + ".jpg"),
+//      cam.viewport[2], cam.viewport[3]);
+//    }
+//    catch(Exception e)
+//    {
+//      e.printStackTrace();
+//    }
+
     processInputs();
 
     processDebugs();
@@ -285,6 +297,9 @@ public class Renderer implements GLEventListener
     drawable.setGL(new DebugGL2(drawable.getGL().getGL2()));
     this.gl = drawable.getGL().getGL2();
 
+    Behaviorism.getInstance().setFontParams();
+    //FontHandler.getInstance().setDefaultFont("Default", 0);
+
     //this.gl = drawable.getGL();
     //drawable.setGL(new DebugGL(gl));
 
@@ -295,10 +310,10 @@ public class Renderer implements GLEventListener
     glu = new GLUgl2();
     glut = new GLUT();
 
-
+    /** TURN ON THESE TO INIT LIGHT, need to make a better lighting strategy **/
 //    gl.glEnable(gl.GL_LIGHT0);					// Enable Default Light (Quick And Dirty)	( NEW )
-//    //gl.glEnable(gl.GL_LIGHTING);				// Enable Lighting				( NEW )
-    gl.glEnable(gl.GL_COLOR_MATERIAL);				// Enable Coloring Of Material			( NEW )
+//    gl.glEnable(gl.GL_LIGHTING);				// Enable Lighting				( NEW )
+//    gl.glEnable(gl.GL_COLOR_MATERIAL);				// Enable Coloring Of Material			( NEW )
     gl.glShadeModel(gl.GL_SMOOTH);                              // Enable Smooth Shading
     //gl.glShadeModel(gl.GL_FLAT);
 
@@ -308,7 +323,8 @@ public class Renderer implements GLEventListener
       }, 0);
     gl.glLightfv(GL_LIGHT0, GL_POSITION, new float[]
       {
-        0f, 0f, 2f, 1f
+        //0f, 0f, 2f, 1f //REAL
+        2f, 2f, 2f, 1f
       }, 0);
 
     // setup the material properties

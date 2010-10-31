@@ -1,16 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package behaviorism.geometry.media;
 
 import behaviorism.geometry.GeomRect;
 import behaviorism.textures.TextureImage;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
-import static javax.media.opengl.GL2.*;
 import javax.media.opengl.GL2;
 import javax.vecmath.Point3f;
+import static javax.media.opengl.GL2.*;
 import static behaviorism.utils.RenderUtils.*;
 
 /**
@@ -108,6 +104,15 @@ public class GeomImage extends GeomRect
     return this.textures.get(0);
   }
 
+   public TextureImage getTexture(int which)
+  {
+    if (this.textures == null || this.textures.size() < which + 1)
+    {
+      return null;
+    }
+    return this.textures.get(which);
+  }
+
   @Override
   public void draw()
   {
@@ -145,11 +150,12 @@ public class GeomImage extends GeomRect
     }
      */
     gl.glColor4fv(color.array(), 0);
-
-
+   
     tex.bind();
     gl.glEnable(GL_TEXTURE_2D);
     TextureCoords tc = this.textures.get(0).texture.getImageTexCoords();
+
+    // gl.glColor4f(0f, 1f, 0f, 1f);
 
     drawRect(gl,
       0f, 0f, offset, w, h,

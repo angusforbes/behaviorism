@@ -54,6 +54,7 @@ import org.grlea.log.SimpleLogger;
 public class Behaviorism
 {
 
+  public Properties properties = null;
   public boolean useMouse = true;
   private int prevCanvasWidth = 600;
   private int prevCanvasHeight = 400;
@@ -184,15 +185,17 @@ public class Behaviorism
 
   public void installProperties(Properties properties)
   {
+    this.properties = properties;
+
     log.entry("in installProperties()");
     //load properties
     if (properties != null)
     {
-      setMainParams(properties);
-      setBehaviorParams(properties);
-      setSceneGraphParams(properties);
-      //setWorldParams(properties);
-      setFontParams(properties);
+      setMainParams();
+      setBehaviorParams();
+      setSceneGraphParams();
+      //setWorldParams(properties); //this is done in the world??
+      //setFontParams(); //this is done via the Renderer.init() when openGL context is active
     }
     log.entry("out installProperties()");
   }
@@ -282,9 +285,12 @@ public class Behaviorism
 
     //set up openGL canvas
     GLCapabilities capabilities = new GLCapabilities(GLProfile.get(GLProfile.GL2));
-    capabilities.setSampleBuffers(true);
     //capabilities.setSampleBuffers(false);
+
+    //real deal!!!
+    capabilities.setSampleBuffers(true);
     capabilities.setNumSamples(4);
+
     //capabilities.setNumSamples(1);
     return new GLCanvas(capabilities);
   }
@@ -316,8 +322,10 @@ public class Behaviorism
 
   private void makeFullScreen(JFrame f)
   {
+
     f.setUndecorated(true);
     //f.setUndecorated(false);
+
     device.setFullScreenWindow(f);
   }
 
@@ -400,7 +408,13 @@ public class Behaviorism
     frame = tmpFrame;
     canvas = tmpCanvas;
 
+    if (fullScreen == true)
+    {
+      frame.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
+    }
 
+    //frame.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
+    System.err.println("frame extended state = " + frame.getExtendedState());
   }
 
   public void toggleFullScreenReal()
@@ -420,14 +434,14 @@ public class Behaviorism
 
       JFrame tmpFrame = new JFrame(this.applicationName);
 
+      GLCanvas tmpCanvas = new GLCanvas();
 //      GLCapabilities capabilities = new GLCapabilities(GLProfile.get(GLProfile.GL2));
 //      GLCanvas tmpCanvas = new GLCanvas(capabilities);
-
-      GLCanvas tmpCanvas = new GLCanvas(
-        canvas.getChosenGLCapabilities(),
-        new DefaultGLCapabilitiesChooser(),
-        canvas.getContext(),
-        null);
+//      GLCanvas tmpCanvas = new GLCanvas(
+//        canvas.getChosenGLCapabilities(),
+//        new DefaultGLCapabilitiesChooser(),
+//        canvas.getContext(),
+//        null);
       tmpFrame.add(tmpCanvas);
 
       addListeners(tmpCanvas);
@@ -486,31 +500,34 @@ public class Behaviorism
     }
   }
 
-  private void setFontParams(Properties properties)
+  public void setFontParams() //this is actually only called by the Renderer.init() method
   {
     boolean updateDefaultFont = false;
     String fontName = "Default";
     int fontStyle = 0;
 
-    if (properties.getProperty("font.defaultFont") != null)
+    if (properties != null)
     {
-      fontName = properties.getProperty("font.defaultFont");
-      updateDefaultFont = true;
-    }
+      if (properties.getProperty("font.defaultFont") != null)
+      {
+        fontName = properties.getProperty("font.defaultFont");
+        updateDefaultFont = true;
+      }
 
-    if (properties.getProperty("font.defaultFontStyle") != null)
-    {
-      fontStyle = Integer.parseInt(properties.getProperty("font.defaultFontStyle"));
-      updateDefaultFont = true;
+      if (properties.getProperty("font.defaultFontStyle") != null)
+      {
+        fontStyle = Integer.parseInt(properties.getProperty("font.defaultFontStyle"));
+        updateDefaultFont = true;
+      }
     }
-
     if (updateDefaultFont == true)
     {
       FontHandler.getInstance().setDefaultFont(fontName, fontStyle);
     }
+
   }
 
-  private void setMainParams(Properties properties)
+  private void setMainParams()
   {
     log.entry("in setMainParams()");
     String appName = properties.getProperty("main.applicationName");
@@ -519,7 +536,10 @@ public class Behaviorism
       this.applicationName = appName;
     }
 
-    this.useMouse = Boolean.parseBoolean(properties.getProperty("main.useMouse"));
+    if (properties.getProperty("main.useMouse") != null)
+    {
+      this.useMouse = Boolean.parseBoolean(properties.getProperty("main.useMouse"));
+    }
 
     log.debug("useMouse = " + useMouse);
 
@@ -558,12 +578,12 @@ public class Behaviorism
     log.exit("out setMainParams()");
   }
 
-  private void setBehaviorParams(Properties properties)
+  private void setBehaviorParams()
   {
     Behavior.debugBehaviors = Boolean.parseBoolean(properties.getProperty("behavior.debugBehaviors"));
   }
 
-  private void setSceneGraphParams(Properties properties)
+  private void setSceneGraphParams()
   {
     //how large an offset?
     SceneGraph.vizOffset = Float.parseFloat(properties.getProperty("viz.offset"));

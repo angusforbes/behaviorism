@@ -26,8 +26,7 @@ abstract public class GeomGluQuadric extends Geom
   public GeomGluQuadric(Point3f p3f)
   {
     super(p3f);
-    glu = RenderUtils.getGLU();
-    quadric = RenderUtils.getQuadric();
+   
   }
 
   public void orientation(int side)
@@ -73,6 +72,10 @@ abstract public class GeomGluQuadric extends Geom
 
   public void draw()
   {
+
+    glu = RenderUtils.getGLU();
+    quadric = RenderUtils.getQuadric();
+
     glu.gluQuadricOrientation(quadric, orientation);
     glu.gluQuadricDrawStyle(quadric, drawStyle);
     glu.gluQuadricNormals(quadric, normals);

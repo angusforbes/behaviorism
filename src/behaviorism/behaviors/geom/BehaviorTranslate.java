@@ -1,6 +1,7 @@
 package behaviorism.behaviors.geom;
 
 import behaviorism.behaviors.BehaviorRange;
+import behaviorism.behaviors.Scheduler;
 import behaviorism.geometry.Geom;
 import behaviorism.utils.GeomUtils;
 import behaviorism.utils.MatrixUtils;
@@ -14,6 +15,21 @@ public class BehaviorTranslate extends BehaviorRange implements GeomUpdater
 {
  
 
+  /**
+   * Creates a BehaviorTranslate without automatically attaching it to a Geom.
+   * @param startTime
+   * @param lengthMS
+   * @param range
+   * @return
+   */
+  public static BehaviorTranslate translate(
+    long startTime,
+    long lengthMS,
+    Point3f range)
+  {
+    return new BehaviorTranslate(startTime, lengthMS, range);
+  }
+
   public static BehaviorTranslate translate(
     Geom g,
     long startTime,
@@ -21,8 +37,8 @@ public class BehaviorTranslate extends BehaviorRange implements GeomUpdater
     Point3f range)
   {
     BehaviorTranslate bt = new BehaviorTranslate(startTime, lengthMS, range);
-    bt.attachGeom(g);
-
+    //bt.attachGeom(g);
+    Scheduler.getInstance().attachGeom(bt, g);
     return bt;
   }
 
@@ -54,8 +70,10 @@ public class BehaviorTranslate extends BehaviorRange implements GeomUpdater
 
     BehaviorTranslate bt = new BehaviorTranslate(
       new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(MatrixUtils.toArray(ranges)));
-       
-    bt.attachGeom(g);
+
+    Scheduler.getInstance().attachGeom(bt, g);
+
+    //bt.attachGeom(g);
 
     return bt;
   }

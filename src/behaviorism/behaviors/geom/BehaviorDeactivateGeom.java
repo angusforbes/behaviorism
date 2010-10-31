@@ -4,6 +4,7 @@
  */
 package behaviorism.behaviors.geom;
 
+import behaviorism.behaviors.Scheduler;
 import behaviorism.geometry.Geom;
 import behaviorism.utils.Utils;
 
@@ -20,7 +21,8 @@ public class BehaviorDeactivateGeom extends BehaviorActivateGeom implements Geom
   public static BehaviorDeactivateGeom deactivateAtNano(Geom geom, long baseNano)
   {
     BehaviorDeactivateGeom bia = new BehaviorDeactivateGeom(baseNano);
-    bia.attachGeom(geom);
+    //bia.attachGeom(geom);
+    Scheduler.getInstance().attachGeom(bia, geom);
 
     return bia;
   }
@@ -28,7 +30,8 @@ public class BehaviorDeactivateGeom extends BehaviorActivateGeom implements Geom
   public static BehaviorDeactivateGeom deactivateAtMillis(Geom geom, long baseNano, long onMS)
   {
     BehaviorDeactivateGeom bia = new BehaviorDeactivateGeom(baseNano + Utils.millisToNanos(onMS));
-    bia.attachGeom(geom);
+    //bia.attachGeom(geom);
+    Scheduler.getInstance().attachGeom(bia, geom);
 
     return bia;
   }
@@ -38,6 +41,7 @@ public class BehaviorDeactivateGeom extends BehaviorActivateGeom implements Geom
     super(startTime);
   }
 
+  @Override
   public void updateGeom(Geom g)
   {
     if (isActive == true)
@@ -48,7 +52,7 @@ public class BehaviorDeactivateGeom extends BehaviorActivateGeom implements Geom
 
   public void deactivate(Geom g)
   {
-    System.out.println("WE HAVE BEEN ACTIVATED!");
+    //System.out.println("WE HAVE BEEN DEACTIVATED!");
     g.isActive = false;
 
     if (updateChildren == true)
@@ -58,7 +62,6 @@ public class BehaviorDeactivateGeom extends BehaviorActivateGeom implements Geom
         deactivate(child);
       }
     }
-
   }
 
   /*

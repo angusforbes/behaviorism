@@ -1,6 +1,7 @@
 package behaviorism.behaviors.geom;
 
 import behaviorism.behaviors.BehaviorRange;
+import behaviorism.behaviors.Scheduler;
 import behaviorism.geometry.Geom;
 import behaviorism.utils.GeomUtils;
 import behaviorism.utils.MatrixUtils;
@@ -21,7 +22,9 @@ public class BehaviorSize extends BehaviorRange implements GeomUpdater
     Point3f range)
   {
     BehaviorSize bt = new BehaviorSize(startTime, lengthMS, range);
-    bt.attachGeom(g);
+    Scheduler.getInstance().attachGeom(bt, g);
+
+//    bt.attachGeom(g);
 
     return bt;
   }

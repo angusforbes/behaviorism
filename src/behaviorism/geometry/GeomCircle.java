@@ -18,6 +18,7 @@ public class GeomCircle extends GeomPoly
   public float startAngle = 0f;
   public float endAngle = 360f;
 
+
   public GeomCircle(float x, float y, float z, float outerRadius)
   {
     super(x, y, z);
@@ -159,6 +160,10 @@ public class GeomCircle extends GeomPoly
 
     GL2 gl = getGL();
     GLU glu = getGLU();
+
+//      gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE);
+//            gl.glDisable(gl.GL_DEPTH_TEST);
+//            gl.glDisable(gl.GL_CULL_FACE);
 
     //get Tesselator object
     GLUtessellator tobj = getTesselator();

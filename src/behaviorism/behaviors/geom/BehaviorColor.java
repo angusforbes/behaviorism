@@ -1,6 +1,7 @@
 package behaviorism.behaviors.geom;
 
 import behaviorism.behaviors.BehaviorRange;
+import behaviorism.behaviors.Scheduler;
 import behaviorism.geometry.Colorf;
 import behaviorism.geometry.Geom;
 import behaviorism.utils.MatrixUtils;
@@ -21,8 +22,9 @@ public class BehaviorColor extends BehaviorRange implements GeomUpdater
   {
     BehaviorColor bt = new BehaviorColor(
       new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(color.array()));
-    bt.attachGeom(g);
+    //bt.attachGeom(g);
 
+     Scheduler.getInstance().attachGeom(bt, g);
     return bt;
   }
 
@@ -38,8 +40,8 @@ public class BehaviorColor extends BehaviorRange implements GeomUpdater
     BehaviorColor bt = new BehaviorColor(
       new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(color.array()));
 
-    bt.attachGeom(g);
-
+    //bt.attachGeom(g);
+ Scheduler.getInstance().attachGeom(bt, g);
     return bt;
   }
 
@@ -54,8 +56,9 @@ public class BehaviorColor extends BehaviorRange implements GeomUpdater
 
     BehaviorColor bt = new BehaviorColor(
       new ContinuousBehaviorBuilder(startTime, lengthMS).ranges(color.array()));
+ Scheduler.getInstance().attachGeom(bt, g);
 
-    bt.attachGeom(g);
+//    bt.attachGeom(g);
 
     return bt;
   }

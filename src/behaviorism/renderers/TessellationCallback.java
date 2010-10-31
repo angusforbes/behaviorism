@@ -59,11 +59,13 @@ public class TessellationCallback implements GLUtessellatorCallback
     vertex[1] = coords[1];
     vertex[2] = coords[2];
 
+    
     //colors
     for (i = 3; i < 6; i++)
     {
       vertex[i] = weight[0] * ((double[]) data[0])[i] + weight[1] * ((double[]) data[1])[i] + weight[2] * ((double[]) data[2])[i] + weight[3] * ((double[]) data[3])[i];
     }
+     
     outData[0] = vertex;
   }
 

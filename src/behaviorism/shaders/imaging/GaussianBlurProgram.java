@@ -1,5 +1,5 @@
 /* GaussianBlurProgram.java ~ Jun 12, 2009 */
-package behaviorism. shaders.imaging;
+package behaviorism.shaders.imaging;
 
 import java.util.Arrays;
 

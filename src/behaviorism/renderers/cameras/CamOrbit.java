@@ -59,13 +59,13 @@ public class CamOrbit extends Cam
     this.rotateAnchor = rotateAnchor;
   }
 
-  public void perspective()
+  public void view()
   {
     System.out.println("ERROR -- we haven't set up the perspective for CamOrbit!!! TO DO!!!");
     System.exit(0);
   }
 
-  @Override
+  /*
   public void setPerspective()
   {
     GL2 gl = getGL();
@@ -78,41 +78,35 @@ public class CamOrbit extends Cam
 
     gl.glTranslatef(translate.x, translate.y, translate.z);
   }
+   */
 
-  @Override
   public void changePitch(double degrees)
   {
     rotate.x += degrees;
   }
 
-  @Override
   public void changeHeading(double degrees)
   {
     rotate.y += -degrees;
   }
 
-  @Override
   public void changeYaw(double degrees)
   {
     rotate.z += degrees;
   }
 
-  @Override
   public void translateX(float x)
   {
     //rotateAnchor.translate.x += x;
   }
 
-  @Override
   public void translateY(float y)
   {
     //rotateAnchor.translate.y += y;
   }
 
-  @Override
   public void translateZ(float z)
   {
-    //rotateAnchor.translate.z += z;
     rotateAnchor.z += z;
   }
 }

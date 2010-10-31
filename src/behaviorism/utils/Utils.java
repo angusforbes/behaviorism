@@ -107,6 +107,27 @@ public class Utils
     return nanosToMillis(now());
   }
 
+
+  /**
+   * Clamps the val to a specified min, if val < min, or max, or val > max
+   * @param val
+   * @param min
+   * @param max
+   * @return the clamped val
+   */
+  public static float clamp(float val, float min, float max)
+  {
+    if (val < min)
+    {
+      return min;
+    }
+    if (val > max)
+    {
+      return max;
+    }
+    return val;
+  }
+
   /**
    * Normalizes a set of values with an aribitray total
    * so that their total is an specified value.
@@ -308,16 +329,28 @@ public class Utils
     return new Point3f(randomFloat(p1.x, p2.x), randomFloat(p1.y, p2.y), randomFloat(p1.z, p2.z));
   }
 
-  public static float randomAngle()
+  public static float randomAngle() //returns in radians
   {
     return (float)Utils.random(-Math.PI, Math.PI);
   }
+
+
 
   /**
    * Creates a random 2D normalized vector (the z value is always set to 0f)
    * @return the random normalized vector.
    */
   public static Vector3f randomVector2D()
+  {
+    return randomVector2D(1.0f);
+  }
+
+  public static Vector3f randomVector2D(float minLength, float maxLength)
+  {
+    return randomVector2D(randomFloat(minLength, maxLength));
+  }
+
+  public static Vector3f randomVector2D(float length)
   {
     float radian = randomAngle();
 
@@ -328,7 +361,8 @@ public class Utils
     //System.err.println("x/y = " + x + "/" +y);
 
     Vector3f vec = new Vector3f(x, y, 0f);
-    //vec.normalize();  //already normalized
+    vec.normalize();  //already normalized
+    vec.scale(length);
     return vec;
   }
 
@@ -384,6 +418,63 @@ public class Utils
     }
     //return (Integer[]) ints.toArray(new Integer[ints.size()]);
     return ints.toArray(new Integer[ints.size()]);
+  }
+
+
+  public static <T> List<T> randomElements(Collection<T> collection, int howMany, int min, int max)
+  {
+
+    List<T> list = new ArrayList<T>(collection);
+
+    List<T> sublist = list.subList(Math.max(0,min), Math.min(list.size() - 1, max));
+
+    if (sublist.size() < howMany)
+    {
+      System.err.println("ERROR : you are requesting too many elements from this list!");
+      return null;
+    }
+   
+    Collections.shuffle(sublist);
+
+    List<T> returnList = new ArrayList<T>();
+    for (int i = 0; i < howMany; i++)
+    {
+      returnList.add(sublist.get(i));
+    }
+    return returnList;
+  }
+
+  public static <T> List<T> randomElements(Collection<T> collection, int howMany)
+  {
+    if (collection.size() < howMany)
+    {
+      System.err.println("ERROR : you are requesting too many elements from this list!");
+      return null;
+    }
+
+    List<T> list = new ArrayList<T>(collection);
+    
+    Collections.shuffle(list);
+
+    List<T> returnList = new ArrayList<T>();
+    for (int i = 0; i < howMany; i++)
+    {
+      returnList.add(list.get(i));
+    }
+    return returnList;
+  }
+  public static <T> T randomElement(Collection<T> collection, int min, int max)
+  {
+    //((List<T>) collection).get(1);
+    List<T> list = new ArrayList<T>(collection);
+    return list.get(Utils.randomInt(
+      Math.max(0,min), Math.min(collection.size() - 1, max)));
+  }
+  public static <T> T randomElement(Collection<T> collection)
+  {
+    //((List<T>) collection).get(1);
+    List<T> list = new ArrayList<T>(collection);
+    return list.get(Utils.randomInt(0, collection.size() - 1));
   }
 
   public static Integer[] shuffledArrayOfInts(int length)
@@ -596,6 +687,79 @@ public class Utils
     }
 
     return angles;
+  }
+
+  public static int[] getAlternatingNumbers(int startNum, int min, int max,
+    boolean includeStartNumber)
+  {
+    int[] arr;
+    int idx;
+    int dist = 1;
+    if (includeStartNumber == true)
+    {
+      arr = new int[max - min];
+      arr[0] = startNum;
+      idx = 1;
+    }
+    else
+    {
+      arr = new int[max - min - 1];
+      idx = 0;
+    }
+
+    while (true)
+    {
+      if (startNum - dist >= min)
+      {
+        arr[idx] = startNum - dist;
+        idx++;
+      }
+
+      if (startNum + dist <= max - 1)
+      {
+        arr[idx] = startNum + dist;
+        idx++;
+      }
+
+      if (idx >= max - min - 1)
+      {
+        break;
+      }
+
+      dist++;
+    }
+
+    return arr;
+  }
+
+  public static int[] getAlternatingNumbers(int startNum, int min, int max)
+  {
+    int[] arr = new int[max - min - 1];
+    int dist = 1;
+    int idx = 0;
+    while (true)
+    {
+      if (startNum - dist >= min)
+      {
+        arr[idx] = startNum - dist;
+        idx++;
+      }
+
+      if (startNum + dist <= max - 1)
+      {
+        arr[idx] = startNum + dist;
+        idx++;
+      }
+
+      if (idx >= max - min - 1)
+      {
+        break;
+      }
+
+      dist++;
+    }
+
+    return arr;
   }
 
   public static long millisToNanos(double val)

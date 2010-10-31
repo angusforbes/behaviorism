@@ -4,9 +4,11 @@ package behaviorism.handlers;
 import com.sun.opengl.util.awt.TextRenderer;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.font.FontRenderContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,8 +24,8 @@ import org.grlea.log.SimpleLogger;
 public class FontHandler
 {
 
-  boolean USE_VERTEX_ARRAYS = false;
-  boolean USE_SMOOTHING = true;
+  boolean USE_VERTEX_ARRAYS = true; //false;
+  boolean USE_SMOOTHING = false; //true;
   boolean USE_MIPMAPS = false;
   boolean USE_FRACTIONAL_METRICS = false;
   float MIN_ALIASED_FONT_SIZE = 10f; //18f;
@@ -227,6 +229,7 @@ public class FontHandler
     return defaultFontFamily;
   }
 
+  public Map<TextRenderer, FontRenderContext> textRendererToFontRendererContext = new HashMap<TextRenderer, FontRenderContext>();
   /**
    * Creates a single TextRenderer for a specified font and style with a particular size.
    * @param font
@@ -248,6 +251,8 @@ public class FontHandler
       useAntialias, USE_FRACTIONAL_METRICS, null, USE_MIPMAPS);
     //renderer.setSmoothing(USE_SMOOTHING);
     renderer.setUseVertexArrays(USE_VERTEX_ARRAYS);
+
+    textRendererToFontRendererContext.put(renderer, renderer.getFontRenderContext());
 
     return renderer;
   }
@@ -352,7 +357,7 @@ public class FontHandler
 
   public List<TextRenderer> createTextRenderersForFamily(Font font, int fontStyle)
   {
-    List<TextRenderer> familyTextRenderers = new CopyOnWriteArrayList();
+    List<TextRenderer> familyTextRenderers = new CopyOnWriteArrayList<TextRenderer>();
 
     float fontSizes[] =
     {

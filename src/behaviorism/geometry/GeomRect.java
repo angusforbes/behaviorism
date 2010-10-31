@@ -278,6 +278,7 @@ public class GeomRect extends Geom
 
   // get this and all packing algorithm bullshit the fuck out of this class!!!!!!!!!!
   //from now on rectangle coords are always in absolute coordinates...
+  @Deprecated
   public Rectangle2D makeRectangle2DFromRect()
   {
     /*
@@ -333,6 +334,7 @@ public class GeomRect extends Geom
   }
 
   //public void setCoordFromRectangle(Rectangle2D.Float bounds)
+  @Deprecated
   public void setCoordFromRectangle(Rectangle2D bounds)
   {
 

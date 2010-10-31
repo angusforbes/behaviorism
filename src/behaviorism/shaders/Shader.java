@@ -152,14 +152,14 @@ public class Shader
     try
     {
       reader = new BufferedReader(new InputStreamReader(is));
-      ArrayList lineList = new ArrayList(100);
+      ArrayList<String> lineList = new ArrayList<String>(100);
 
       for (String line = reader.readLine(); line != null; line = reader.readLine())
       {
         lineList.add(line + "\n");
       }
 
-      String[] lines = (String[]) lineList.toArray(new String[lineList.size()]);
+      String[] lines = lineList.toArray(new String[lineList.size()]);
 
       int[] lengths = new int[lines.length];
       for (int i = 0; i < lines.length; i++)
@@ -208,14 +208,14 @@ public class Shader
     try
     {
       reader = new BufferedReader(new FileReader(file));
-      ArrayList lineList = new ArrayList(100);
+      ArrayList<String> lineList = new ArrayList<String>(100);
 
       for (String line = reader.readLine(); line != null; line = reader.readLine())
       {
         lineList.add(line + "\n");
       }
 
-      String[] lines = (String[]) lineList.toArray(new String[lineList.size()]);
+      String[] lines = lineList.toArray(new String[lineList.size()]);
 
       int[] lengths = new int[lines.length];
       for (int i = 0; i < lines.length; i++)

@@ -5,6 +5,7 @@
 package behaviorism.behaviors.geom;
 
 import behaviorism.behaviors.BehaviorSimple;
+import behaviorism.behaviors.Scheduler;
 import behaviorism.geometry.Geom;
 import behaviorism.utils.Utils;
 
@@ -23,7 +24,9 @@ public class BehaviorActivateGeom extends BehaviorSimple implements GeomUpdater
   public static BehaviorActivateGeom activateAtNano(Geom geom, long baseNano)
   {
     BehaviorActivateGeom bia = new BehaviorActivateGeom(baseNano);
-    bia.attachGeom(geom);
+    //bia.attachGeom(geom);
+
+    Scheduler.getInstance().attachGeom(bia, geom);
 
     return bia;
   }
@@ -31,7 +34,8 @@ public class BehaviorActivateGeom extends BehaviorSimple implements GeomUpdater
   public static BehaviorActivateGeom activateAtMillis(Geom geom, long baseNano, long onMS)
   {
     BehaviorActivateGeom bia = new BehaviorActivateGeom(baseNano + Utils.millisToNanos(onMS));
-    bia.attachGeom(geom);
+    //bia.attachGeom(geom);
+    Scheduler.getInstance().attachGeom(bia, geom);
 
     return bia;
   }
@@ -72,7 +76,9 @@ public class BehaviorActivateGeom extends BehaviorSimple implements GeomUpdater
 
   public void updateGeom(Geom g)
   {
-    if (isActive == true)
+    System.err.println("IS ACTIVE = " + isActive);
+    if (isActive == true) //that is, if BEHAVIOR is active (i think)
+    //if (isActive == false) //huh?
     {
       activate(g);
     }
@@ -82,6 +88,7 @@ public class BehaviorActivateGeom extends BehaviorSimple implements GeomUpdater
   {
     //System.out.println("WE HAVE BEEN ACTIVATED!");
     g.isActive = true;
+    g.isDone = false;
 
     if (updateChildren == true)
     {

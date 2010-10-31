@@ -18,7 +18,7 @@ public class GeomTrace extends GeomPoint
 {
   public float lineWidth = 1f;
   public LinkedList<Point3f> trace;
-  public int maxPoints = 10000;
+  public int numTrailingPoints = 10000;
 
   /**
    * Creates a new GeomTrace anchored at a specified point with the default number of trace points.
@@ -33,31 +33,31 @@ public class GeomTrace extends GeomPoint
   /**
    * Creates a new GeomTrace anchored at a specified point with a maximum number of trace points.
    * @param p3f The achor point.
-   * @param maxPoints The maximum number of points in the trace.
+   * @param numTrailingPoints The maximum number of points in the trace.
    */
   public GeomTrace(Point3f p3f, int maxPoints)
   {
     super(p3f);
-    this.maxPoints = maxPoints;
+    this.numTrailingPoints = maxPoints;
     this.trace = new LinkedList<Point3f>();
   }
 
   /**
    * Creates a new GeomTrace anchored at a specified point with a maximum number of trace points.
    * @param p3f The achor point.
-   * @param maxPoints The maximum number of points in the trace.
+   * @param numTrailingPoints The maximum number of points in the trace.
    */
   public GeomTrace(Point3f p3f, List<Point3f> trace, int maxPoints)
   {
     super(p3f);
-    this.maxPoints = maxPoints;
+    this.numTrailingPoints = maxPoints;
     this.trace = new LinkedList<Point3f>(trace);
   }
 
 
   /**
    * Adds a point to the trace. Checks to make sure the same point isn't already at the end of the List of points.
-   * If adding another point would make the size of the List of points greater than maxPoints, then first delete
+   * If adding another point would make the size of the List of points greater than numTrailingPoints, then first delete
    * the oldest point before adding this one.
    * @param p3f The point we are adding to the trace.
    */
@@ -68,7 +68,7 @@ public class GeomTrace extends GeomPoint
     {
       if (!(this.trace.getLast().equals(p3f)))
       {
-        if (this.trace.size() > maxPoints)
+        if (this.trace.size() > numTrailingPoints)
         {
           this.trace.removeFirst();
         }

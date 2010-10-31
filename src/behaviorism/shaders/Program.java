@@ -172,7 +172,7 @@ public class Program
    */
   public void mapUniforms()
   {
-    System.out.println("IN mapUniforms()");
+    System.out.println("!!!!!!!!IN mapUniforms()");
 
     GL2 gl = getGL();
     int[] length = new int[1];

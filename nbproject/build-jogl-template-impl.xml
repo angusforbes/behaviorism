@@ -5,7 +5,7 @@
 -->
 <project name="jogl-template-impl" default="default" basedir=".." >
     <description>Ant targets for JOGL projects.</description>
-
+<!--
     <target name="-jogl-template-post-jar">
         <echo message="Creating native distibutions"/>
 
@@ -47,11 +47,9 @@
     </target>
 
     <target name="-jogl-template-jnlp" depends="-jogl-template-test-jnlp-enabled,-jogl-template-patch-master-jnlp,jnlp-impl.jnlp" if="is.jnlp.enabled">
-        <!--remove jogl from dist/lib folder-->
         <delete file="${dist.dir}/lib/jogl.jar"/>
         <delete file="${dist.dir}/lib/gluegen-rt.jar"/>
 
-        <!--remove jogl dependency from jnlp to add it later as jnlp extention-->
         <replace file="${dist.dir}/launch.jnlp">
             <replacetoken><![CDATA[<jar href="lib/jogl.jar"/>]]></replacetoken>
             <replacevalue></replacevalue>
@@ -70,7 +68,6 @@
         </replace>
     </target>
 
-    <!--noop in case jnlp-impl.xml is not available-->
     <target name="jnlp-impl.jnlp" ></target>
 
 
@@ -93,7 +90,6 @@
 
     <target name="-create-native-distribution">
         <mkdir dir="${dist.dir}-${platform.name}"/>
-        <!-- This is a bit of a hack to simulate string replacements with ant :/ -->
         <pathconvert pathsep=" " property="platformFiles">
             <path>
                 <fileset dir="${libs.JOGL.classpath}-natives-${natives.platform}" defaultexcludes="yes"/>
@@ -132,5 +128,5 @@
             <equals arg1="${jnlp.enabled}" arg2="true" casesensitive="false" trim="true"/>
         </condition>
     </target>
-
+-->
 </project>

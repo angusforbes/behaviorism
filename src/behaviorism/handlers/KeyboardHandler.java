@@ -380,32 +380,32 @@ public class KeyboardHandler implements KeyListener
 
     if (keys[KeyEvent.VK_UP])
     {
-      cam.changePitch(0.5f);
+      cam.rotateX(+0.5f);
     }
 
     if (keys[KeyEvent.VK_DOWN])
     {
-      cam.changePitch(-0.5f);
+      cam.rotateX(-0.5f);
     }
 
     if (keys[KeyEvent.VK_LEFT])
     {
-      cam.changeHeading(-0.5f);
+      cam.rotateY(+0.5f);
     }
 
     if (keys[KeyEvent.VK_RIGHT])
     {
-      cam.changeHeading(0.5f);
+      cam.rotateY(-0.5f);
     }
 
     if (keys[KeyEvent.VK_HOME])
     {
-      cam.changeYaw(0.5f);
+      cam.rotateZ(0.5f);
     }
 
     if (keys[KeyEvent.VK_END])
     {
-      cam.changeYaw(-0.5f);
+      cam.rotateZ(-0.5f);
     }
 
     if (keys[KeyEvent.VK_PAGE_DOWN])
@@ -426,13 +426,11 @@ public class KeyboardHandler implements KeyListener
     }
     if (keys[KeyEvent.VK_3])
     {
-      //          BehaviorismDriver.renderer.cam.m_StrafeY += 0.1f;
       cam.translateY(-.1f);
     }
 
     if (keys[KeyEvent.VK_4])
     {
-      //BehaviorismDriver.renderer.cam.m_StrafeY -= 0.1f;
       cam.translateY(.1f);
     }
   }

@@ -1,7 +1,8 @@
 /* RenderUtils.java ~ Jun 18, 2009 */
 package behaviorism.utils;
 
-import behaviorism.Behaviorism;
+import behaviorism.behaviors.Behavior;
+import behaviorism.behaviors.Scheduler;
 import behaviorism.geometry.Geom;
 import behaviorism.geometry.GeomPoint;
 import behaviorism.geometry.GeomPoly;
@@ -181,6 +182,16 @@ public class RenderUtils
   public static World getWorld()
   {
     return getRenderer().currentWorld;
+  }
+
+  public static Scheduler getScheduler()
+  {
+    return Scheduler.getInstance();
+  }
+
+  public static List<Behavior> getSchedule()
+  {
+    return Scheduler.getInstance().behaviors;
   }
 
   public static SortedMap<Integer, RendererLayer> getLayers()

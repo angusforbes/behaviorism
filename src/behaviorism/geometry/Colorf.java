@@ -230,7 +230,13 @@ public class Colorf
 
   public Color toJavaColor()
   {
-    return new Color(r, g, b, a);
+
+    //System.err.println("in Colorf() : r/g/b/a = " + r + "/" +g + "/" +b + "/" +a);
+    return new Color(
+      Utils.clamp(r, 0f, 1f),
+      Utils.clamp(g, 0f, 1f),
+      Utils.clamp(b, 0f, 1f),
+      Utils.clamp(a, 0f, 1f));
   }
 
   public static Color toJavaColor(Colorf c)

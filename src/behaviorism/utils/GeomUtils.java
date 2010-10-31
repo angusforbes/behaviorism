@@ -839,6 +839,18 @@ public class GeomUtils
     return p3fs;
   }
 
+  public static List<GeomPoint> toGeomPoint(List<Point3f> pts)
+  {
+    List<GeomPoint> gps = new ArrayList<GeomPoint>();
+
+    for(Point3f pt : pts)
+    {
+      gps.add(new GeomPoint(pt));
+    }
+
+    return gps;
+  }
+
   public static Point3f toPoint3f(GeomPoint gp)
   {
     return new Point3f(gp.translate.x, gp.translate.y, gp.translate.z);
@@ -847,6 +859,21 @@ public class GeomUtils
   public static Point3f toPoint3f(Point2D p2d)
   {
     return new Point3f((float) p2d.getX(), (float) p2d.getY(), 0f);
+  }
+
+
+  public static double clampAngle(double angle) //clamps an angle in radians to between -PI and +PI
+    //(ie, 0-->180 for top half; -180 --> -0 for bottom half
+  {
+    if (angle > Math.PI)
+    {
+      angle -= Math.PI * 2f;
+    }
+    else if (angle < -Math.PI)
+    {
+      angle += Math.PI * 2f;
+    }
+    return angle;
   }
 
   /* returns the angle in radians */
@@ -1486,7 +1513,7 @@ public class GeomUtils
   {
     float nx = (p1.x + ((p2.x - p1.x) * perc));
     float ny = (p1.y + ((p2.y - p1.y) * perc));
-    float nz = (p1.x + ((p2.z - p1.z) * perc));
+    float nz = (p1.z + ((p2.z - p1.z) * perc));
 
     return new Point3f(nx, ny, nz);
   }
@@ -1521,20 +1548,18 @@ public class GeomUtils
     float dx = s.p2.x - s.p1.x;
     float dy = s.p2.y - s.p1.y;
     double theta = Math.atan2(dy, dx);
+    theta -= Math.toRadians(90.0 * direction) ;
+    double cos = Math.cos(theta);
+    double sin = Math.sin(theta);
 
     Point3f s1 = new Point3f();
     Point3f s2 = new Point3f();
 
-    //System.err.println("THETA = " + theta);
+    s1.x = (float) (s.p1.x + (cos * start)  );
+    s1.y = (float) (s.p1.y + (sin * start) );
 
-
-    s1.x = s.p1.x + ((float) Math.cos(theta - (Math.toRadians(90.0 * direction))) * start);
-    s1.y = s.p1.y + ((float) Math.sin(theta - (Math.toRadians(90.0 * direction))) * start);
-
-    s2.x = s.p1.x + ((float) Math.cos(theta - (Math.toRadians(90.0 * direction))) * end);
-    s2.y = s.p1.y + ((float) Math.sin(theta - (Math.toRadians(90.0 * direction))) * end);
-//    s2.x = s.p1.x + ((float) Math.cos(theta - Math.PI/2) * end);
-//    s2.y = s.p1.y + ((float) Math.sin(theta - Math.PI/2) * end);
+    s2.x = (float) (s.p1.x + (cos * end) );
+    s2.y = (float) (s.p1.y + (sin * end) );
 
     return new Segment(s1, s2);
   }
@@ -1896,8 +1921,9 @@ public class GeomUtils
     }
     if (d < Math.abs(r0 - r1))
     {
+      System.out.println("ONE CIRCLE IS COMPLETELY INSIDE THE OTHER");
       //no solution. one circle is contained in the other
-      return false;
+      return true; //temp trying this out for Looper project...
     }
 
 

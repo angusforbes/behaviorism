@@ -61,8 +61,10 @@ public class BehaviorInterpolated extends Behavior
     timeToLoop = false;
     isActive = (false);
 
+     // System.err.println("INTERRUPTED? " + isInterrupted + ", nano=" + interruptNano + "/" + getTick());
     if (isInterrupted == true && interruptNano <= getTick())
     {
+      //System.err.println("INTERRUPTED!");
       this.isDone = (true);
       return;
     }

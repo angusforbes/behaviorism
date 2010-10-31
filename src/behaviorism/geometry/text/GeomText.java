@@ -17,7 +17,6 @@ import java.awt.font.LineMetrics;
 import java.util.List;
 import javax.media.opengl.GL2;
 import behaviorism.utils.RenderUtils;
-import javax.media.opengl.GL;
 import static behaviorism.utils.RenderUtils.*;
 
 public class GeomText extends GeomRect
@@ -71,6 +70,13 @@ public class GeomText extends GeomRect
   public GeomText()
   {
   } //temp while we are cleaning stuff up... remove this soon! TODO
+
+  public GeomText(TextBuilder builder)
+  {
+    super(builder.anchorPt, 0, 0); //we calculate the width/height ourselves
+    initialize(builder);
+    // calculateWorld();
+  }
 
   public GeomText(Point3f anchorPt, TextBuilder builder)
   {
@@ -475,27 +481,17 @@ public class GeomText extends GeomRect
     }
   }
 
-  //DebugTimer timer = new DebugTimer();
   @Override
-  public void draw()
+  public void calculate()
   {
-    GL2 gl = getGL();
+
     if (isRecalculated)
     {
       recalculate();
     }
 
-    if (this.backgroundColor != null)
-    {
-      gl.glColor4fv(backgroundColor.array(), 0);
-      drawRect(offset);
-    }
-
-    if (useNonDynamicTextRenderer == true)
-    {
-      drawText();
-    }
-    else
+   
+    if (useNonDynamicTextRenderer == false)
     {
       //timer.resetTime();
       calculateUnrotatedPixelWidthAndHeight();
@@ -516,11 +512,28 @@ public class GeomText extends GeomRect
         }
       }
 
-      drawText();
     }
+
+   // drawText();
     //System.out.println("time to draw = " + timer.resetTime());
 
     isRecalculated = false;
+  }
+
+  @Override
+  public void draw()
+  {
+    calculate();
+
+    GL2 gl = getGL();
+    
+    if (this.backgroundColor != null)
+    {
+      gl.glColor4fv(backgroundColor.array(), 0);
+      drawRect(offset);
+    }
+
+    drawText();
   }
 
   private void drawText()
@@ -555,11 +568,16 @@ public class GeomText extends GeomRect
   public void drawPickingBackground()
   {
     GL2 gl = getGL();
-    gl.glColor4f(1f, 0f, 0f, .2f);
+    gl.glColor4f(0f, 0f, 0f, 0f);
+    drawRect(offset);
+
+    /*
+    GL2 gl = getGL();
+    gl.glColor4f(1f, 0f, 0f, .5f);
     offset = 0f;
 
-    translateAnchor.x = -transX;
-    translateAnchor.y = transY;
+    //translateAnchor.x = -transX;
+    //translateAnchor.y = transY;
     float x = -transX;
     float y = transY;
     gl.glBegin(gl.GL_QUADS);
@@ -568,7 +586,7 @@ public class GeomText extends GeomRect
     gl.glVertex3f(x + w, y + h, offset);
     gl.glVertex3f(x, y + h, offset);
     gl.glEnd();
-    //drawRect(0f);
+    */
 
 //    boolean depthTest = RenderUtils.getBoolean(GL.GL_DEPTH_TEST);
 //
@@ -609,7 +627,8 @@ public class GeomText extends GeomRect
   public Rectangle2D getStringWidthUsingTextRenderer(TextRenderer tr)
   {
     Rectangle2D rect = null;
-    frc = tr.getFontRenderContext();
+    //frc = tr.getFontRenderContext();
+    frc = FontHandler.getInstance().textRendererToFontRendererContext.get(tr);
     font = tr.getFont();
 
     if (exactPixelBounds == true)

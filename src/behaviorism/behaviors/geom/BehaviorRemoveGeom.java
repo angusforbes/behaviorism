@@ -5,6 +5,7 @@
 package behaviorism.behaviors.geom;
 
 import behaviorism.behaviors.BehaviorSimple;
+import behaviorism.behaviors.Scheduler;
 import behaviorism.geometry.Geom;
 import behaviorism.utils.Utils;
 
@@ -23,7 +24,8 @@ public class BehaviorRemoveGeom extends BehaviorSimple implements GeomUpdater
   public static BehaviorRemoveGeom removeAtNano(Geom geom, long baseNano)
   {
     BehaviorRemoveGeom bia = new BehaviorRemoveGeom(baseNano);
-    bia.attachGeom(geom);
+//    bia.attachGeom(geom);
+    Scheduler.getInstance().attachGeom(bia, geom);
 
     return bia;
   }
@@ -31,7 +33,8 @@ public class BehaviorRemoveGeom extends BehaviorSimple implements GeomUpdater
   public static BehaviorRemoveGeom removeAtMillis(Geom geom, long baseNano, long onMS)
   {
     BehaviorRemoveGeom bia = new BehaviorRemoveGeom(baseNano + Utils.millisToNanos(onMS));
-    bia.attachGeom(geom);
+  //  bia.attachGeom(geom);
+    Scheduler.getInstance().attachGeom(bia, geom);
 
     return bia;
   }

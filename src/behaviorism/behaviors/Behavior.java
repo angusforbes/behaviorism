@@ -1,5 +1,6 @@
 package behaviorism.behaviors;
 
+import behaviorism.data.Node;
 import behaviorism.geometry.Geom;
 import behaviorism.utils.RenderUtils;
 import behaviorism.utils.Utils;
@@ -35,8 +36,15 @@ abstract public class Behavior
   public long nextTime = 0L;
 
   ///TESTING THIS
+  /**
+   * A List of all Behaviors that are affecting this Geom.
+   */
+  public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
+
   public List<Geom> attachedGeoms = new CopyOnWriteArrayList<Geom>();
+  public List<Node> attachedNodes = new CopyOnWriteArrayList<Node>();
   public List<Behavior> attachedBehaviors = new CopyOnWriteArrayList<Behavior>();
+
   public void attachBehavior(Behavior b)
   {
     attachedBehaviors.add(b);
@@ -111,8 +119,10 @@ abstract public class Behavior
 
   public void interrupt(long nano)
   {
+
     isInterrupted = true;
     interruptNano = nano;
+    //System.err.println("setting interrupt to " + isInterrupted + " at " + interruptNano);
   }
 
   public void interruptNowPlusMillis(long millis)

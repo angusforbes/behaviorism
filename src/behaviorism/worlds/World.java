@@ -13,6 +13,7 @@ import behaviorism.renderers.Renderer;
 import behaviorism.renderers.State;
 import behaviorism.renderers.cameras.Cam;
 import behaviorism.renderers.cameras.CamBasic;
+import behaviorism.renderers.cameras.CamQuat;
 import behaviorism.renderers.layers.BackToFrontLayer;
 import behaviorism.renderers.layers.RendererLayer;
 import behaviorism.sequences.Sequence;
@@ -37,6 +38,9 @@ public abstract class World extends GeomPoint
   public Sequence sequence = new Sequence(); //CopyOnWriteArrayList<Sequence>();
   public SortedMap<Integer, RendererLayer> layers = new TreeMap<Integer, RendererLayer>();  //protected Connector database = null;
   public Cam cam = new CamBasic(); //this cam should be the same as the cam in RendererJogl, or should point to it.
+  //public Cam cam = new CamVector(); //this cam should be the same as the cam in RendererJogl, or should point to it.
+  //public Cam cam = new CamQuat(); //this cam should be the same as the cam in RendererJogl, or should point to it.
+
   //TESTING
   public List<Behavior> behaviors2 = new CopyOnWriteArrayList<Behavior>();
   public static final SimpleLogger log = new SimpleLogger(World.class);
@@ -309,7 +313,7 @@ public abstract class World extends GeomPoint
   {
   addGeom(g);
 
-  while (g.isAttached == false)
+  while (g.isCalculated == false)
   {
   Utils.sleep(10);
   }
@@ -394,9 +398,9 @@ public abstract class World extends GeomPoint
   protected void setCamera()
   {
     //setCamera(new CamOrbit(0f, 0f, 0f, -5f)); //look at center(0f,0f,0f) from 5 units back (0f,0f,-5f)
-    setCamera(new CamBasic(0f, 0f, -5f)); //position at anchor (0f,0f,5f) and look straight (0f,0f,-infinity)
-    //setCamera(new CamBasic());
-    //Cam cam = new Cam();
+    //setCamera(new CamBasic(0f, 0f, -5f)); //position at anchor (0f,0f,5f) and look straight (0f,0f,-infinity)
+    setCamera(new CamBasic(0f, 0f, 0f)); //position at anchor (0f,0f,5f) and look straight (0f,0f,-infinity)
+    //setCamera(new CamVector());
   }
 
   /** Sets the camera with the camera of your choice */
@@ -408,6 +412,9 @@ public abstract class World extends GeomPoint
     RenderUtils.getRenderer().installWorld(this); //is this right??????
 
     //BehaviorismDriver.renderer.setCamera(cam);
+    //this.cam = currentWorld.cam;
+
+    //boundsHaveChanged = true;
   }
 
   /**

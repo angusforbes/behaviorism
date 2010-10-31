@@ -3,33 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1">
         <file>
             <url>src/behaviorism/Behaviorism.java</url>
-            <line>524</line>
+            <line>537</line>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/behaviors/geom/ContinuousBehaviorBuilder.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/behaviors/geom/BehaviorTranslate.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/Data.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/DataEnum.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/geometry/Geom.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/Node.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/Category.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/Relationship.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/filterers/CategoryFilterer.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/collectors/Collector.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/BreakCondition.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/MaxDepthBreakCondition.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/MaxSizeBreakCondition.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/analyzers/CollectorAnalyzer.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/analyzers/NodeAnalyzer.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/analyzers/SetAnalyzer.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/data/analyzers/RelationshipAnalyzer.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/textures/TextureManager.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/textures/TextureVideo.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/textures/Texture.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/handlers/FontHandler.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/handlers/MouseHandler.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/parsers/Connector.java</file>
-        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/handlers/KeyboardHandler.java</file>
+        <file>file:/Users/angus/Projects/behaviorism/src/behaviorism/geometry/media/GeomImage.java</file>
+        <file>file:/Users/angus/Projects/behaviorism/nbproject/build-jogl-template-impl.xml</file>
     </open-files>
 </project-private>

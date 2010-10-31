@@ -1,6 +1,7 @@
 /* Geom.java - Created on July 12, 2007, 7:52 PM */
-package behaviorism. geometry;
+package behaviorism.geometry;
 
+import behaviorism.behaviors.Behavior;
 import behaviorism.behaviors.geom.BehaviorActivateGeom;
 import behaviorism.behaviors.geom.BehaviorRemoveGeom;
 import behaviorism.data.Node;
@@ -9,11 +10,13 @@ import behaviorism.renderers.State;
 import behaviorism.textures.TextureImage;
 import behaviorism.utils.MatrixUtils;
 import behaviorism.utils.RenderUtils;
+import behaviorism.utils.Utils;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
+import javax.vecmath.Vector3f;
 import static behaviorism.utils.MatrixUtils.*;
 import static behaviorism.utils.RenderUtils.*;
 import static behaviorism.utils.Utils.*;
@@ -34,18 +37,16 @@ public abstract class Geom
    */
   public List<Geom> geoms = new CopyOnWriteArrayList<Geom>();
   /**
-   * A List of all Behaviors attached to this Geom.
+   * A List of all Behaviors that are affecting this Geom.
    */
- // public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
+  public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
   /**
    * A root Data node that can hold various types of Data attached to this Geom.
    * This should be NULL by default, only used if needed!!!
    */
   public Node data = null; //new Data();
-
   //used for centering, etc, without changing the modelview
   public Point3f translateAnchor = new Point3f(0f, 0f, 0f);
-
   public Point3f translate = new Point3f(0f, 0f, 0f);
   /**
    * The relative point (in parent's coordinates) around which the object is to rotate.
@@ -74,37 +75,31 @@ public abstract class Geom
   //  put the translation AFTER the rotation
   //
   //same with scale setTranslate...
-
   //these should be both set to TRUE as the defaults.
   boolean rotateRelative = true;
   boolean scaleRelative = true;
-
   //protected float w = 1f;
   //protected float h = 1f;
   //protected float d = 0f;
- //make this protected and add proper setters!
-  public  float w = 1f;
-  public  float h = 1f;
-  public  float d = 0f;
-
+  //make this protected and add proper setters!
+  public float w = 1f;
+  public float h = 1f;
+  public float d = 0f;
   public Colorf color = new Colorf();
-
   @Deprecated
   public float area = 0f; //i think i was using this for an picking alogrithm. it was a dumb idea. this shouldn't be stored.
-
   //used if need for polygon offset in 2D
   public float offset = 0f;
-
   //various flags for rendering, texturing, picking, timing, etc.
   public boolean isTransformed = true; //if true, we will update the transformation matrix
-  public boolean isActive = false; //if true, it will be displayed
+  public boolean isActive = true; //if true, it will be displayed
   public boolean isDone = false; //if true, it will be removed
   public boolean isTextured = false; //if true, we will handle texture coords
   public boolean isReady = false; //ie, has texture been loaded/generated?
   public boolean isBound = false; //ie, has texture been bound to GL
   public boolean isSelectable = false; //ie, can it be selected by a mouseClick?
   public boolean isVisible = true; //ie, is it currently within the view frustum? (if no, can't be picked)
-  public boolean isAttached = false; //ie, is it attached to the scenegraph (has it been drawn once?)
+  public boolean isCalculated = false; //ie, is it attached to the scenegraph (has it been drawn once?)
   //public TextureData textureData = null;
   //public Texture texture = null;
   public List<TextureImage> textures = null;
@@ -122,7 +117,6 @@ public abstract class Geom
    */
   private State state = null;
   public boolean hasState = false;
-
   public int layerNum = 0;
   //indicates which Geom mouse actions we fire when the MouseHandler finds a mouse event on this Geom.
   //The default value is simply to use itself.
@@ -176,8 +170,8 @@ public abstract class Geom
     }
     else
     {
-       int www =  RenderUtils.getViewport()[2];
-    int hhh =  RenderUtils.getViewport()[3];
+      int www = RenderUtils.getViewport()[2];
+      int hhh = RenderUtils.getViewport()[3];
 
       int pxX = x + www / 2;
       int pxY = y + hhh / 2;
@@ -223,17 +217,18 @@ public abstract class Geom
   {
     System.out.println("PIXEL ");
 
-     int www =  RenderUtils.getViewport()[2];
-    int hhh =  RenderUtils.getViewport()[3];
+    int www = RenderUtils.getViewport()[2];
+    int hhh = RenderUtils.getViewport()[3];
 
     this.w = pixelToWorld(
-        www / 2 + w,
-        hhh / 2 - 0).x;
+      www / 2 + w,
+      hhh / 2 - 0).x;
 
     System.out.println("width 1 = " + this.w);
 
- 
+
   }
+
   public void setWidth(float w)
   {
     this.w = w;
@@ -249,7 +244,6 @@ public abstract class Geom
     this.d = d;
   }
 
-
   public void setDimensions(float w, float h, float d)
   {
     this.w = w;
@@ -257,13 +251,21 @@ public abstract class Geom
     this.d = d;
   }
 
-
   public void setDimensions(float w, float h)
   {
     this.w = w;
     this.h = h;
     this.d = 0f;
   }
+
+  /**
+   * Called by the scenegraph for objects that need an openGL context. For instance, GeomText
+   * needs to figure out its width using the TextRenderer. Leave empty if you don't need it.
+   */
+  public void calculate()
+  {
+  }
+
   /**
    * Instructions for the Geom to draw itself within the openGL context. Called during each frame of the openGL display loop.
    * gl and glu define the openGL context. offset is a tiny value that can be used to ensure that there are no rendering errors
@@ -317,35 +319,34 @@ public abstract class Geom
   @Deprecated
   public void drawDebugGeom(GL gl, GLU glu)
   {
-    gl.glDisable(gl.GL_BLEND);
-    if (rotateAnchor != null)
-    {
-      gl.glPointSize(10f);
-      gl.glColor4f(0f, 1f, 0f, 1f);
-      gl.glBegin(gl.GL_POINTS);
+  gl.glDisable(gl.GL_BLEND);
+  if (rotateAnchor != null)
+  {
+  gl.glPointSize(10f);
+  gl.glColor4f(0f, 1f, 0f, 1f);
+  gl.glBegin(gl.GL_POINTS);
 
-      //gl.glVertex3f(0f, 0f, 0f);
-      gl.glVertex3f(rotateAnchor.x, rotateAnchor.y, rotateAnchor.z);
-      
-//      gl.glVertex3f(translate.x + rotateAnchor.translate.x,
-//      translate.y + rotateAnchor.translate.y,
-//      translate.z + rotateAnchor.translate.z);
-       
-      gl.glEnd();
-    }
-    if (scaleAnchor != null)
-    {
-      gl.glPointSize(5f);
+  //gl.glVertex3f(0f, 0f, 0f);
+  gl.glVertex3f(rotateAnchor.x, rotateAnchor.y, rotateAnchor.z);
 
-      gl.glColor4f(1f, 0f, 0f, 1f);
-      gl.glBegin(gl.GL_POINTS);
-      gl.glVertex3f(scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
-      gl.glEnd();
-    }
-    gl.glEnable(gl.GL_BLEND);
+  //      gl.glVertex3f(translate.x + rotateAnchor.translate.x,
+  //      translate.y + rotateAnchor.translate.y,
+  //      translate.z + rotateAnchor.translate.z);
+
+  gl.glEnd();
   }
-  */
+  if (scaleAnchor != null)
+  {
+  gl.glPointSize(5f);
 
+  gl.glColor4f(1f, 0f, 0f, 1f);
+  gl.glBegin(gl.GL_POINTS);
+  gl.glVertex3f(scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
+  gl.glEnd();
+  }
+  gl.glEnable(gl.GL_BLEND);
+  }
+   */
   /**
    * Translates a point in this Geom's coordinates into world coordinates.
    * Just a convenience method that calls MatrixUtils.getGeomPointInWorldCoordinates() with appropriate parameters.
@@ -374,7 +375,7 @@ public abstract class Geom
   {
     if (!isTransformed)
     {
-      return;
+      return; //UNCOMMENT THIS
     }
 
     //System.err.println("in transform for Geom of type " + getClass());
@@ -431,7 +432,8 @@ public abstract class Geom
     modelview = MatrixUtils.translate(modelview, translate.x, translate.y, translate.z);
   }
 
-  private void transformRotate()
+  //private void transformRotate()
+  public void transformRotate()
   {
     if (rotate.x == 0f && rotate.y == 0f && rotate.z == 0f)
     {
@@ -503,19 +505,18 @@ public abstract class Geom
   gl.glTranslatef(-scaleAnchor.x, -scaleAnchor.y, -scaleAnchor.z);
   }
    */
-
   //MOVE THESE somewhere!!! only used in a couple of places...
 
   /*
   public void scale(GL gl)
   {
-    //ScaleEnum se = scaleDirection;
-    //determineScaleAnchor(ScaleEnum.NE);
-    //determineScaleAnchor(ScaleEnum.CENTER);
+  //ScaleEnum se = scaleDirection;
+  //determineScaleAnchor(ScaleEnum.NE);
+  //determineScaleAnchor(ScaleEnum.CENTER);
 
-    gl.glTranslatef(scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
-    gl.glScalef((float) scale.x, (float) scale.y, (float) scale.z);
-    gl.glTranslatef(-scaleAnchor.x, -scaleAnchor.y, -scaleAnchor.z);
+  gl.glTranslatef(scaleAnchor.x, scaleAnchor.y, scaleAnchor.z);
+  gl.glScalef((float) scale.x, (float) scale.y, (float) scale.z);
+  gl.glTranslatef(-scaleAnchor.x, -scaleAnchor.y, -scaleAnchor.z);
 
   //gl.glScalef((float)scale.x, (float)scale.y, (float)scale.z);
   //scaleDirection = se;
@@ -523,16 +524,15 @@ public abstract class Geom
 
   public void translate(GL gl, float tx, float ty, float tz)
   {
-    gl.glTranslatef(tx, ty, tz);
+  gl.glTranslatef(tx, ty, tz);
   }
-  */
-
+   */
   public Point3f getCenter()
   {
     //default behavior... obviously needs to be overwritten by almost every Geom.
     return new Point3f(w * .5f, h * .5f, d * .5f);
   }
-   
+
   /**
    * This version of addGeom activates the Geom a specified number of milliseconds in the future.
    * It is simply a convience method to avoid having to define a BehaviorActivateGeom behavior since
@@ -602,21 +602,20 @@ public abstract class Geom
 
   /*
   public void addGeom(Geom g, long baseNano,
-    List<Long> timesMSs)
+  List<Long> timesMSs)
   {
-    addGeomToLayer(g, false, 0);
+  addGeomToLayer(g, false, 0);
 
-    BehaviorActivateGeom.activateBetweenMillis(g, baseNano, timesMSs);
+  BehaviorActivateGeom.activateBetweenMillis(g, baseNano, timesMSs);
   }
 
   public void addGeomToLayer(Geom g, long baseNano, List<Long> timesMSs, int layerNum)
   {
-    addGeomToLayer(g, false, layerNum);
+  addGeomToLayer(g, false, layerNum);
 
-    BehaviorActivateGeom.activateBetweenMillis(g, baseNano, timesMSs);
+  BehaviorActivateGeom.activateBetweenMillis(g, baseNano, timesMSs);
   }
-  */
-
+   */
   /**
    * Adds a Geom to this World. By default the Geom is immediately activated.
    * @param g The Geom being added.
@@ -670,7 +669,6 @@ public abstract class Geom
    * @param g
    * @param millisInFuture
    */
-
 //  public void addGeom(Geom g, long baseNano, long millisInFuture)
 //  {
 //    g.isActive = false;
@@ -697,23 +695,24 @@ public abstract class Geom
 
   /**
    * This version of addGeom waits until the Geom has been drawn once (so that the modelview is updated correctly)
-   * before returning. If the parameter isActive is true the Geom will be activated only after is has been attached to the scene graph.
-   * If the parameter isActive is false then it will need to be manually activated.
+   * before returning. If the parameter isVisible is true the Geom will be activated only after is has been
+   * attached to the scene graph and the initial calculate() method has been called for the geom.
+   * If the parameter isVisible is false then it will need to be manually set to be visible.
    * @param g
-   * @param isActive
+   * @param isVisible
    */
-  public void addGeomAndWaitUntilAdded(Geom g, boolean isActive)
+  public void addGeomAndWaitUntilCalculated(final Geom g, final boolean isVisible)
   {
+    g.isVisible = false;
     addGeom(g);
 
-    while (g.isAttached == false)
+    while (g.isCalculated == false)
     {
-      sleep(30); //could make this less I guess
+      Utils.sleep(10); //could make this less I guess
     }
 
-    g.isActive = isActive;
+    g.isVisible = isVisible;
   }
-
 //	public void addGeom(Geom g, long baseNano, 
 //					List<Long> timesMSs)
 //  {
@@ -725,6 +724,7 @@ public abstract class Geom
 //		g.attachBehavior(bia);
 //  }
 //	
+
   /**
    * Adds a child Geom to this parent Geom. By default the Geom is immediately activated.
    * @param g The child Geom being added.
@@ -756,25 +756,24 @@ public abstract class Geom
   {
     BehaviorRemoveGeom.removeAtMillis(g, now(), 0L);
 
-   // g.isActive = false;
-   // g.isDone = true;
+    // g.isActive = false;
+    // g.isDone = true;
   }
 
   public void removeGeom(Geom g, long millisInFuture)
   {
     BehaviorRemoveGeom.removeAtMillis(g, now(), millisInFuture);
 
-   // g.isActive = false;
-   // g.isDone = true;
+    // g.isActive = false;
+    // g.isDone = true;
   }
-
 
   public void removeGeom(Geom g, long nano, long millisInFuture)
   {
     BehaviorRemoveGeom.removeAtMillis(g, nano, millisInFuture);
 
-   // g.isActive = false;
-   // g.isDone = true;
+    // g.isActive = false;
+    // g.isDone = true;
   }
 
   public void removeGeoms(Collection<Geom> geoms)
@@ -794,7 +793,7 @@ public abstract class Geom
         removeGeom(g);
         //      g.parent = null;
       }
-   //   geoms.clear();
+      //   geoms.clear();
     }
   }
 
@@ -923,6 +922,11 @@ public abstract class Geom
     }
   }
 
+  public void rotateAxis(Vector3f axis, float angle)
+  {
+
+  }
+
   public void rotate(float x, float y, float z)
   {
     rotateX(x);
@@ -962,7 +966,7 @@ public abstract class Geom
 
   public void setRotate(float x, float y, float z)
   {
-    if (x != rotate.x && y != rotate.y && z != rotate.z)
+    if (x != rotate.x || y != rotate.y || z != rotate.z)
     {
       rotate.set(x, y, z);
       isTransformed = true;
@@ -1014,22 +1018,21 @@ public abstract class Geom
   /*
   public void detachBehavior(Behavior b)
   {
-    //synchronized(behaviors)
-    {
-      behaviors.remove(b);
-    }
+  //synchronized(behaviors)
+  {
+  behaviors.remove(b);
+  }
   }
 
   //old version... remove later... (LATER) huh? what's old about this???
   public void attachBehavior(Behavior b)
   {
-    //synchronized(behaviors)
-    {
-      behaviors.add(b);
-    }
+  //synchronized(behaviors)
+  {
+  behaviors.add(b);
   }
-  */
-  
+  }
+   */
   /**
    * Handles initialization and update of textures.
    * If textureData is not yet available, return false.
@@ -1037,7 +1040,7 @@ public abstract class Geom
    * If textureData has changed, update the texture.
    * @return true if all textures are ready, false otherwise.
    */
- // final public boolean updateTextures()
+  // final public boolean updateTextures()
   //{
 //    if (this.textures == null)
 //    {
@@ -1051,10 +1054,8 @@ public abstract class Geom
 //        return false;
 //      }
 //    }
-
-    //return false; //true;
- // }
-
+  //return false; //true;
+  // }
   final public void bindTexture(int which)
   {
     this.textures.get(which).texture.bind();
@@ -1120,7 +1121,6 @@ public abstract class Geom
   }
    */
   ////replace this with dot product code!!!
-
   //The following 3 methods should be removed. The same functionality is in GeomUtils!
   @Deprecated
   public static float getAngleBetweenGeoms(Geom g1, Geom g2)
@@ -1457,11 +1457,10 @@ public abstract class Geom
   {
   }
   //pressing and holding down
+
   public void pressAction(Geom originatingGeom)
   {
-
   }
-
 
   public void clickAction(Geom originatingGeom)
   {
@@ -1479,42 +1478,36 @@ public abstract class Geom
     //System.out.println("Geom superclass releaseAction : I shouldn't be here... i should be with my children!");
   }
 
-  
-
   // these three are for hovering without moving
   public void mouseInAction(Geom originatingGeom)
   {
-
   }
 
   public void mouseOverAction(Geom originatingGeom)
   {
-
   }
 
   public void mouseOutAction(Geom originatingGeom)
   {
-
   }
-
 
   //these three look for mouse movement
   public void mouseMovingAction(Geom originatingGeom)
   {
-  //  System.out.println("i am a " + getClass());
-   // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
+    //  System.out.println("i am a " + getClass());
+    // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
   }
 
   public void mouseStoppedMovingAction(Geom originatingGeom)
   {
-  //  System.out.println("i am a " + getClass());
-   // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
+    //  System.out.println("i am a " + getClass());
+    // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
   }
 
   public void mouseStartedMovingAction(Geom originatingGeom)
   {
-  //  System.out.println("i am a " + getClass());
-   // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
+    //  System.out.println("i am a " + getClass());
+    // System.out.println("Geom superclass mouseMovingAction : I shouldn't be here... i should be with my children!");
   }
 
   //combo mouse pressed and mouse moved
@@ -1525,7 +1518,6 @@ public abstract class Geom
     MouseHandler.getInstance().dragGeom();
     //System.out.println("you dragged a " + getClass());
   }
-
 
   public final void handleSelected()
   {
@@ -1558,7 +1550,6 @@ public abstract class Geom
       hoverableObject.mouseInAction(this);
     }
   }
-
 
   public final void handleMouseOver()
   {
@@ -1830,7 +1821,7 @@ public abstract class Geom
   sum.x += sum1.x;
   sum.y += sum1.y;
   sum.z += sum1.z;
- }
+  }
   return sum;
   }
    */
@@ -1860,7 +1851,7 @@ public abstract class Geom
     {
       textures.clear();
     }
-    
+
 //    {
 //      for (TextureImage texture : textures)
 //      {
@@ -1868,17 +1859,17 @@ public abstract class Geom
 //      }
 //    }
   /*
-  if (texture != null)
-  {
-  //System.out.println("disposing texture... ");
-  texture.dispose();
-  texture = null;
-  }
-  if (textureData != null)
-  {
-  textureData.flush();
-  textureData = null;
-  }
-   */
+    if (texture != null)
+    {
+    //System.out.println("disposing texture... ");
+    texture.dispose();
+    texture = null;
+    }
+    if (textureData != null)
+    {
+    textureData.flush();
+    textureData = null;
+    }
+     */
   }
 }

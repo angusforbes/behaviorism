@@ -137,8 +137,11 @@ public class FileUtils
 */
   public static List<String> getFilenamesFromDirectoryMatching(String dirName, final String match)
   {
-    File dir = new File(dirName); //e.g., "/data/images/celltango" 
-
+    return getFilenamesFromDirectoryMatching(new File(dirName), match);
+  }
+    
+  public static List<String> getFilenamesFromDirectoryMatching(File dir, final String match)
+  {
     FilenameFilter filter = new FilenameFilter()
     {
 
@@ -165,8 +168,11 @@ public class FileUtils
 
   public static List<String> getFilenamesFromDirectory(String dirName, final String filetype)
   {
-    File dir = new File(dirName); //e.g., "/data/images/celltango" 
+    return getFilenamesFromDirectory(new File(dirName), filetype);
+  }
 
+  public static List<String> getFilenamesFromDirectory(File dir, final String filetype)
+  {
     FilenameFilter filter = new FilenameFilter()
     {
 
@@ -222,7 +228,11 @@ public class FileUtils
 
   public static List<File> getFilesFromDirectory(String dirName, final String filetype)
   {
-    File dir = new File(toCrossPlatformFilename(dirName)); //e.g., "/data/images/celltango"
+    return getFilesFromDirectory(new File(toCrossPlatformFilename(dirName)), filetype); //e.g., "/data/images/celltango"
+  }
+
+  public static List<File> getFilesFromDirectory(File dir, final String filetype)
+  {
 
     FilenameFilter filter = new FilenameFilter()
     {
@@ -262,10 +272,10 @@ public class FileUtils
 
       public boolean accept(File dir, String name)
       {
-        // System.out.println("dir = " + dir.getAbsolutePath() + ", filename = " + name);
+         //System.out.println("dir = " + dir.getAbsolutePath() + ", filename = " + name);
         if (!name.matches(match) || name.startsWith("."))
         {
-          // System.out.println("... no does not match...");
+           //System.out.println("... no does not match...");
           return false;
         }
 

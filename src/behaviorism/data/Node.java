@@ -2,11 +2,14 @@
 
 package behaviorism.data;
 
+import behaviorism.behaviors.Behavior;
 import behaviorism.geometry.Geom;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -20,6 +23,8 @@ abstract public class Node
   Set<Node> datas = new HashSet<Node>();
   Map<Category, Set<Node>> categoryMap = new HashMap<Category, Set<Node>>();
   Map<Node, Set<Relationship>> relationshipMap = new HashMap<Node, Set<Relationship>>();
+
+  public List<Behavior> behaviors = new CopyOnWriteArrayList<Behavior>();
 
   public boolean hasChanged = false;
 

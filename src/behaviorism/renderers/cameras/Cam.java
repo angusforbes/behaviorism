@@ -18,7 +18,7 @@ public abstract class Cam extends GeomPoint
 
   public Point3f resetAnchor = new Point3f();
   public Point3f resetRotateAnchor = new Point3f();
-  //perspective information
+  //view information
   private double fovy; //field of view angle, in	degrees, in the y	direction.
   private double aspect; //the	aspect ratio that determines the field of view in the x direction. The aspect ratio is the ratio	of x (width) to	y (height).
   private double nearPlane = 1f; //the	distance from the viewer to the	near clipping plane (always positive).
@@ -32,6 +32,16 @@ public abstract class Cam extends GeomPoint
     this.nearPlane = near;
     this.farPlane = far;
     this.projectionHasChanged = true;
+  }
+
+  public double getFovy()
+  {
+    return fovy;
+  }
+
+  public double getAspectRatio()
+  {
+    return aspect;
   }
 
   public void setFovy(double fovy)
@@ -66,6 +76,7 @@ public abstract class Cam extends GeomPoint
     this.projectionHasChanged = true;
   }
 
+  /*
   public void changeHeading(double degrees)
   {
   }
@@ -77,19 +88,22 @@ public abstract class Cam extends GeomPoint
   public void changeYaw(double degrees)
   {
   }
+  */
 
   @Deprecated
   public void resetPerspective()
   {
   }
 
+  /*
   public void setPerspective()
   {
   }
-
+  */
+  
   //should be abstract
-  //public double[] perspective()
-  abstract public void perspective();
+  //public double[] view()
+  abstract public void view();
 //  {
 //    return MatrixUtils.getIdentity();
 //  }
@@ -129,6 +143,7 @@ public abstract class Cam extends GeomPoint
   {
   }
    */
+  /*
   public void moveTo(float x, float y, float z, long when, long howfast)
   {
   }
@@ -136,5 +151,6 @@ public abstract class Cam extends GeomPoint
   public void jumpTo(float x, float y, float z)
   {
   }
+   */
 }
 

@@ -2,11 +2,11 @@
 package behaviorism.utils;
 
 import behaviorism.geometry.Geom;
+import behaviorism.worlds.World;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3f;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import static javax.media.opengl.GL2.*;
 import javax.vecmath.Point3d;
 import javax.vecmath.SingularMatrixException;
@@ -147,6 +147,13 @@ public class MatrixUtils
     Point3d absPt = getPointInAbsoluteCoordinates(origPt, origModelview);
 
     return getAbsolutePointInCoordinates(absPt, destModelview);
+  }
+
+
+  public static Point3f getGeomPointInWorldCoordinates(Point3f geomPt, Geom geom, World world)
+  {
+    Point3d absPt = getPointInAbsoluteCoordinates(toPoint3d(geomPt), geom.modelview);
+    return toPoint3f(getAbsolutePointInCoordinates(absPt, world.modelview));
   }
 
   public static Point3d getGeomPointInWorldCoordinates(Point3d geomPt, double[] geomModelview, double[] worldModelview)
@@ -458,21 +465,30 @@ public class MatrixUtils
     double[] windowVec = project(
       pointToHomogenousCoords(p3f),
       RenderUtils.getCamera().modelview,
+      //RenderUtils.getWorld().modelview,
       RenderUtils.getCamera().projection,
-      RenderUtils.getCamera().viewport);
+      RenderUtils.getCamera().viewport
+      );
 
     return new Point3f((float) windowVec[0], (float) windowVec[1], (float) windowVec[2]);
   }
 
+
   public static Point3f project(Point3f p3f, double[] modelview)
+  {
+    return project(p3f, modelview, false);
+  }
+
+  public static Point3f project(Point3f p3f, double[] modelview, boolean debug)
   {
     double[] windowVec = project(
       pointToHomogenousCoords(p3f),
       modelview,
       RenderUtils.getCamera().projection,
-      RenderUtils.getCamera().viewport);
+      RenderUtils.getCamera().viewport, debug);
 
     return new Point3f((float) windowVec[0], (float) windowVec[1], (float) windowVec[2]);
+
   }
 
   /**
@@ -490,12 +506,59 @@ public class MatrixUtils
    */
   public static double[] project(double[] objectPt, double[] modelview, double[] projection, int[] viewport)
   {
+    return project(objectPt, modelview, projection, viewport, false);
+  }
+  
+
+  public static double[] project(double[] objectPt, double[] modelview, double[] projection, int[] viewport,
+    boolean debug)
+  {
     double[] eyeVec = objectCoordsToEyeCoords(objectPt, modelview);
     double[] clipVec = eyeCoordsToClipCoords(eyeVec, projection);
     double[] deviceVec = clipCoordsToDeviceCoords(clipVec);
     double[] windowVec = deviceCoordsToWindowCoords(deviceVec, viewport);
 
+    if (debug == true)
+    {
+      System.out.println("eyeVec:");
+      printVector(eyeVec);
+      System.out.println("clipVec:");
+      printVector(clipVec);
+      System.out.println("deviceVec:");
+      printVector(deviceVec);
+      System.out.println("windowVec:");
+      printVector(windowVec);
+
+    }
     return windowVec;
+  }
+
+
+
+  public static Point3f unproject(Point3f p3f)
+  {
+    return unproject(p3f.x, p3f.y, p3f.z);
+  }
+
+  //this takes the pixel point WITH a specified depth and then finds the opneGL coords for it
+  public static Point3f unproject(double x, double y, double z)
+  {
+    double[] coords = unproject(new double[]{x, y, z},
+      RenderUtils.getCamera().modelview,
+      RenderUtils.getCamera().projection,
+      RenderUtils.getCamera().viewport);
+    return toPoint3f((new Point3d(coords[0], coords[1], coords[2])));
+  }
+
+  //this takes the pixel point WITHOUT a specified depth (which is read from the depth buffer)
+  //and then finds the opneGL coords for it
+  public static Point3f unproject(double x, double y)
+  {
+    double[] coords = unproject(new double[]{x, y}, //if no z, then it is read from depth buffer
+      RenderUtils.getCamera().modelview,
+      RenderUtils.getCamera().projection,
+      RenderUtils.getCamera().viewport);
+    return toPoint3f((new Point3d(coords[0], coords[1], coords[2])));
   }
 
   public static double[] unproject(double[] pixelPt, double[] modelview, double[] projection, int[] viewport)
@@ -702,6 +765,8 @@ public class MatrixUtils
    */
   public static double[] deviceCoordsToWindowCoords(double[] deviceVec, int[] viewport)
   {
+
+    //(x_ndc + 1)*width/2
     return new double[]
       {
         viewport[0] + (((deviceVec[0] + 1) * (viewport[2])) / 2),
@@ -736,7 +801,7 @@ public class MatrixUtils
     else //we assume you know what you are doing
     {
       y = pixels[1]; //might need to reverse as well?
-      z = pixels[2];
+      z = pixels[2] ;
     }
 
     return (new double[]

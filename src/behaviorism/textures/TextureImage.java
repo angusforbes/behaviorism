@@ -2,6 +2,8 @@
 package behaviorism.textures;
 
 import com.sun.opengl.util.texture.TextureIO;
+import com.sun.opengl.util.texture.awt.AWTTextureIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +19,7 @@ public class TextureImage extends Texture
 
   public com.sun.opengl.util.texture.TextureData textureData = null;
   public static final SimpleLogger log = new SimpleLogger(TextureImage.class);
+  public boolean mipmapping = false;
 
   public Object tempTextureDataHackObject = null;
 
@@ -42,30 +45,55 @@ public class TextureImage extends Texture
     tempTextureDataHackObject = is;
   }
 
+
+  public TextureImage(BufferedImage bi, boolean mipmapping)
+  {
+    //generateTextureData(file, false);
+    tempTextureDataHackObject = bi;
+    this.mipmapping = mipmapping;
+  }
+
+  protected void initializeTexture() //defualt mipmapping = false
+  {
+    initializeTexture(false);
+  }
   /**
    * Creates a new texture from the textureData. Assumes that textureData is indeed available.
    */
-  protected void initializeTexture()
+  protected void initializeTexture(boolean mipmapping)
   {
     log.entry("in initializeTexture()");
 
     if (tempTextureDataHackObject instanceof File)
     {
       log.debug("trying to load texture from file " + ((File) tempTextureDataHackObject));
-      generateTextureData((File)tempTextureDataHackObject, false);
+      generateTextureData((File)tempTextureDataHackObject, mipmapping);
     }
     
     else if (tempTextureDataHackObject instanceof URL)
     {
       log.debug("trying to load texture from URL " + ((URL) tempTextureDataHackObject));
-      generateTextureData((URL)tempTextureDataHackObject, false);
+      generateTextureData((URL)tempTextureDataHackObject, mipmapping);
     }
 
     else if (tempTextureDataHackObject instanceof InputStream)
     {
       log.debug("trying to load texture from InputStream " + ((InputStream) tempTextureDataHackObject));
-      generateTextureData((InputStream)tempTextureDataHackObject, false);
+      generateTextureData((InputStream)tempTextureDataHackObject, mipmapping);
     }
+
+    else if (tempTextureDataHackObject instanceof BufferedImage)
+    {
+      log.debug("trying to load texture from InputStream " + ((BufferedImage) tempTextureDataHackObject));
+      generateTextureData((BufferedImage)tempTextureDataHackObject, mipmapping);
+    }
+    else
+    {
+      log.debug("what the hell is this? image is of type: " + tempTextureDataHackObject.getClass());
+      System.err.println("what the hell is this? image is of type: " + tempTextureDataHackObject.getClass());
+      return;
+    }
+
     this.texture = TextureIO.newTexture(textureData);
     log.exit("out initializeTexture()");
   }
@@ -91,7 +119,7 @@ public class TextureImage extends Texture
     if (texture == null)// && textureData != null) //texture needs to be intialized
     {
       log.debug("GL texture = null, needs to be initialized");
-      initializeTexture();
+      initializeTexture(mipmapping);
     
       copyDataToTexture();
       log.debug("we no longer need the TextureData, so lets flush it now...");
@@ -285,7 +313,7 @@ public class TextureImage extends Texture
     catch (IOException ioe)
     {
       //System.err.println("in generateTextureData() : PROBLEM with FILE " + file);
-      //ioe.printStackTrace();
+      ioe.printStackTrace();
     }
 
 
@@ -297,12 +325,14 @@ public class TextureImage extends Texture
 
   }
 
-  /*
+  
   public void generateTextureData(BufferedImage bi, boolean useMipMaps)
   {
-    this.textureData = TextureIO.newTextureData(bi, useMipMaps);
+    this.textureData = AWTTextureIO.newTextureData(bi, useMipMaps);
+    this.w = textureData.getWidth();
+    this.h = textureData.getHeight();
   }
-  */
+  
 
   @Override
   public String toString()

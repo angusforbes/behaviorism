@@ -76,6 +76,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
   public Geom hoverGeom = null;
   public Geom prevMouseOverGeom = null;
   public long lastTimeMoved = 0;
+  public boolean mouseInView = false;
   private static final MouseHandler instance = new MouseHandler();
 
   /**
@@ -100,6 +101,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
   {
     if (isProcessing.get() == true)
     {
+      System.err.println("isProcessing = true");
       return;
     }
 
@@ -109,6 +111,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
     //mouse clicks
     if (isReleasing == true)
     {
+      System.err.println("isReleasing = true");
       processMouseReleasing();
       isPressing = false;
       isDragging = false;
@@ -123,6 +126,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
     //mouse moves or stops moving
     if (isMoving == true)
     {
+      //System.err.println("isMoving = true;");
       isMoving = false;
       if (wasMoving == false)
       {
@@ -136,6 +140,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
     }
     else if (wasMoving == true && Utils.nanosToMillis(Utils.now() - lastTimeMoved) > 100L)
     {
+      //System.err.println("wasMoving = true;");
       wasMoving = false;
       processMouseStoppedMoving();
     }
@@ -154,6 +159,8 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
         processMousePressing();
       }
 
+      //System.err.println("not dragging, and going to processMouseOver");
+
       processMouseOver();
     }
 
@@ -166,18 +173,21 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
 
     if (hoverGeom != prevMouseOverGeom)
     {
+      //System.err.println("hoverGeom != prevMouseOverGeom");
       if (prevMouseOverGeom != null)
       {
         prevMouseOverGeom.handleMouseOut();
       }
       if (hoverGeom != null)
       {
+        //System.err.println("hoverGeom != null");
         hoverGeom.handleMouseIn();
       }
       prevMouseOverGeom = hoverGeom;
     }
     else if (hoverGeom == prevMouseOverGeom)
     {
+     // System.err.println("hoverGeom == prevMouseOverGeom");
       if (hoverGeom != null)
       {
         hoverGeom.handleMouseOver();
@@ -281,12 +291,18 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
 
     mouseOverGeom = selectPossibleGeom(RenderUtils.getWorld().geoms);
 
+    if (mouseOverGeom == null && mouseInView == true)
+    {
+      //System.err.println("mousePixel = " + mousePixel + ", mx/my" + mx + "/" +my);
+      mouseOverGeom = RenderUtils.getWorld(); //trying this out...
+    }
+
+
     if (mouseOverGeom != null)
     {
       mouseGeomPoint = worldPtToGeomPt(mouseWorldPoint, mouseOverGeom);
       hoverGeom = mouseOverGeom.hoverableObject;
     }
-
     //System.err.println("mouseOverGeom = " + mouseOverGeom);
   }
 
@@ -342,8 +358,8 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
     else if (button == 3)
     {
       //System.out.println("drag camera 3");
-      cam.changeHeading(xDif * 0.5);
-      cam.changePitch(yDif * 0.5);
+      cam.rotateY(xDif * 0.5f);
+      cam.rotateX(yDif * 0.5f);
     }
   }
 
@@ -575,11 +591,13 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
 
   public void mouseEntered(MouseEvent e)
   {
-
+    //System.err.println("mouseEntered");
+    mouseInView = true;
   }
   public void mouseExited(MouseEvent e)
   {
-
+    //System.err.println("mouseExited");
+    mouseInView = false;
   }
 
   public void mouseMoved(MouseEvent e)
@@ -590,6 +608,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
     mx = e.getX();
     my = e.getY();
 
+    //System.err.println("in mouseMoved(e) : mx/my = " + mx + "/" +my);
     mousePixel.setLocation(mx, my);
 
     lastTimeMoved = Utils.now();
