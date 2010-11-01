@@ -1,0 +1,4 @@
+*.class
+logging/*.txt
+dist/*
+build/*
